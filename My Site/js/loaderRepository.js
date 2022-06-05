@@ -2,11 +2,6 @@ window.onload= function () {
     fetchDataListOfRepository("Elpiu");
   }
 
-  jQuery.ajaxPrefilter(function(options) {
-    if (options.crossDomain && jQuery.support.cors) {
-        options.url = 'https://cors-anywhere.herokuapp.com/' + options.url;
-    }
-});
 
   /**
    * Fetch sulla repository prende il readme della repo e lo mette nel divID passato
@@ -18,8 +13,11 @@ window.onload= function () {
     //var user = 'Elpiu';
     var baseUri = 'https://github.com/';
 
-    fetch(url,{
+    //CORS Anywhere
+    //Proxy CORS by https://github.com/Rob--W/cors-anywhere/#documentation
+    fetch('https://cors-anywhere.herokuapp.com/'+url,{
       method : 'GET',
+      headers : {'origin': window.location.href}
   
     }).then(function (response) {
       // The API call was successful!
