@@ -2,6 +2,7 @@ window.onload= function () {
     fetchDataListOfRepository("Elpiu");
   }
 
+
   /**
    * Fetch sulla repository prende il readme della repo e lo mette nel divID passato
    * @param {*repository url to fetch} url 
@@ -10,8 +11,11 @@ window.onload= function () {
    */
    function featchRepositoryReadme(url, user, divID){
     //var user = 'Elpiu';
-    var baseUri = 'https://cors.io/?https://github.com/';
-    var headers = {};
+    var baseUri = 'https://github.com/';
+    var headers = {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': 'https://github.com/'
+    };
     fetch(url,{
       method : 'GET',
       mode : 'cors',
