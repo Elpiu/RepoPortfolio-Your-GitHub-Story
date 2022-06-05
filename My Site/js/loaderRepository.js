@@ -11,10 +11,9 @@ window.onload= function () {
    */
    function featchRepositoryReadme(url, user, divID){
     //var user = 'Elpiu';
-    var baseUri = 'https://github.com/';
+    var baseUri = 'https://cors-anywhere.herokuapp.com/https://github.com/';
     var headers = {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Origin': 'https://github.com/'
     };
     fetch(url,{
       method : 'GET',
