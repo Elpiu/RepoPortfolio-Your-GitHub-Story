@@ -8,47 +8,50 @@ window.onload= function () {
    * @param {*User of the repository} user 
    * @param {*div to spawn content} divID 
    */
-function featchRepositoryReadme(url, user, divID){
-  //var user = 'Elpiu';
-  var baseUri = 'https://github.com/'
-  fetch(url,{
-    method : 'GET',
-
-  }).then(function (response) {
-    // The API call was successful!
-    return response.text();
-  }).then(function (html) {
-    var parser = new DOMParser;
-    var doc = parser.parseFromString(html, 'text/html');
-
-    var divReadme = doc.getElementById('readme');
-
-    var links = divReadme.querySelectorAll('img');
-    links.forEach(link => {
-      var l = link.src.split(user)[1];
+   function featchRepositoryReadme(url, user, divID){
+    //var user = 'Elpiu';
+    var baseUri = 'https://cors.io/?https://github.com/';
+    var headers = {};
+    fetch(url,{
+      method : 'GET',
+      mode : 'cors',
+      headers: headers
+  
+    }).then(function (response) {
+      // The API call was successful!
+      return response.text();
+    }).then(function (html) {
+      var parser = new DOMParser;
+      var doc = parser.parseFromString(html, 'text/html');
+  
+      var divReadme = doc.getElementById('readme');
+  
+      var links = divReadme.querySelectorAll('img');
+      links.forEach(link => {
+        var l = link.src.split(user)[1];
+      
+        link.src = baseUri+user+l;
+        l.baseUri = baseUri;
+        
+      });
+  
+      var links = divReadme.querySelectorAll('a[target=_blank]');
+      links.forEach(link => {
+        var l = link.href.split(user)[1];
+        link.href = baseUri+user+l;
+        
+      });
+  
+      var htmlOld = document.getElementById(divID).innerHTML;
+      document.getElementById(divID).innerHTML = divReadme.innerHTML + htmlOld;
     
-      link.src = baseUri+user+l;
-      l.baseUri = baseUri;
-      
+    }).catch(function (err) {
+      // There was an error
+      console.warn('Something went wrong.', err);
     });
-
-    var links = divReadme.querySelectorAll('a[target=_blank]');
-    links.forEach(link => {
-      var l = link.href.split(user)[1];
-      link.href = baseUri+user+l;
-      
-    });
-
-    var htmlOld = document.getElementById(divID).innerHTML;
-    document.getElementById(divID).innerHTML = divReadme.innerHTML + htmlOld;
+    
   
-  }).catch(function (err) {
-    // There was an error
-    console.warn('Something went wrong.', err);
-  });
-  
-
-}
+  }
 
   /**
    * Crea ultimo div della repository con icona e scritta con numeretto
