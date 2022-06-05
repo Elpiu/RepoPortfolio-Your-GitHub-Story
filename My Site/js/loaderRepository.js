@@ -10,9 +10,12 @@ window.onload= function () {
    */
 function featchRepositoryReadme(url, user, divID){
   //var user = 'Elpiu';
-  var baseUri = 'https://github.com/'
+  var baseUri = 'https://cors.io/?https://github.com/';
+  var headers = {};
   fetch(url,{
     method : 'GET',
+    mode : 'cors',
+    headers: headers
 
   }).then(function (response) {
     // The API call was successful!
