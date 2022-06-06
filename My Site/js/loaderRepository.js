@@ -15,9 +15,12 @@ window.onload= function () {
 
     //CORS Anywhere
     //Proxy CORS by https://github.com/Rob--W/cors-anywhere/#documentation
-    fetch('https://cors-anywhere.herokuapp.com/'+url,{
+    //Video https://softauthor.com/how-to-fix-cors-issue-permanently-right-now/
+    //Usato questo proxy https://allorigins.win/
+    urlFetchProxy = "https://api.allorigins.win/raw?url="+url;
+    fetch(urlFetchProxy,{
       method : 'GET',
-      headers : {'origin': window.location.href}
+      //headers : {'origin': window.location.href}
   
     }).then(function (response) {
       // The API call was successful!

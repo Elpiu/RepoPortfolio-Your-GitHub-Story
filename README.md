@@ -10,3 +10,6 @@ Il portfolio dei progetti del sito web si aggiorna automaticamente tramite uno s
 ![img](https://github.com/Elpiu/personal-website/blob/main/My%20Site/assets/fotoProgetti/progettiImg.jpg)
 
 
+
+Proxy Usato CORS https://allorigins.win/
+A free and open source javascript AnyOrigin alternative, inspired by Whatever Origin.
