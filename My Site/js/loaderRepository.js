@@ -3,6 +3,7 @@ window.onload= function () {
   }
 
 
+
   /**
    * Fetch sulla repository prende il readme della repo e lo mette nel divID passato
    * @param {*repository url to fetch} url 
@@ -30,7 +31,8 @@ window.onload= function () {
       var doc = parser.parseFromString(html, 'text/html');
   
       var divReadme = doc.getElementById('readme');
-  
+   
+
       var links = divReadme.querySelectorAll('img');
       links.forEach(link => {
         var l = link.src.split(user)[1];
@@ -50,12 +52,17 @@ window.onload= function () {
       var htmlOld = document.getElementById(divID).innerHTML;
       document.getElementById(divID).innerHTML = divReadme.innerHTML + htmlOld;
     
+
+      ele = document.getElementById(divID);
+      ele.querySelector("[data-target='readme-toc.content']").classList.remove('Box-body', 'px-5', 'pb-5');
+    
+
     }).catch(function (err) {
       // There was an error
       console.warn('Something went wrong.', err);
     });
-    
   
+
   }
 
   /**
@@ -172,10 +179,6 @@ function createBoxElementPortfolioItem(id, data, userNameGithub){
     featchRepositoryReadme(repoURL, userNameGithub, containerID);
     //mainContainer.appendChild(div);
 }
-
-
-
-
 
 
 
