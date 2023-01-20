@@ -1,0 +1,11 @@
+a, a:active, a:visited, a:hover {
+  color: white;
+  text-decoration: none;
+}
+.animate-zoom {
+  transition: transform 0.5s;
+}
+
+.animate-zoom:hover {
+  transform: scale(1.4);
+}

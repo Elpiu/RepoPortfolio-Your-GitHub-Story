@@ -1,0 +1,132 @@
+<div class="p-2 text-white text-center" [style]="{'background-color': colorBackground}">
+  <h1 class="mb-5 mt-2">
+    <i class="fas fa-briefcase"></i>
+    Carriera</h1>
+
+  <!-- 1 -->
+  <div class="m-2 mb-4" (mouseenter)="toggleCollapse(1)"
+       (mouseleave)="toggleCollapse(1)">
+    <c-card-header>
+      <h3>
+        <div *ngIf="visible[1]; else dotPin">
+          <i class="fas fa-dot-circle"></i>
+        </div>
+        <ng-template #dotPin>
+          <i class="far fa-circle"></i>
+        </ng-template>
+        Unisa Laurea L-31 Informatica
+      </h3>
+    </c-card-header>
+    <div [visible]="visible[1]" cCollapse>
+      <c-card class="shadow m-2 my-card rounded">
+        <c-card-body
+          [style]="{'background-color': colorItemList}"
+        >
+          <div class="row">
+            <div class="col-md-4">
+              <img class="img-fluid"
+                   src="assets/img/logo_standard_unisa.png" alt="">
+            </div>
+            <div class="col-md-8">
+              <div class="m-5">
+                <h5>Ho conseguito la laurea in informatica L31 di primo livello in informatica (L31) presso L’
+                  Università degli
+                  Studi di Salerno, Fisciano (SA) (Italia).</h5>
+                <h4>Con voto 100/110L</h4>
+              </div>
+
+            </div>
+          </div>
+        </c-card-body>
+      </c-card>
+
+    </div>
+  </div>
+  <!-- 2 -->
+  <div class="m-2 mb-4" (mouseenter)="toggleCollapse(2)"
+       (mouseleave)="toggleCollapse(2)">
+    <c-card-header>
+      <h3>
+        <div *ngIf="visible[2]; else dotPin">
+          <i class="fas fa-dot-circle"></i>
+        </div>
+        <ng-template #dotPin>
+          <i class="far fa-circle"></i>
+        </ng-template>
+
+        Attualmente lavoro in Nexsoft
+      </h3>
+    </c-card-header>
+    <div [visible]="visible[2]" cCollapse>
+      <c-card class="shadow m-2 my-card rounded">
+        <c-card-body
+          [style]="{'background-color': colorItemList}"
+        >
+          <div class="row">
+            <div class="col-md-4">
+              <img class="img-fluid"
+                   src="assets/img/logo_standard_nexsoft.png" alt="">
+            </div>
+            <div class="col-md-8">
+              <div class="m-5">
+                <h5>Dipendente dell’azienda Nexsoft S.P.A. nel ruolo di Junior software developer.</h5>
+                <h4>Dal 7/2022 – in corso</h4>
+                <p>
+                  Lavoro come dipendente in outsourcing presso l'azienda Targetik.
+                  All'interno di Targetik, lavoro con il mio team per creare nuove funzionalità per l'applicativo, dal
+                  backend al frontend. Ci occupiamo di modularizzare parti del monolite per permettere una futura
+                  transizione verso i microservizi. Inoltre, risolviamo i bug delle funzionalità dell'area di
+                  competenza.
+                </p>
+              </div>
+
+            </div>
+          </div>
+        </c-card-body>
+      </c-card>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="m-2 mb-4" (mouseenter)="toggleCollapse(3)"
+       (mouseleave)="toggleCollapse(3)">
+    <c-card-header>
+      <h3>
+        <div *ngIf="visible[3]; else dotPin">
+          <i class="fas fa-dot-circle"></i>
+        </div>
+        <ng-template #dotPin>
+          <i class="far fa-circle"></i>
+        </ng-template>
+
+        Attualmente studente a Unimarconi
+      </h3>
+    </c-card-header>
+    <div [visible]="visible[3]" cCollapse>
+      <c-card class="shadow m-2 my-card rounded">
+        <c-card-body
+          [style]="{'background-color': colorItemList}"
+        >
+          <div class="row">
+            <div class="col-md-4">
+              <img class="img-fluid"
+                   src="assets/img/logo_standard_unimarconi.png" alt="">
+            </div>
+            <div class="col-md-8">
+              <div class="m-5">
+                <h5>
+                  Attualmente sono iscritto al corso di laurea magistrale in ingegneria informatica con orientamento in
+                  sistemi informativi e qualità del software.
+                </h5>
+                <h4>
+                  Dal 1/2023 – in corso
+                </h4>
+              </div>
+
+            </div>
+          </div>
+        </c-card-body>
+      </c-card>
+    </div>
+  </div>
+</div>

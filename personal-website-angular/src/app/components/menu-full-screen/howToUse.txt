@@ -1,0 +1,18 @@
+    <app-menu-full-screen [listItems]="listMenu"
+    ></app-menu-full-screen>
+    <div id="Portfolio">
+    </div>
+    <div id="Home">
+
+    </div>
+    <div id="AboutMe">
+    </div>
+
+  public listMenu: MenuItem[]
+  constructor(){
+    this.listMenu = [
+      new MenuItem("Home", "Home", false),
+      new MenuItem("Portfolio", "Portfolio", false),
+      new MenuItem("About Me", "AboutMe", false)
+    ]
+  }

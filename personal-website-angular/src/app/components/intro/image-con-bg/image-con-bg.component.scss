@@ -1,0 +1,14 @@
+
+.animation-image {
+  animation: spawn-from-center 0.7s ease 0s 1 alternate none;
+}
+
+@keyframes spawn-from-center {
+  0% {
+    transform: scale(0.5);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
