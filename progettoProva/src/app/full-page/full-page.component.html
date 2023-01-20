@@ -1,0 +1,28 @@
+<link rel="stylesheet" href="https://unpkg.com/@coreui/coreui/dist/css/coreui.min.css">
+<script src="https://unpkg.com/@coreui/coreui/dist/js/coreui.bundle.min.js"></script>
+
+
+<div *ngIf="loaded;else other_content" class="">
+  <app-about
+    [intro2]="dati.intro2"
+    [mission]="dati.mission"
+  ></app-about>
+  <app-footer
+    [copyrightFullName]="dati.fullName"
+    [copyrightYear]="dati.yearVersion"
+    [whatsapp]="dati.whatsapp"
+    [gmail]="dati.email"
+    [telephone]="dati.telefono"
+    [location]="dati.locazione.citta"
+    [state]="dati.locazione.country"
+  ></app-footer>
+</div>
+
+<ng-template #other_content>
+  <div class="text-center mt-5">
+    <div class="spinner-grow text-secondary text-center" role="status" style="width: 6rem; height:6rem;">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+</ng-template>
+
