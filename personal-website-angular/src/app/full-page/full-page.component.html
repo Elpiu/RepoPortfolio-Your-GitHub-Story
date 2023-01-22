@@ -1,56 +1,64 @@
-
-<div *ngIf="loaded;else other_content" class="">
-  <!-- Menu full page -->
-  <app-menu-full-screen [listItems]="listMenu"
-  ></app-menu-full-screen>
-
-  <!-- Intro Component -->
-  <app-intro
-    [imageUrls]="imageUrls"
-    [email]="dati.email"
-    [linkCV]="dati.curriculum_link"
-    [linkGithub]="dati.github_link"
-    [intro]="dati.intro"
-    [descrizione]="dati.descrizione"
+<div class="container-fluid"
+     style="background-color: #2c3e50"
   >
-  </app-intro>
-
-  <!-- Road Map -->
-  <app-road-map-stepper>
-  </app-road-map-stepper>
-
-  <!-- Competenze Informatiche Component -->
-  <!-- TODO -->
-
-  <!-- Soft Skill Component -->
-  <app-soft-skill id="SoftSkill"
-                  [listOfSkills]="dati.soft_skill"
-  ></app-soft-skill>
-
-  <!-- Progetti Component -->
-  <app-progetti
-    [noShowThisRepository]="dati.hideRepositorys"
-  ></app-progetti>
+  <div *ngIf="loaded;else other_content" class="col-sm-12 col-md-8 col-lg-6 mx-auto">
+    <!-- Menu full page -->
+    <app-menu-full-screen [listItems]="listMenu"
+    ></app-menu-full-screen>
 
 
-  <!-- About Component -->
-  <app-about id="AboutMe"
-             [intro2]="dati.intro2"
-             [mission]="dati.mission"
-  ></app-about>
+    <!-- Intro Component -->
+    <app-intro
+      [imageUrls]="imageUrls"
+      [email]="dati.email"
+      [linkCV]="dati.curriculum_link"
+      [linkGithub]="dati.github_link"
+      [intro]="dati.intro"
+      [descrizione]="dati.descrizione"
+    >
+    </app-intro>
 
-  <!-- Footer Component -->
-  <app-footer id="Footer"
-              [copyrightFullName]="dati.fullName"
-              [copyrightYear]="dati.yearVersion"
-              [whatsapp]="dati.whatsapp"
-              [gmail]="dati.email"
-              [telephone]="dati.telefono"
-              [location]="dati.locazione.citta"
-              [state]="dati.locazione.country"
-  ></app-footer>
+
+    <!-- Road Map -->
+    <app-road-map-stepper>
+    </app-road-map-stepper>
+
+
+    <!-- Competenze Informatiche Component -->
+    <!-- TODO -->
+
+    <!-- Soft Skill Component -->
+    <app-soft-skill id="SoftSkill"
+                    [listOfSkills]="dati.soft_skill"
+    ></app-soft-skill>
+
+
+    <!-- Progetti Component -->
+    <app-progetti
+      [noShowThisRepository]="dati.hideRepositorys"
+    ></app-progetti>
+
+
+    <!-- About Component -->
+    <app-about id="AboutMe"
+               [intro2]="dati.intro2"
+               [mission]="dati.mission"
+    ></app-about>
+
+
+    <!-- Footer Component -->
+    <app-footer id="Footer"
+                [copyrightFullName]="dati.fullName"
+                [copyrightYear]="dati.yearVersion"
+                [whatsapp]="dati.whatsapp"
+                [gmail]="dati.email"
+                [telephone]="dati.telefono"
+                [location]="dati.locazione.citta"
+                [state]="dati.locazione.country"
+    ></app-footer>
+
+  </div>
 </div>
-
 <ng-template #other_content>
   <div class="text-center mt-5">
     <div class="spinner-grow text-primary text-center" role="status"

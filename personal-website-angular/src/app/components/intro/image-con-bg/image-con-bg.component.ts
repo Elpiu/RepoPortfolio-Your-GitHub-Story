@@ -6,7 +6,7 @@ import {Component, Input, OnInit} from '@angular/core';
   template: `
       <div class="text-center animation-image"
       >
-          <img src="{{imageUrl}}">
+          <img class="img-fluid" src="{{imageUrl}}">
       </div>
   `
 })

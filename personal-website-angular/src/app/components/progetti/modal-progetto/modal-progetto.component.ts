@@ -8,15 +8,19 @@ import {LoaderApiGithubService} from "../../../services/loader-api-github.servic
   template: `
 
     <button [cModalToggle]="modalLg.id" #myButtonId class="invisible" cButton>Large modal</button>
-    <c-modal #modalLg id="modalLg" size="lg">
+    <div class="">
+    <c-modal #modalLg id="modalLg" size="lg" class="" [visible]="visible">
+      <c-modal-header class="bg-secondary">
+        <button class="btn-danger btn" (click)="toggleLiveDemo()" >Close</button>
+        <button type="button"
+                (click)="goToRepo()" class="btn btn-primary">GitHub</button>
+      </c-modal-header>
       <c-modal-body class="bg-secondary">
 
         <div *ngIf="loaded;else other_content" class="">
         <markdown id="markdown" class="markdown-img container"
         [src]="urlRepo" (load)="changeImgUrls()"
         ></markdown>
-        <button type="button"
-                (click)="goToRepo()" class="btn btn-primary">GitHub</button>
         </div>
         <ng-template #other_content>
           <div class="text-center mt-5">
@@ -28,7 +32,7 @@ import {LoaderApiGithubService} from "../../../services/loader-api-github.servic
         </ng-template>
       </c-modal-body>
     </c-modal>
-
+    </div>
   `
 })
 export class ModalProgettoComponent implements OnInit {
@@ -38,6 +42,7 @@ export class ModalProgettoComponent implements OnInit {
   public urlRepo!: string
   public linkRepo!: string
   @Input() public loaded: boolean = false
+  public visible = false;
 
   constructor(private apiService: LoaderApiGithubService) {
   }
@@ -52,6 +57,7 @@ export class ModalProgettoComponent implements OnInit {
       this.myButtonId.nativeElement.click()
       this.linkRepo = evento[1]
       this.urlRepo = this.apiService.getUrlForRowReadmeInMarkdown(evento[0])
+      this.visible = true
     });
   }
 
@@ -62,5 +68,9 @@ export class ModalProgettoComponent implements OnInit {
       allImg[i]['src'] = allImg[i]['src'].replace("/blob/","/raw/")
       allImg[i].classList.add('w-75', 'class2');
     }
+  }
+
+  toggleLiveDemo() {
+    this.visible = !this.visible;
   }
 }

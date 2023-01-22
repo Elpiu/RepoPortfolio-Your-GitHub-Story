@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 
 @Component({
   selector: 'app-intro',
@@ -13,32 +13,35 @@ import {Component, Input, OnInit} from '@angular/core';
          class="text-center"
     >
       <app-image-con-bg [imageUrls]=imageUrls
-                        class="m-5 animate-enter-image">
+                        class="m-5">
       </app-image-con-bg>
+
       <h1 class="text-white strong">Full-stack Developer</h1>
       <a href="mailto:{{email}}">
         <h3 class="animate-zoom">{{email}}</h3>
       </a>
 
-      <div class="text-white row mt-3">
-        <div class="col-6 mb-3">
+      <div class="text-white row pt-3 m-2">
+        <div class="col-6 p-3">
           <h5>Il mio GitHub</h5>
           <a href="#" (click)="goToGithub()">
             <i class="fab fa-github fa-4x mt-2 animate-zoom"></i>
           </a>
         </div>
-        <div class="col-6 mb-3">
+        <div class="col-6 p-3">
           <h5>Il mio CV</h5>
           <a href="#" (click)="goToCV()"><i
             class="far fa-file-alt fa-4x mt-2 animate-zoom"></i>
           </a>
         </div>
       </div>
+
       <div class="text-white p-5">
         <h4 class="pb-2">{{intro}}</h4>
         <h4 class="pb-2">{{descrizione}}</h4>
       </div>
     </div>
+
   `
 })
 
