@@ -1,9 +1,9 @@
 "use client";
 
 import SectionHeading from "@/components/section-heading";
-import { skillsData } from "@/lib/data";
-import { useSectionInView } from "@/lib/hooks";
+import {useJsonDataFromPublic, useSectionInView} from "@/lib/hooks";
 import { motion } from "framer-motion";
+import {SOFT_SKILLS_FOLDER, SOFT_SKILLS_JSON} from "@/lib/storage.accessors";
 
 const fadeInAnimationVariants = {
   initial: {
@@ -22,6 +22,8 @@ const fadeInAnimationVariants = {
 export default function Skills() {
   const { ref } = useSectionInView("Skills");
 
+  const skillsData : string[] = useJsonDataFromPublic(SOFT_SKILLS_FOLDER, SOFT_SKILLS_JSON)
+
   return (
     <section
       ref={ref}
@@ -29,23 +31,28 @@ export default function Skills() {
       id="skills"
     >
       <SectionHeading>My Skills</SectionHeading>
-      <ul className="flex flex-wrap justify-center gap-2 text-lg text-gray-800">
-        {skillsData.map((skill, index) => (
-          <motion.li
-            className="bg-white borderBlack rounded-xl px-5 py-3 dark:bg-white/10 dark:text-white/80"
-            key={index}
-            variants={fadeInAnimationVariants}
-            initial="initial"
-            whileInView="animate"
-            viewport={{
-              once: true,
-            }}
-            custom={index}
-          >
-            {skill}
-          </motion.li>
-        ))}
-      </ul>
+      {skillsData && skillsData.length > 0 ? (
+        <ul className="flex flex-wrap justify-center gap-2 text-lg text-gray-800">
+          {skillsData.map((skill, index) => (
+            <motion.li
+              className="bg-white borderBlack rounded-xl px-5 py-3 dark:bg-white/10 dark:text-white/80"
+              key={index}
+              variants={fadeInAnimationVariants}
+              initial="initial"
+              whileInView="animate"
+              viewport={{
+                once: true,
+              }}
+              custom={index}
+            >
+              {skill}
+            </motion.li>
+          ))}
+        </ul>
+      ) : (
+        <p>No skills data available</p>
+      )}
+
     </section>
   );
 }

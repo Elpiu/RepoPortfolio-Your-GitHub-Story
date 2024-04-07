@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -8,10 +8,16 @@ import { BsArrowRight, BsGithub, BsLinkedin } from "react-icons/bs";
 import { HiDownload } from "react-icons/hi";
 import { useSectionInView } from "@/lib/hooks";
 import { useActiveSectionContext } from "../../context/active-section";
+import {usePersonalInfoContext} from "../../context/personal.information";
+import {RootData} from "@/lib/types";
+import {DATA_FILE_NAME} from "@/lib/storage.accessors";
 
 export default function Intro() {
   const { ref } = useSectionInView("Home", 0.5);
   const { setActiveSection, setTimeOfLastClick } = useActiveSectionContext();
+
+  const personalInfo = usePersonalInfoContext().introData
+
 
   return (
     <section
@@ -30,8 +36,8 @@ export default function Intro() {
             }}
           >
             <Image
-              src="https://avatars.githubusercontent.com/u/49283847?v=4"
-              alt="Ricardo portrait"
+              src={personalInfo.profileImage}
+              alt={personalInfo.fullName+ " Image"}
               width="192"
               height="192"
               quality="95"
@@ -51,21 +57,22 @@ export default function Intro() {
             }}
             className="absolute bottom-0 right-0 text-4xl"
           >
-            👋
+            {personalInfo.emojiIconAsText}
           </motion.span>
         </div>
       </div>
 
       <motion.h1
         className="mb-10 mt-4 px-4 text-2xl font-medium !leading-[1.5] sm:text-4xl"
-        initial={{ opacity: 0, y: 100 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{opacity: 0, y: 100}}
+        animate={{opacity: 1, y: 0}}
       >
-        <span className="font-bold">Hello, I'm Ricardo.</span> I'm a{" "}
-        <span className="font-bold">full-stack developer</span> with{" "}
-        <span className="font-bold">8 years</span> of experience. I enjoy
-        building <span className="italic">sites & apps</span>. My focus is{" "}
-        <span className="underline">React (Next.js)</span>.
+        <span className="font-bold">Hello, I&apos;m {personalInfo.name}.</span> I&apos;m a{" "}
+        <span className="font-bold">{personalInfo.profession}</span> with{" "}
+        <span className="font-bold">{personalInfo.yearExperience} years</span> of experience.
+        <br/>
+        <br/>
+        <span className="italic">{personalInfo.smallIntroPhrase}</span>
       </motion.h1>
 
       <motion.div
@@ -89,7 +96,8 @@ export default function Intro() {
         <a
           className="group bg-white  px-7 py-3 flex items-center gap-2 rounded-full outline-none
           focus:scale-110 hover:scale-110 active:scale-105 transition cursor-pointer borderBlack dark:bg-white/10 dark:text-white/60"
-          href="/CV.pdf"
+          href={personalInfo.linkToCv}
+          target="_blank"
           download
         >
           Download DC{" "}
@@ -99,7 +107,7 @@ export default function Intro() {
         <a
           className="bg-white p-4 text-gray-700 hover:text-gray-950 flex items-center gap-2 rounded-full
          focus:scale-[1.15] hover:scale-[1.15] active:scale-105 transition cursor-pointer borderBlack dark:bg-white/10 dark:text-white/60 focus:scale-110 hover:scale-[1.15] active:scale-[1.15] transition cursor-pointer borderBlack"
-          href="https://www.linkedin.com/in/elpidio-mazza-72b641155/"
+          href={personalInfo.linkLinkedin}
           target="_blank"
         >
           <BsLinkedin />
@@ -111,7 +119,7 @@ export default function Intro() {
          active:scale-105 transition cursor-pointer borderBlack
          dark:bg-white/10 dark:text-white/60 focus:scale-[1.15]
          hover:scale-[1.15] active:scale-105 transition cursor-pointer borderBlack"
-          href="https://github.com/Elpiu"
+          href={personalInfo.linkGithub}
           target="_blank"
         >
           <BsGithub />
