@@ -1,7 +1,7 @@
 "use client"
 
 import React, {createContext, useContext, useEffect, useState} from "react";
-import {RootData} from "@/lib/types";
+import {Experience, IntroData, RootData} from "@/lib/types";
 import axios from "axios";
 import {DATA_FILE_JSON_FIELD, DATA_FILE_NAME} from "@/lib/storage.accessors";
 
@@ -21,13 +21,14 @@ export default function PersonalInfoContextProvider({
                                                     }: PersonalInfoContextProviderProps) {
 
   const [personalInfo, setPersonalInfo] = useState<RootData | null>(null);
-
   useEffect(() => {
     // Check if personalInfo already exists, if not, fetch and set it
     if (!personalInfo) {
       axios
-        .get(`/data/${DATA_FILE_NAME}.json`)
-        .then((response) => {
+        .get(`/data/${DATA_FILE_NAME}.json`,  {
+          responseType: "json",
+        })
+        .then((response) =>  {
           const data = response.data[DATA_FILE_JSON_FIELD] as PersonalInfoContextType;
           setPersonalInfo(data);
         })
@@ -60,4 +61,16 @@ export function usePersonalInfoContext(): PersonalInfoContextType {
     );
   }
   return context;
+}
+
+export function usePersonalInfoContextForGettingIntroData(): IntroData {
+  return usePersonalInfoContext().introData
+}
+
+export function usePersonalInfoContextForGettingAboutMeData(): string[] {
+  return usePersonalInfoContext().aboutMe
+}
+
+export function usePersonalInfoContextForGettingExperienceData(): Experience[] {
+  return usePersonalInfoContext().experiences
 }

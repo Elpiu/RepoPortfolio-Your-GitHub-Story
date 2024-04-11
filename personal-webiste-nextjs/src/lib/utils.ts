@@ -1,3 +1,11 @@
+import React from "react";
+import {CgWorkAlt} from "react-icons/cg";
+import {LuGraduationCap} from "react-icons/lu";
+
+const supportedIconMapFromString = new Map()
+  .set("work", CgWorkAlt )
+  .set("education", LuGraduationCap)
+
 export const validateString = (value: unknown, maxLenght: number) => {
   if (!value || typeof value !== "string" || value.length > maxLenght) {
     return false;
@@ -20,3 +28,7 @@ export const getErrorMessage = (error: unknown): string => {
 
   return message;
 };
+
+export const createIconFromText = (iconName: string) => {
+  return React.createElement(supportedIconMapFromString.get(iconName))
+}

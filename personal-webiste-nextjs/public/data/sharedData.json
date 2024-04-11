@@ -12,7 +12,26 @@
       "linkLinkedin": "https://www.linkedin.com/in/elpidio-mazza-72b641155/",
       "linkGithub": "https://github.com/Elpiu",
       "smallIntroPhrase": "L'informatica è una delle mie più grandi passioni, riesce sempre a proporre nuove sfide e non ci si annoia mai."
-
-    }
+    },
+    "aboutMe": [
+      "Chi sono. Classe 97 residente a Ravello (SA), informatico alle prime esperienze sempre pronto ad accettare nuove sfide e ad arricchire il proprio bagaglio personale nell’ambito informatico con particolare riferimento al mondo Web.",
+      "La mia missione è semplificare la vita delle persone con l'informatica."
+    ],
+    "experiences": [
+      {
+        "title": "Unisa Laurea L-31 Informatica",
+        "location": "Salerno",
+        "description": "Ho conseguito la laurea in informatica L31 di primo livello in informatica (L31) presso L’ Università degli Studi di Salerno, Fisciano (SA) (Italia).\nCon voto 100/110L",
+        "icon": "education",
+        "date": "2019 - 2022"
+      },
+      {
+        "title": "Attualmente lavoro in Nexsoft",
+        "location": "Salerno - Full Remote",
+        "description": "Dipendente dell’azienda Nexsoft S.P.A. nel ruolo di Junior software developer.\n Lavoro come dipendente in outsourcing presso l'azienda Tagetik. All'interno di Tagetik, lavoro con il mio team per creare nuove funzionalità per l'applicativo, dal backend al frontend. Ci occupiamo di modularizzare parti del monolite per permettere una futura transizione verso i microservizi. Inoltre, risolviamo i bug delle funzionalità dell'area di competenza.",
+        "icon": "work",
+        "date": "Dal 7/2022 – in corso"
+      }
+    ]
   }
 }

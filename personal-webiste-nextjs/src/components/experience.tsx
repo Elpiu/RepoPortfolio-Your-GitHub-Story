@@ -10,12 +10,17 @@ import {
 import React from "react";
 import "react-vertical-timeline-component/style.min.css";
 import { useTheme } from "../../context/theme-context";
+import {usePersonalInfoContextForGettingExperienceData} from "../../context/personal.information";
+import {Experience} from "@/lib/types";
+import {createIconFromText} from "@/lib/utils";
 
 export default function Experience() {
   const { ref, inView } = useSectionInView("Experience", 0.5);
   const { theme } = useTheme();
 
   const [isVisible, setIsVisible] = React.useState(false);
+
+  const myExperience: Experience[] = usePersonalInfoContextForGettingExperienceData()
 
   React.useEffect(() => {
     if (inView) {
@@ -27,7 +32,7 @@ export default function Experience() {
     <section id="experience" ref={ref} className="scroll-mt-28 mb-28 sm:mb-40">
       <SectionHeading>My experience</SectionHeading>
       <VerticalTimeline lineColor="">
-        {experiencesData.map((item, index) => (
+        {myExperience.map((item, index) => (
           <React.Fragment key={index}>
             <VerticalTimelineElement
               visible={isVisible}
@@ -46,7 +51,7 @@ export default function Experience() {
                     : "0.4rem solid rgba(255, 255, 255, 0.5)",
               }}
               date={item.date}
-              icon={item.icon}
+              icon={createIconFromText(item.icon)}
               iconStyle={{
                 background:
                   theme === "light" ? "white" : "rgba(255, 255, 255, 0.15)",

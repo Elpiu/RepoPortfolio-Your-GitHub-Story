@@ -8,16 +8,14 @@ import { BsArrowRight, BsGithub, BsLinkedin } from "react-icons/bs";
 import { HiDownload } from "react-icons/hi";
 import { useSectionInView } from "@/lib/hooks";
 import { useActiveSectionContext } from "../../context/active-section";
-import {usePersonalInfoContext} from "../../context/personal.information";
-import {RootData} from "@/lib/types";
-import {DATA_FILE_NAME} from "@/lib/storage.accessors";
+import { usePersonalInfoContextForGettingIntroData } from "../../context/personal.information";
+import {IntroData} from "@/lib/types";
 
 export default function Intro() {
   const { ref } = useSectionInView("Home", 0.5);
   const { setActiveSection, setTimeOfLastClick } = useActiveSectionContext();
 
-  const personalInfo = usePersonalInfoContext().introData
-
+  const personalInfo: IntroData = usePersonalInfoContextForGettingIntroData()
 
   return (
     <section

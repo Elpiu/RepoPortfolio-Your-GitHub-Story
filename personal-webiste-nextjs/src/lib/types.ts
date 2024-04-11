@@ -4,7 +4,9 @@ export type SectionName = (typeof links)[number]["name"];
 export type Theme = "light" | "dark";
 
 export type RootData = {
-  introData: IntroData
+  introData: IntroData,
+  aboutMe: string[],
+  experiences: Experience[]
 }
 
 export type IntroData = {
@@ -21,8 +23,6 @@ export type IntroData = {
   smallIntroPhrase: string,
 }
 
-
-
 export type Location = {
   country: string;
   provincia: string;
@@ -31,24 +31,21 @@ export type Location = {
   citta: string;
 }
 
-export type PersonalInformation = {
-  nome: string;
-  cognome: string;
-  fullName: string;
-  telefono: string;
-  whatsapp: string;
-  email: string;
-  yearVersion: string;
-  locazione: Location;
-  github_profile: string;
-  github_link: string;
-  curriculum_link: string;
-  sono_un: string,
-  "anni_esperienza": number,
-  "github_profile_img": string,
-  linkedin_profile: string,
-  intro: string;
-  descrizione: string;
-  about: string;
-  mission: string;
+export type Experience = {
+  title: string,
+  location: string,
+  description: string,
+  icon: string, //React Icon
+  date: string
 }
+// stargazers_count
+// watchers_count
+//
+// forks_count
+// forks
+// url
+// description
+// html_url<
+// topics: string[]
+// languages_url
+// contributors_url
