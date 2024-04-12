@@ -1,4 +1,4 @@
-import { links } from "./data";
+import {links} from "./data";
 
 export type SectionName = (typeof links)[number]["name"];
 export type Theme = "light" | "dark";
@@ -6,7 +6,8 @@ export type Theme = "light" | "dark";
 export type RootData = {
   introData: IntroData,
   aboutMe: string[],
-  experiences: Experience[]
+  experiences: Experience[],
+  gitHubRepoData: GitHubRepoData
 }
 
 export type IntroData = {
@@ -38,14 +39,27 @@ export type Experience = {
   icon: string, //React Icon
   date: string
 }
-// stargazers_count
-// watchers_count
-//
-// forks_count
-// forks
-// url
-// description
-// html_url<
-// topics: string[]
-// languages_url
-// contributors_url
+
+export type GitHubRepoData = {
+  excludedRepo: string[] //Repository to hide
+  nameGithub: string
+  urlApiGithub: string
+  "fragmentRepository": string
+}
+
+export type Repository = {
+  id: string
+  name: string
+  description: string
+  created_at: Date
+  stargazers_count: string
+  watchers_count: string
+  forks_count: string
+  forks: string
+  url: string
+  description: string
+  html_url: string
+  topics: string[]
+  languages_url: string
+  contributors_url: string
+}

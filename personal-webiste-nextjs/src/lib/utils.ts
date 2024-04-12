@@ -2,8 +2,9 @@ import React from "react";
 import {CgWorkAlt} from "react-icons/cg";
 import {LuGraduationCap} from "react-icons/lu";
 
+
 const supportedIconMapFromString = new Map()
-  .set("work", CgWorkAlt )
+  .set("work", CgWorkAlt)
   .set("education", LuGraduationCap)
 
 export const validateString = (value: unknown, maxLenght: number) => {
@@ -31,4 +32,9 @@ export const getErrorMessage = (error: unknown): string => {
 
 export const createIconFromText = (iconName: string) => {
   return React.createElement(supportedIconMapFromString.get(iconName))
+}
+
+export function repositoryRandomImagePlaceholder(){
+  const randomIndex = Math.floor(Math.random() * 7)+1;
+  return `/repo-placeholder/placeholder-${randomIndex}.webp`
 }

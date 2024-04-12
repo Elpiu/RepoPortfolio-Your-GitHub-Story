@@ -1,7 +1,7 @@
 "use client"
 
 import React, {createContext, useContext, useEffect, useState} from "react";
-import {Experience, IntroData, RootData} from "@/lib/types";
+import {Experience, GitHubRepoData, IntroData, RootData} from "@/lib/types";
 import axios from "axios";
 import {DATA_FILE_JSON_FIELD, DATA_FILE_NAME} from "@/lib/storage.accessors";
 
@@ -73,4 +73,8 @@ export function usePersonalInfoContextForGettingAboutMeData(): string[] {
 
 export function usePersonalInfoContextForGettingExperienceData(): Experience[] {
   return usePersonalInfoContext().experiences
+}
+
+export function usePersonalInfoContextForGettingGitHubRepoData(): GitHubRepoData {
+  return usePersonalInfoContext().gitHubRepoData
 }

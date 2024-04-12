@@ -32,6 +32,14 @@
         "icon": "work",
         "date": "Dal 7/2022 – in corso"
       }
-    ]
+    ],
+    "gitHubRepoData": {
+      "nameGithub": "Elpiu",
+      "excludedRepo": [
+        "elpiu"
+      ],
+      "urlApiGithub": "https://api.github.com/users",
+      "fragmentRepository": "repos"
+    }
   }
 }
