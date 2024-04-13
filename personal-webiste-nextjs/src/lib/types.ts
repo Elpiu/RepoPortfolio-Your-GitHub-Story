@@ -44,7 +44,8 @@ export type GitHubRepoData = {
   excludedRepo: string[] //Repository to hide
   nameGithub: string
   urlApiGithub: string
-  "fragmentRepository": string
+  fragmentRepository: string
+  orderByStars: boolean
 }
 
 export type Repository = {
@@ -57,7 +58,6 @@ export type Repository = {
   forks_count: string
   forks: string
   url: string
-  description: string
   html_url: string
   topics: string[]
   languages_url: string

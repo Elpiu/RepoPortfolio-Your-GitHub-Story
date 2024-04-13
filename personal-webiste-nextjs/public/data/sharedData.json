@@ -39,7 +39,8 @@
         "elpiu"
       ],
       "urlApiGithub": "https://api.github.com/users",
-      "fragmentRepository": "repos"
+      "fragmentRepository": "repos",
+      "orderByStars": true
     }
   }
 }

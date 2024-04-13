@@ -12,7 +12,7 @@ export default function Projects() {
   const {ref} = useSectionInView("Projects", 0.5);
   const gitHubRepoData: GitHubRepoData = usePersonalInfoContextForGettingGitHubRepoData()
 
-  const [gitHubRepositories, setGitHubData] = useState<Repository[]>(null)
+  const [gitHubRepositories, setGitHubData] = useState<Repository[]>([])
   const [isLoading, setLoading] = useState(true)
 
   const [visibleProjects, setVisibleProjects] = useState(6);
@@ -24,6 +24,11 @@ export default function Projects() {
       .then((response) => {
         let data = response.data as Repository[]
         data = data.filter(repo => !gitHubRepoData.excludedRepo.includes(repo.name))
+        //TODO sorting by star can exclude other project more valuable
+        if(gitHubRepoData.orderByStars){
+          data.sort((repoA, repoB) =>
+            repoB.stargazers_count - repoA.stargazers_count);
+        }
         setGitHubData(data)
         setLoading(false)
       })
@@ -56,17 +61,16 @@ export default function Projects() {
         ))}
 
         <div className="flex items-center justify-center ">
-        {visibleProjects < gitHubRepositories.length && (
-          <button
-            className="group bg-gray-900 text-white px-7 py-3 flex items-center gap-2 rounded-full outline-none
+          {visibleProjects < gitHubRepositories.length && (
+            <button
+              className="group bg-gray-900 text-white px-7 py-3 flex items-center gap-2 rounded-full outline-none
           focus:scale-110 hover:scale-110 hover:bg-gray-950 active:scale-105 transition"
-            onClick={handleLoadMore}>
-            Carica altro
-          </button>
-        )}
+              onClick={handleLoadMore}>
+              Load more...
+            </button>
+          )}
         </div>
       </div>
-
     </section>
   );
 
