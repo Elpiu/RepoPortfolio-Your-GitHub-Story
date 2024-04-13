@@ -1,11 +1,5 @@
-### New Version 3 Next.js 
 
-Questo progetto è una versione aggiornata del suo predecessore, realizzato solo con CSS, JS e HTML. Con questa versione, è stato fatto il porting utilizzando il framework Angular, rendendolo più dinamico e facile da gestire. Inoltre, i dati del sito portfolio sono caricati dal file "asset/data/database.json", rendendo più semplice l'aggiornamento del contenuto del sito.
-Tuttavia, la cartella contenente il vecchio sito verrà comunque mantenuta per riferimento.
-
-
-
-### New Version 2 Angular 14
+### Angular 14
 
 Questo progetto è una versione aggiornata del suo predecessore, realizzato solo con CSS, JS e HTML. Con questa versione, è stato fatto il porting utilizzando il framework Angular, rendendolo più dinamico e facile da gestire. Inoltre, i dati del sito portfolio sono caricati dal file "asset/data/database.json", rendendo più semplice l'aggiornamento del contenuto del sito.
 Tuttavia, la cartella contenente il vecchio sito verrà comunque mantenuta per riferimento.
