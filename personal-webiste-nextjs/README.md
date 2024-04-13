@@ -1,2 +1,5 @@
-# try-nextjs
- nextJs + Aws Amplify 2
+# How to run
+
+- npm install
+- next dev
+- go to http://localhost:3000/
