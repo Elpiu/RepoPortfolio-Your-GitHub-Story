@@ -7,6 +7,8 @@ import {useSectionInView} from "@/lib/hooks";
 import axios from "axios";
 import {GitHubRepoData, Repository} from "@/lib/types";
 import {usePersonalInfoContextForGettingGitHubRepoData} from "../../context/personal.information";
+import ProjectModal from "@/components/project-modal";
+import EventEmitter from "events";
 
 export default function Projects() {
   const {ref} = useSectionInView("Projects", 0.5);
@@ -17,6 +19,11 @@ export default function Projects() {
 
   const [visibleProjects, setVisibleProjects] = useState(6);
 
+  //Modal Project
+  const ID_MODAL = "PROJECTMODAL"
+  const modalEmitter = new EventEmitter();
+
+
   useEffect(() => {
     axios.get(`${gitHubRepoData.urlApiGithub}/${gitHubRepoData.nameGithub}/${gitHubRepoData.fragmentRepository}`, {
       responseType: "json"
@@ -25,7 +32,7 @@ export default function Projects() {
         let data = response.data as Repository[]
         data = data.filter(repo => !gitHubRepoData.excludedRepo.includes(repo.name))
         //TODO sorting by star can exclude other project more valuable
-        if(gitHubRepoData.orderByStars){
+        if (gitHubRepoData.orderByStars) {
           data.sort((repoA, repoB) =>
             repoB.stargazers_count - repoA.stargazers_count);
         }
@@ -49,14 +56,14 @@ export default function Projects() {
     setVisibleProjects(prev => prev + 12);
   };
 
-
   return (
     <section ref={ref} className="scroll-mt-28 mb-28" id="projects">
       <SectionHeading>My Projects</SectionHeading>
+      <ProjectModal idModal={ID_MODAL} modalEmitter={modalEmitter}/>
       <div>
         {gitHubRepositories.slice(0, visibleProjects).map((project, index) => (
           <React.Fragment key={index}>
-            <Project {...project} />
+            <Project {...project} setAsFocus={(repo: Repository) => modalEmitter.emit("openModal", repo)}/>
           </React.Fragment>
         ))}
 
