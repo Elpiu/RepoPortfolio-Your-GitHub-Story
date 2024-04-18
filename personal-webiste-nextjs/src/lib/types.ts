@@ -44,6 +44,8 @@ export type GitHubRepoData = {
   excludedRepo: string[] //Repository to hide
   nameGithub: string
   urlApiGithub: string
+  gitHubLink: string
+  rawGithub: string
   fragmentRepository: string
   orderByStars: boolean
 }
