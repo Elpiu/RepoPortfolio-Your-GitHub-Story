@@ -34,6 +34,7 @@ export default function Projects() {
         //TODO sorting by star can exclude other project more valuable
         if (gitHubRepoData.orderByStars) {
           data.sort((repoA, repoB) =>
+            // @ts-ignore
             repoB.stargazers_count - repoA.stargazers_count);
         }
         setGitHubData(data)

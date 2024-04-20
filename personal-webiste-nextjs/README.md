@@ -6,12 +6,18 @@
 
 
 
-DONE to install https://github.com/remarkjs/react-markdown?tab=readme-ov-file#install
+DONE to install 
 
 ### TODO
 
-[ ] al primo click il modale non si apre
 
-[ ] mettere su readme.md il link alla repo
 
-[ ] loading al caricamento, quando si fa close pulire il buffer
+
+
+---
+##### Librerie Usate
+- [Framer Motion](https://www.framer.com/motion/)
+- [Framer Motion examples](https://framermotionexamples.com/)
+- [react-markdown](https://remarkjs.github.io/react-markdown/)
+
+
