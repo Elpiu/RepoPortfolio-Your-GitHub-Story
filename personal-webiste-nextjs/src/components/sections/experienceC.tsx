@@ -1,22 +1,19 @@
 "use client";
 
-import { useSectionInView } from "@/lib/hooks";
+import {useSectionInView} from "@/lib/hooks";
 import SectionHeading from "@/components/section-heading";
-import { experiencesData } from "@/lib/data";
-import {
-  VerticalTimeline,
-  VerticalTimelineElement,
-} from "react-vertical-timeline-component";
+import {VerticalTimeline, VerticalTimelineElement,} from "react-vertical-timeline-component";
 import React from "react";
 import "react-vertical-timeline-component/style.min.css";
-import { useTheme } from "../../context/theme-context";
-import {usePersonalInfoContextForGettingExperienceData} from "../../context/personal.information";
-import {Experience} from "@/lib/types";
+import {useTheme} from "../../../context/theme-context";
+import {usePersonalInfoContextForGettingExperienceData} from "../../../context/personal.information";
 import {createIconFromText} from "@/lib/utils";
+import {Experience} from "@/lib/types";
 
-export default function Experience() {
-  const { ref, inView } = useSectionInView("Experience", 0.5);
-  const { theme } = useTheme();
+
+export default function ExperienceC() {
+  const {ref, inView} = useSectionInView("Experience", 0.5);
+  const {theme} = useTheme();
 
   const [isVisible, setIsVisible] = React.useState(false);
 
@@ -33,7 +30,7 @@ export default function Experience() {
       <SectionHeading>My experience</SectionHeading>
       <VerticalTimeline lineColor="">
         {myExperience.map((item, index) => (
-          <React.Fragment key={index}>
+          <React.Fragment key={index + item.title}>
             <VerticalTimelineElement
               visible={isVisible}
               contentStyle={{

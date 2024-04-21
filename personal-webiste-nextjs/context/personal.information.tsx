@@ -4,6 +4,7 @@ import React, {createContext, useContext, useEffect, useState} from "react";
 import {Experience, GitHubRepoData, IntroData, RootData} from "@/lib/types";
 import axios from "axios";
 import {DATA_FILE_JSON_FIELD, DATA_FILE_NAME} from "@/lib/storage.accessors";
+import {LoadingFullScreen} from "@/components/loadingFullScreen";
 
 
 type PersonalInfoContextType = RootData;
@@ -18,17 +19,17 @@ type PersonalInfoContextProviderProps = {
 }
 export default function PersonalInfoContextProvider({
                                                       children,
-                                                    }: PersonalInfoContextProviderProps) {
+                                                    }: Readonly<PersonalInfoContextProviderProps>) {
 
   const [personalInfo, setPersonalInfo] = useState<RootData | null>(null);
   useEffect(() => {
     // Check if personalInfo already exists, if not, fetch and set it
     if (!personalInfo) {
       axios
-        .get(`/data/${DATA_FILE_NAME}.json`,  {
+        .get(`/data/${DATA_FILE_NAME}.json`, {
           responseType: "json",
         })
-        .then((response) =>  {
+        .then((response) => {
           const data = response.data[DATA_FILE_JSON_FIELD] as PersonalInfoContextType;
           setPersonalInfo(data);
         })
@@ -40,10 +41,7 @@ export default function PersonalInfoContextProvider({
 
   // Return a loading state until data is fetched
   if (!personalInfo) {
-    //TODO LOADING
-    return <div>
-      <span className="loading loading-ring loading-lg"></span>
-    </div>;
+    return <LoadingFullScreen/>;
   }
 
   return (
@@ -78,3 +76,8 @@ export function usePersonalInfoContextForGettingExperienceData(): Experience[] {
 export function usePersonalInfoContextForGettingGitHubRepoData(): GitHubRepoData {
   return usePersonalInfoContext().gitHubRepoData
 }
+
+export function usePersonalInfoContextForGettingSkillsData(): string[] {
+  return usePersonalInfoContext().skills
+}
+

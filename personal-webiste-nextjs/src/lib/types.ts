@@ -6,6 +6,7 @@ export type Theme = "light" | "dark";
 export type RootData = {
   introData: IntroData,
   aboutMe: string[],
+  skills: string[],
   experiences: Experience[],
   gitHubRepoData: GitHubRepoData
 }

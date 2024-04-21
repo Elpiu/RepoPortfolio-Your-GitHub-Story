@@ -8,10 +8,8 @@ const supportedIconMapFromString = new Map()
   .set("education", LuGraduationCap)
 
 export const validateString = (value: unknown, maxLenght: number) => {
-  if (!value || typeof value !== "string" || value.length > maxLenght) {
-    return false;
-  }
-  return true;
+  return !(!value || typeof value !== "string" || value.length > maxLenght);
+
 };
 
 export const getErrorMessage = (error: unknown): string => {
@@ -34,7 +32,7 @@ export const createIconFromText = (iconName: string) => {
   return React.createElement(supportedIconMapFromString.get(iconName))
 }
 
-export function repositoryRandomImagePlaceholder(){
-  const randomIndex = Math.floor(Math.random() * 7)+1;
+export function repositoryRandomImagePlaceholder() {
+  const randomIndex = Math.floor(Math.random() * 7) + 1;
   return `/repo-placeholder/placeholder-${randomIndex}.webp`
 }

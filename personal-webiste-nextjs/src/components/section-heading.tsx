@@ -4,7 +4,7 @@ type SectionHeadingProps = {
   children: React.ReactNode;
 };
 
-export default function SectionHeading({ children }: SectionHeadingProps) {
+export default function SectionHeading({children}: Readonly<SectionHeadingProps>) {
   return (
     <h2 className="text-3xl font-medium capitalize mb-8 text-center">
       {children}

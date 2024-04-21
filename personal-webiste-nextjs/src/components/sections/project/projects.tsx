@@ -2,20 +2,21 @@
 
 import SectionHeading from "@/components/section-heading";
 import React, {useEffect, useState} from "react";
-import Project from "@/components/project";
+import Project from "@/components/sections/project/project";
 import {useSectionInView} from "@/lib/hooks";
 import axios from "axios";
 import {GitHubRepoData, Repository} from "@/lib/types";
-import {usePersonalInfoContextForGettingGitHubRepoData} from "../../context/personal.information";
-import ProjectModal from "@/components/project-modal";
+import {usePersonalInfoContextForGettingGitHubRepoData} from "../../../../context/personal.information";
+import ProjectModal from "@/components/sections/project/project-modal";
 import EventEmitter from "events";
+import {LoadingInContent} from "@/components/loadingFullScreen";
 
 export default function Projects() {
   const {ref} = useSectionInView("Projects", 0.5);
   const gitHubRepoData: GitHubRepoData = usePersonalInfoContextForGettingGitHubRepoData()
 
-  const [gitHubRepositories, setGitHubData] = useState<Repository[]>([])
-  const [isLoading, setLoading] = useState(true)
+  const [gitHubRepositories, setGitHubRepositories] = useState<Repository[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   const [visibleProjects, setVisibleProjects] = useState(6);
 
@@ -37,8 +38,8 @@ export default function Projects() {
             // @ts-ignore
             repoB.stargazers_count - repoA.stargazers_count);
         }
-        setGitHubData(data)
-        setLoading(false)
+        setGitHubRepositories(data)
+        setIsLoading(false)
       })
       .catch((error) => {
         console.error("Error fetching repositories from GitHub:", error);
@@ -47,10 +48,7 @@ export default function Projects() {
 
   // Return a loading state until data is fetched
   if (isLoading) {
-    //TODO LOADING
-    return <div>
-      <span className="loading loading-ring loading-lg"></span>
-    </div>;
+    return <LoadingInContent/>;
   }
 
   const handleLoadMore = () => {
@@ -63,7 +61,7 @@ export default function Projects() {
       <ProjectModal idModal={ID_MODAL} modalEmitter={modalEmitter}/>
       <div>
         {gitHubRepositories.slice(0, visibleProjects).map((project, index) => (
-          <React.Fragment key={index}>
+          <React.Fragment key={index + project.name}>
             <Project {...project} setAsFocus={(repo: Repository) => modalEmitter.emit("openModal", repo)}/>
           </React.Fragment>
         ))}

@@ -5,7 +5,6 @@ import {motion, useScroll, useTransform} from "framer-motion";
 import Image from "next/image";
 import {Repository} from "@/lib/types";
 import {repositoryRandomImagePlaceholder} from "@/lib/utils";
-import exp from "node:constants";
 
 type ProjectProps = Repository & {
   setAsFocus: (repo: Repository) => void
@@ -103,7 +102,7 @@ export function Description(descriptionProps: DescriptionProps) {
 
 }
 
-export function Topic(topicsProps: TopicProps){
+export function Topic(topicsProps: TopicProps) {
 
   return (
     <>

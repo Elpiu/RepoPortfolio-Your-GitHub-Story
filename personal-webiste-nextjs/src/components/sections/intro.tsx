@@ -1,19 +1,19 @@
 "use client";
 
-import React, {useEffect, useState} from "react";
+import React from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import {motion} from "framer-motion";
 import Link from "next/link";
-import { BsArrowRight, BsGithub, BsLinkedin } from "react-icons/bs";
-import { HiDownload } from "react-icons/hi";
-import { useSectionInView } from "@/lib/hooks";
-import { useActiveSectionContext } from "../../context/active-section";
-import { usePersonalInfoContextForGettingIntroData } from "../../context/personal.information";
+import {BsArrowRight, BsGithub, BsLinkedin} from "react-icons/bs";
+import {HiDownload} from "react-icons/hi";
+import {useSectionInView} from "@/lib/hooks";
+import {useActiveSectionContext} from "../../../context/active-section";
+import {usePersonalInfoContextForGettingIntroData} from "../../../context/personal.information";
 import {IntroData} from "@/lib/types";
 
 export default function Intro() {
-  const { ref } = useSectionInView("Home", 0.5);
-  const { setActiveSection, setTimeOfLastClick } = useActiveSectionContext();
+  const {ref} = useSectionInView("Home", 0.5);
+  const {setActiveSection, setTimeOfLastClick} = useActiveSectionContext();
 
   const personalInfo: IntroData = usePersonalInfoContextForGettingIntroData()
 
@@ -26,8 +26,8 @@ export default function Intro() {
       <div className="flex items-center justify-center">
         <div className="relative">
           <motion.div
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{opacity: 0, scale: 0}}
+            animate={{opacity: 1, scale: 1}}
             transition={{
               type: "tween",
               duration: 0.2,
@@ -35,7 +35,7 @@ export default function Intro() {
           >
             <Image
               src={personalInfo.profileImage}
-              alt={personalInfo.fullName+ " Image"}
+              alt={personalInfo.fullName + " Image"}
               width="192"
               height="192"
               quality="95"
@@ -44,8 +44,8 @@ export default function Intro() {
             />
           </motion.div>
           <motion.span
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{opacity: 0, scale: 0}}
+            animate={{opacity: 1, scale: 1}}
             transition={{
               type: "spring",
               stiffness: 125,
@@ -75,9 +75,9 @@ export default function Intro() {
 
       <motion.div
         className="flex flex-col sm:flex-row items-center justify-center gap-2 px-4 text-lg font-medium"
-        initial={{ opacity: 0, y: 100 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
+        initial={{opacity: 0, y: 100}}
+        animate={{opacity: 1, y: 0}}
+        transition={{delay: 0.3}}
       >
         <Link
           href="#contact"
@@ -89,7 +89,7 @@ export default function Intro() {
           }}
         >
           Contact me{" "}
-          <BsArrowRight className="opacity-70 group-hover:translate-x-2 transition" />
+          <BsArrowRight className="opacity-70 group-hover:translate-x-2 transition"/>
         </Link>
         <a
           className="group bg-white  px-7 py-3 flex items-center gap-2 rounded-full outline-none
@@ -99,7 +99,7 @@ export default function Intro() {
           download
         >
           Download DC{" "}
-          <HiDownload className="opacity-60 group-hover:translate-y-1 transition" />
+          <HiDownload className="opacity-60 group-hover:translate-y-1 transition"/>
         </a>
 
         <a
@@ -108,7 +108,7 @@ export default function Intro() {
           href={personalInfo.linkLinkedin}
           target="_blank"
         >
-          <BsLinkedin />
+          <BsLinkedin/>
         </a>
 
         <a
@@ -120,7 +120,7 @@ export default function Intro() {
           href={personalInfo.linkGithub}
           target="_blank"
         >
-          <BsGithub />
+          <BsGithub/>
         </a>
       </motion.div>
     </section>

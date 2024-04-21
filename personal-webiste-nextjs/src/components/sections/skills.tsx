@@ -1,9 +1,9 @@
 "use client";
 
 import SectionHeading from "@/components/section-heading";
-import {useJsonDataFromPublic, useSectionInView} from "@/lib/hooks";
-import { motion } from "framer-motion";
-import {SOFT_SKILLS_FOLDER, SOFT_SKILLS_JSON} from "@/lib/storage.accessors";
+import {useSectionInView} from "@/lib/hooks";
+import {motion} from "framer-motion";
+import {usePersonalInfoContextForGettingSkillsData} from "../../../context/personal.information";
 
 const fadeInAnimationVariants = {
   initial: {
@@ -20,9 +20,10 @@ const fadeInAnimationVariants = {
 };
 
 export default function Skills() {
-  const { ref } = useSectionInView("Skills");
+  const {ref} = useSectionInView("Skills");
 
-  const skillsData : string[] = useJsonDataFromPublic(SOFT_SKILLS_FOLDER, SOFT_SKILLS_JSON)
+  const skillsData: string[] = usePersonalInfoContextForGettingSkillsData()
+
 
   return (
     <section
@@ -36,7 +37,7 @@ export default function Skills() {
           {skillsData.map((skill, index) => (
             <motion.li
               className="bg-white borderBlack rounded-xl px-5 py-3 dark:bg-white/10 dark:text-white/80"
-              key={index}
+              key={index + skill}
               variants={fadeInAnimationVariants}
               initial="initial"
               whileInView="animate"

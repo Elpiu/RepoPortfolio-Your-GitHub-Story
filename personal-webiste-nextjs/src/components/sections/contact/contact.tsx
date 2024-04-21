@@ -2,14 +2,14 @@
 
 import React from "react";
 import SectionHeading from "@/components/section-heading";
-import { useSectionInView } from "@/lib/hooks";
-import { motion } from "framer-motion";
-import { sendEmail } from "../../actions/sendEmail";
-import SubmitBtn from "@/components/submit-btn";
-import { toast } from "react-hot-toast";
+import {useSectionInView} from "@/lib/hooks";
+import {motion} from "framer-motion";
+import {sendEmail} from "../../../../actions/sendEmail";
+import SubmitBtn from "@/components/sections/contact/submit-btn";
+import {toast} from "react-hot-toast";
 
 export default function Contact() {
-  const { ref } = useSectionInView("Contact");
+  const {ref} = useSectionInView("Contact");
 
   return (
     <motion.section
@@ -40,7 +40,7 @@ export default function Contact() {
       <form
         className="mt-10 flex flex-col"
         action={async (formData) => {
-          const { error } = await sendEmail(formData);
+          const {error} = await sendEmail(formData);
 
           if (error) {
             toast.error(error);
@@ -65,7 +65,7 @@ export default function Contact() {
           required
           maxLength={5000}
         ></textarea>
-        <SubmitBtn />
+        <SubmitBtn/>
       </form>
     </motion.section>
   );
