@@ -25,8 +25,8 @@ DONE to install
 - [ ] fare pagina 404 e far scomparire header
 - [ ] nuovo contact me con capcha per nascondere il numero
 - [ ] avviene il re rendering ogni volta che si sposta l'header di sezione
-- [ ] img vetrina progetto
-
+- [ ] img vetrina progetto (trovare una strategia es: folder speciale)
+- [ ] refactor contact me section
 ---
 - [ ] rendere SPA tutto il sito per hostarlo su GitHubPages [Tutorial](https://www.youtube.com/watch?v=mJuz45RXeXY)
 - [ ] disabilitare tutti i componenti server-side
