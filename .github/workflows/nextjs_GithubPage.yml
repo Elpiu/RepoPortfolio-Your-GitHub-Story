@@ -24,6 +24,10 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
+defaults:
+  run:
+    working-directory: personal-webiste-nextjs
+
 jobs:
   # Build job
   build:
