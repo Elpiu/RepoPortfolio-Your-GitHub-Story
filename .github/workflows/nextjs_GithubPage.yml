@@ -32,8 +32,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Navigate to project directory
-        run: cd personal-webiste-nextjs
       - name: Detect package manager
         id: detect-package-manager
         run: |
