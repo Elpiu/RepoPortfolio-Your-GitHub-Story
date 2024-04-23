@@ -2,10 +2,10 @@
 
 import React, {createContext, useContext, useEffect, useState} from "react";
 import {Experience, GitHubRepoData, IntroData, RootData} from "../src/lib/types";
-import axios from "axios";
-import {DATA_FILE_JSON_FIELD, DATA_FILE_NAME} from "@/lib/storage.accessors";
+import {DATA_FILE_JSON_FIELD} from "@/lib/storage.accessors";
 import {LoadingFullScreen} from "@/components/loadingFullScreen";
 
+import json_data from '../public/data/sharedData.json'
 
 type PersonalInfoContextType = RootData;
 
@@ -25,17 +25,18 @@ export default function PersonalInfoContextProvider({
   useEffect(() => {
     // Check if personalInfo already exists, if not, fetch and set it
     if (!personalInfo) {
-      axios
-        .get(`/data/${DATA_FILE_NAME}.json`, {
-          responseType: "json",
-        })
-        .then((response) => {
-          const data = response.data[DATA_FILE_JSON_FIELD] as PersonalInfoContextType;
-          setPersonalInfo(data);
-        })
-        .catch((error) => {
-          console.error("Error fetching personal info:", error);
-        });
+      setPersonalInfo(json_data[DATA_FILE_JSON_FIELD] as PersonalInfoContextType)
+      /*      axios
+              .get(`/data/${DATA_FILE_NAME}.json`, {
+                responseType: "json",
+              })
+              .then((response) => {
+                const data = response.data[DATA_FILE_JSON_FIELD] as PersonalInfoContextType;
+                setPersonalInfo(data);
+              })
+              .catch((error) => {
+                console.error("Error fetching personal info:", error);
+              });*/
     }
   }, []);
 
