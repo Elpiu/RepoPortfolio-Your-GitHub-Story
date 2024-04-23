@@ -4,6 +4,7 @@ const nextConfig = {
   distDir: 'docs',
 
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",

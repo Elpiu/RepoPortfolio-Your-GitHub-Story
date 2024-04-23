@@ -3,7 +3,7 @@
 import React, {createContext, useContext, useEffect, useState} from "react";
 import {Experience, GitHubRepoData, IntroData, RootData} from "../src/lib/types";
 import axios from "axios";
-import {DATA_FILE_JSON_FIELD, DATA_FILE_NAME} from "../src/lib/storage.accessors";
+import {DATA_FILE_JSON_FIELD, DATA_FILE_NAME} from "@/lib/storage.accessors";
 import {LoadingFullScreen} from "@/components/loadingFullScreen";
 
 
