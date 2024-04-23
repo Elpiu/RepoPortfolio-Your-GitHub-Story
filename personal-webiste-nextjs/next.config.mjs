@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "export",
+  distDir: '../docs',
+
   images: {
     remotePatterns: [
       {
@@ -15,9 +18,6 @@ const nextConfig = {
         hostname: "media.licdn.com",
       },
     ],
-  },
-  experimental: {
-    serverActions: true,
   },
 };
 

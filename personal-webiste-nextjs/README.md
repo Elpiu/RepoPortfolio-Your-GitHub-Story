@@ -19,6 +19,9 @@ DONE to install
 ---
 - [ ] rendere SPA tutto il sito per hostarlo su GitHubPages [Tutorial](https://www.youtube.com/watch?v=mJuz45RXeXY)
 - [ ] disabilitare tutti i componenti server-side
+---
+- [ ] SEO Metadata
+- [ ] Google search engine
 
 ---
 ##### Librerie Usate & Framework
