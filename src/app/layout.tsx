@@ -9,13 +9,11 @@ import React from "react";
 import ThemeSwitch from "@/components/theme-switch";
 import Footer from "@/components/sections/footer";
 import PersonalInfoContextProvider from "../../context/personal.information";
+import {getSEOTagsLayout} from "@/lib/SEO";
 
 const inter = Inter({subsets: ["latin"]});
 
-export const metadata: Metadata = {
-  title: "Elpidio | Personal Portfolio",
-  description: "Elpidio is a full-stack developer with 4 year of experience.",
-};
+export const metadata: Metadata = getSEOTagsLayout()
 
 export default function RootLayout({
                                      children,

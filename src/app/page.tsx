@@ -6,6 +6,12 @@ import Skills from "@/components/sections/skills";
 import ExperienceC from "@/components/sections/experienceC";
 import Contact from "@/components/sections/contact/contact";
 import React from "react";
+import type {Metadata} from "next";
+import {getSEOTagsLayout} from "@/lib/SEO";
+
+
+export const metadata: Metadata = getSEOTagsLayout()
+
 
 export default function Home() {
   return (
