@@ -76,7 +76,7 @@ export default function ProjectModal({idModal, modalEmitter}: Readonly<ProjectMo
 
 
   return <dialog id={idModal} className="modal">
-    <div className="modal-box sm:w-10/12 w-8/12 max-w-5xl text-lg dark:bg-gray-700 ">
+    <div className="modal-box md:w-6/12 max-w-5xl text-lg dark:bg-gray-700 ">
       <motion.div
         initial={{scale: 0}} animate={controls}
       >

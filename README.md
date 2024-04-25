@@ -9,11 +9,22 @@ Tuttavia, la cartella contenente il vecchio sito verrà comunque mantenuta per r
 ### GitHub Portfolio
 Questo progetto è un sito web dinamico per il portfolio che si aggiorna automaticamente con le repository di GitHub dell'utente. La sezione del portfolio viene generata da uno script che, dato il profilo GitHub dell'utente, recupera le repository pubbliche dell'utente e le crea dinamicamente nella sezione del portfolio. Inoltre, il file README.md di ogni repository viene anche caricato dinamicamente all'interno di una finestra modale sulla pagina del portfolio. Ciò consente un portfolio costantemente aggiornato e facilmente accessibile dei progetti dell'utente.
 
-# How to run
+# 🛠️ Installation Steps:
 
-- npm install
-- next dev
-- go to http://localhost:3000/
+### Requirements
+*  Node 18
+---
+
+- Install dependency `npm install`
+- Start application `next dev`
+- Go to http://localhost:3000/
+
+### 🧐 Features
+Here're some of the project's best features:
+
+- [X] Fast Customization --> /public/data/sharedData.json (modify with your data and save)
+- [X] SEO friendly --> /lib/SEO.ts
+- [X] GitHub Action Deploy (on GitHub Pages)
 
 ### Requirements
 
@@ -21,22 +32,18 @@ Questo progetto è un sito web dinamico per il portfolio che si aggiorna automat
 
 DONE to install
 
-### TODO
+# TODO
 - [ ] fare pagina 404 e far scomparire header
 - [ ] nuovo contact me con capcha per nascondere il numero
 - [ ] link al CV
 - [ ] avviene il re rendering ogni volta che si sposta l'header di sezione (veramente boring consuma banda)
 - [ ] img vetrina progetto (trovare una strategia es: folder speciale)
-- [ ] refactor contact me section
----
-- [X] rendere SPA tutto il sito per hostarlo su GitHubPages [Tutorial](https://www.youtube.com/watch?v=mJuz45RXeXY)
-- [X] disabilitare tutti i componenti server-side 
----
-- [X] SEO Metadata
-- [X] Google search engine
+- [ ] Buy me a coffe
 
 ---
-##### Librerie Usate & Framework
+##### 💻 Built with
+Technologies used in the project:
+
 - [NEXT.js](https://nextjs.org/)
 - [React](https://react.dev/)
 - [Tailwindcss](https://tailwindcss.com/)
