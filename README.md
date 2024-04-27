@@ -1,13 +1,6 @@
-### New Version 3 Next.js 
+# GitHub Portfolio
+RepoPortfolio is a powerful portfolio builder that empowers you to create a beautiful and customized portfolio website in just minutes. You simply need to edit some data in a file, commit, and easily deploy your portfolio with GitHub Pages. Explore all the features [Here](#Features)
 
-Questo progetto è una versione aggiornata del suo predecessore, realizzato solo con CSS, JS e HTML. Con questa versione, è stato fatto il porting utilizzando il framework Angular, rendendolo più dinamico e facile da gestire. Inoltre, i dati del sito portfolio sono caricati dal file "asset/data/database.json", rendendo più semplice l'aggiornamento del contenuto del sito.
-Tuttavia, la cartella contenente il vecchio sito verrà comunque mantenuta per riferimento.
-
-
-
----
-### GitHub Portfolio
-Questo progetto è un sito web dinamico per il portfolio che si aggiorna automaticamente con le repository di GitHub dell'utente. La sezione del portfolio viene generata da uno script che, dato il profilo GitHub dell'utente, recupera le repository pubbliche dell'utente e le crea dinamicamente nella sezione del portfolio. Inoltre, il file README.md di ogni repository viene anche caricato dinamicamente all'interno di una finestra modale sulla pagina del portfolio. Ciò consente un portfolio costantemente aggiornato e facilmente accessibile dei progetti dell'utente.
 
 # 🛠️ Installation Steps:
 
@@ -37,7 +30,7 @@ DONE to install
 
 # TODO
 - [ ] Avviene il re rendering ogni volta che si sposta l'header di sezione (veramente boring consuma banda)
-
+- [ ] Guida al setup con gli steps
 
 
 ---
@@ -54,5 +47,6 @@ Technologies used in the project:
 
 
 
+### About History of Project 
 
-
+This project is a progression of its predecessors, initially built solely with CSS, JS, and HTML. It was then converted to Angular, making it more dynamic and easier to manage. In the latest step, the project has migrated to Next.js. The old versions have been branched and tagged with 'OLD'.
