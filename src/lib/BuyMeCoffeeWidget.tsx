@@ -2,7 +2,7 @@ import React from "react";
 
 
 //1) Change here the script
-//2) add defer at the end | defer ></script>
+//2) add defer at the end defer ></script>
 export const BuyMeCoffeeWidget = () => {
 
   return <>

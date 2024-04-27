@@ -26,6 +26,7 @@ Here're some of the project's best features:
 - [X] SEO friendly --> /lib/SEO.ts
 - [X] GitHub Action Deploy (on GitHub Pages)
 - [X] Buy Me a coffee integration
+- [X] CV Download By GoogleDrive Sharing
 
 ### Requirements
 
@@ -34,10 +35,8 @@ Here're some of the project's best features:
 DONE to install
 
 # TODO
-- [ ] fare pagina 404 e far scomparire header
-- [ ] nuovo contact me con capcha per nascondere il numero
-- [ ] link al CV
-- [ ] avviene il re rendering ogni volta che si sposta l'header di sezione (veramente boring consuma banda)
+- [ ] Nuovo contact me con capcha per nascondere il numero
+- [ ] Avviene il re rendering ogni volta che si sposta l'header di sezione (veramente boring consuma banda)
 - [ ] img vetrina progetto (trovare una strategia es: folder speciale)
 
 
