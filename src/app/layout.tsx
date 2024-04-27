@@ -10,6 +10,7 @@ import ThemeSwitch from "@/components/theme-switch";
 import Footer from "@/components/sections/footer";
 import PersonalInfoContextProvider from "../../context/personal.information";
 import {getSEOTagsLayout} from "@/lib/SEO";
+import {BuyMeCoffeeWidget} from "@/lib/BuyMeCoffeeWidget";
 
 const inter = Inter({subsets: ["latin"]});
 
@@ -27,6 +28,9 @@ export default function RootLayout({
         dark:bg-gray-900 dark:text-gray-50 dark:text-opacity-90
         `}
     >
+
+
+    <BuyMeCoffeeWidget></BuyMeCoffeeWidget>
     <ThemeContextProvider>
       <PersonalInfoContextProvider>
         <ActiveSectionContextProvider>

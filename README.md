@@ -25,6 +25,7 @@ Here're some of the project's best features:
 - [X] Fast Customization --> /public/data/sharedData.json (modify with your data and save)
 - [X] SEO friendly --> /lib/SEO.ts
 - [X] GitHub Action Deploy (on GitHub Pages)
+- [X] Buy Me a coffee integration
 
 ### Requirements
 
@@ -38,7 +39,7 @@ DONE to install
 - [ ] link al CV
 - [ ] avviene il re rendering ogni volta che si sposta l'header di sezione (veramente boring consuma banda)
 - [ ] img vetrina progetto (trovare una strategia es: folder speciale)
-- [ ] Buy me a coffe
+
 
 ---
 ##### 💻 Built with
