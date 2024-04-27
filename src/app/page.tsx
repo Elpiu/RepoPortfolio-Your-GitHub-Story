@@ -7,6 +7,7 @@ import ExperienceC from "@/components/sections/experienceC";
 import React from "react";
 import type {Metadata} from "next";
 import {getSEOTagsLayout} from "@/lib/SEO";
+import Contact from "@/components/sections/contact/contact";
 
 
 export const metadata: Metadata = getSEOTagsLayout()
@@ -21,6 +22,7 @@ export default function Home() {
       <Projects/>
       <Skills/>
       <ExperienceC/>
+      <Contact/>
     </main>
   );
 }

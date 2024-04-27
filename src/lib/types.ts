@@ -23,6 +23,7 @@ export type IntroData = {
   linkLinkedin: string,
   linkGithub: string
   smallIntroPhrase: string,
+  telephoneNumber: string
 }
 
 export type Location = {
@@ -49,6 +50,7 @@ export type GitHubRepoData = {
   rawGithub: string
   fragmentRepository: string
   orderByStars: boolean
+  pathImgShowRepository: string
 }
 
 export type Repository = {

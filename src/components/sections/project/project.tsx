@@ -7,6 +7,7 @@ import {Repository} from "@/lib/types";
 import {repositoryRandomImagePlaceholder} from "@/lib/utils";
 
 type ProjectProps = Repository & {
+  imgSrc: string
   setAsFocus: (repo: Repository) => void
 };
 
@@ -45,7 +46,11 @@ export default function Project({
         </div>
 
         <Image
-          src={repositoryRandomImagePlaceholder()}
+          src={props.html_url+"/blob/main/"+props.imgSrc+"?raw=true"}
+          onError={({ currentTarget }) => {
+          currentTarget.onerror = null; // prevents looping
+          currentTarget.src=repositoryRandomImagePlaceholder().src;
+        }}
           width={800} // Larghezza effettiva dell'immagine
           height={600} // Altezza effettiva dell'immagine
           alt="Project I worked on"

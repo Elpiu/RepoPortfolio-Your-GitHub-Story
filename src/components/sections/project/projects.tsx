@@ -62,7 +62,9 @@ export default function Projects() {
       <div>
         {gitHubRepositories.slice(0, visibleProjects).map((project, index) => (
           <React.Fragment key={index + project.name}>
-            <Project {...project} setAsFocus={(repo: Repository) => modalEmitter.emit("openModal", repo)}/>
+            <Project {...project}
+                     imgSrc={gitHubRepoData.pathImgShowRepository}
+                     setAsFocus={(repo: Repository) => modalEmitter.emit("openModal", repo)}/>
           </React.Fragment>
         ))}
 
