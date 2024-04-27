@@ -3,9 +3,6 @@
 //const isProd = process.env.NODE_ENV = 'production'
 
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   output: "export",
   distDir: 'docs',
   //basePath: isProd ? '/RepoPortfolio-Your-GitHub-Story' : '',
