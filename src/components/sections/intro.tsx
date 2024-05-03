@@ -98,7 +98,7 @@ export default function Intro() {
           target="_blank"
           download
         >
-          Download DC{" "}
+          Download CV{" "}
           <HiDownload className="opacity-60 group-hover:translate-y-1 transition"/>
         </a>
 
