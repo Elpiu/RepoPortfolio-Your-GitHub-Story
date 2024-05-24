@@ -20,6 +20,7 @@ Here're some of the project's best features:
 - [X] Fast Customization --> /public/data/sharedData.json (modify with your data and save)
 - [X] SEO friendly --> /lib/SEO.ts
 - [X] GitHub Action Deploy (on GitHub Pages)
+- [X] Fetch information form Repository (Branch must be named 'main')
 - [X] In-project preview image [ Every repository must include a folder named '.github/RepoPortfolio-Your-GitHub-Story' containing an image named 'index.png'.]
 - [X] Buy Me a coffee integration
 - [X] CV Download By GoogleDrive Sharing

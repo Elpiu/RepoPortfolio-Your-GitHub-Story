@@ -83,7 +83,7 @@ type TopicProps = {
 
 export function Description(descriptionProps: DescriptionProps) {
 
-  let words = descriptionProps.description.split(" ")
+  let words = descriptionProps.description?.split(" ") || []
 
   if (words.length > 20) {
     let description = descriptionProps.description.split(" ").slice(0, 20)
