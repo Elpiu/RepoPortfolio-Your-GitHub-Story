@@ -32,7 +32,6 @@ Here're some of the project's best features:
 DONE to install
 
 # TODO
-- [ ] Avviene il re rendering ogni volta che si sposta l'header di sezione (veramente boring consuma banda)
 - [ ] Guida al setup con gli steps
 
 

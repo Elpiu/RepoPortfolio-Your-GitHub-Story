@@ -8,7 +8,7 @@
       "profession": "full-stack developer",
       "yearExperience": 4,
       "contactEmail": "elpidio.mazza97@gmail.com",
-      "linkToCv": "https://drive.google.com/file/d/1HYK0zUHrmyXZyMtuhhsqygy23eLcNKgO/view",
+      "linkToCv": "https://drive.google.com/file/d/1x3qxOnlDvWpHqb1q4qC4xK067VelHxeO/view",
       "linkLinkedin": "https://www.linkedin.com/in/elpidio-mazza-72b641155/",
       "linkGithub": "https://github.com/Elpiu",
       "smallIntroPhrase": "L'informatica è una delle mie più grandi passioni, riesce sempre a proporre nuove sfide e non ci si annoia mai.",
@@ -39,11 +39,18 @@
         "date": "2019 - 2022"
       },
       {
-        "title": "Attualmente lavoro in Nexsoft",
+        "title": "Nexsoft S.p.A.",
         "location": "Salerno - Full Remote",
-        "description": "Dipendente dell’azienda Nexsoft S.P.A. nel ruolo di come Software Developer, ho la responsabilità di operare come outsourced professional presso CHH Tagetik. Il mio ruolo si concentra sulla progettazione, lo sviluppo, il porting e il testing di un'applicazione enterprise nell'area funzionale di competenza. Questo coinvolge l'utilizzo delle tecnologie Java/Typescript e dei framework Spring/Angular.",
+        "description": "Ho avuto la responsabilità di operare come outsourced professional presso CHH Tagetik. Il mio ruolo si è concentrato sulla progettazione, lo sviluppo, il porting e il testing di un'applicazione enterprise nell'area funzionale di competenza. Questo ha coinvolto l'utilizzo delle tecnologie Java/Typescript e dei framework Spring/Angular.",
         "icon": "work",
-        "date": "Dal 7/2022 – in corso"
+        "date": "Dal 7/2022 – al 6/2024"
+      },
+      {
+        "title": "System Management S.p.A.",
+        "location": "Napoli - Hybrid",
+        "description": "Sviluppo applicazioni CRM/KPI personalizzate per i clienti, lavorando sia sul backend che sul frontend, con particolare focus\nsu soluzioni IoT intelligenti che facilitano la comunicazione tra dispositivi eterogenei.",
+        "icon": "work",
+        "date": "Dal 7/2024 – in corso"
       }
     ],
     "gitHubRepoData": {
