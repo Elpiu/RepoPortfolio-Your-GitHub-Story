@@ -1,0 +1,29 @@
+{
+  "styleConfig": {
+    "isVisibleToolConfing": false,
+    "isVisibleProfileIcon": false,
+    "isVisibleConfigIcon": false,
+    "isVisibleSidebar": false,
+    "scaleValues": [12, 13, 14, 15, 16],
+    "ripple": true,
+    "inputStyle": "outlined",
+    "menuMode": "drawer",
+    "colorScheme": "dark",
+    "theme": "indigo",
+    "scale": 14,
+    "menuTheme": "primaryColor",
+    "lightUrl": "theme/light/theme.css",
+    "darkUrl": "theme/dark/theme.css"
+  },
+
+  "layoutConfig": {
+    "staticMenuDesktopInactive": false,
+    "overlayMenuActive": false,
+    "profileSidebarVisible": false,
+    "configSidebarVisible": false,
+    "staticMenuMobileActive": false,
+    "menuHoverActive": false,
+    "sidebarActive": false,
+    "anchored": false
+  }
+}
