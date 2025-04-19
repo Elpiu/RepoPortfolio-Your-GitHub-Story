@@ -162,6 +162,18 @@
         {
           "name": "Nest.js: A Progressive Node.js Framework",
           "imgUrlCover": "https://m.media-amazon.com/images/I/512bhoDmCeL._SY466_.jpg"
+        },
+        {
+          "name": "Blockchain and Ethereum Smart Contract Solution Development",
+          "imgUrlCover": "https://media.springernature.com/full/springer-static/cover-hires/book/978-1-4842-8164-2?as=webp"
+        },
+        {
+          "name": "PostgreSQL: Up and Running",
+          "imgUrlCover": "https://m.media-amazon.com/images/I/91V4KvmUzdL._SY342_.jpg"
+        },
+        {
+          "name": "Scrum: The Art of Doing Twice the Work in Half the Time",
+          "imgUrlCover": "https://m.media-amazon.com/images/I/71OUBnMjOwL._SY466_.jpg"
         }
       ]
     },
