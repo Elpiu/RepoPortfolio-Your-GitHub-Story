@@ -1,5 +1,9 @@
 # Changelog
 
+> **Legacy changelog.** Riferito alla versione Next.js precedente, conservato
+> come memoria del progetto. Il nuovo ciclo di release riparte dalla riscrittura
+> Nuxt (vedi `docs/09-roadmap-e-adr.md`).
+
 
 
 ---
