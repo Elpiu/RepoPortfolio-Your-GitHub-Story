@@ -73,7 +73,9 @@ l'hook `prerender:routes`.
   Raggi, bordi, superfici e tipografia vengono riallineati ai token di
   [06 — Design system](06-design-system.md) tramite `app.config.ts`.
 - Componenti usati: `UButton`, `UBadge`, `UAvatar`, `UTabs`, `UInput`,
-  `USelect`, `UTooltip`, `UDropdownMenu`, `USlideover`, `UApp`.
+  `USelect`, `UTooltip`.
+- Menu e switcher usano disclosure nativi (`<details>`, `<select>`): evitano il
+  peso runtime di `UDropdownMenu`/`USlideover` e restano accessibili senza JS.
 - Accessibilità delegata a Reka UI (focus trap, ARIA, tastiera).
 - I componenti non vanno reimplementati: si wrappano solo quando serve una
   variante di progetto (`AppButton`).
@@ -126,7 +128,7 @@ Due famiglie: un sans e un mono, come Linear e Vercel.
 fonts: {
   families: [
     { name: 'Geist', provider: 'google', weights: ['400 700'], subsets: ['latin'] },
-    { name: 'Geist Mono', provider: 'google', weights: [400, 500], subsets: ['latin'] },
+    { name: 'Geist Mono', provider: 'google', weights: [400], subsets: ['latin'] },
   ],
   defaults: {
     fallbacks: {
@@ -141,6 +143,9 @@ fonts: {
   vengono scaricati e serviti dal dominio del sito.
 - Geist è un font variabile: un file per il range di pesi.
 - `font-display: swap` e fallback metrics per limitare il CLS.
+- Un solo peso per Geist Mono (400): con il peso 500 incluso i file font
+  superavano il budget di 100 KB totali. Il mono enfatizzato usa il colore, non
+  un secondo file.
 - Nessun `<link>` a `fonts.googleapis.com` nel markup finale: va verificato in
   CI.
 

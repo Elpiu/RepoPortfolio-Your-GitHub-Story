@@ -1,0 +1,8 @@
+allowBuilds:
+  esbuild: true
+  unrs-resolver: true
+  vue-demi: true
+minimumReleaseAgeExclude:
+  - '@vue/language-core@3.3.14'
+  - eslint@10.14.0
+  - vue-tsc@3.3.14

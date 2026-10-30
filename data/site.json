@@ -1,0 +1,38 @@
+{
+  "$schema": "./schema/site.schema.json",
+  "github": {
+    "username": "",
+    "excludedRepos": [],
+    "includeForks": false,
+    "includeArchived": false,
+    "excludeProfileRepo": true,
+    "maxRepos": 300,
+    "readmeMaxBytes": 200000
+  },
+  "links": {
+    "email": "you@example.com",
+    "phone": null,
+    "linkedin": null,
+    "website": null,
+    "cvUrl": null
+  },
+  "career": {
+    "start": "2022-07"
+  },
+  "story": {
+    "autoEvents": true,
+    "includeReleases": true,
+    "maxAutoEvents": 8
+  },
+  "locales": [
+    { "code": "en", "language": "en-US", "name": "English", "default": true },
+    { "code": "it", "language": "it-IT", "name": "Italiano", "default": false }
+  ],
+  "deploy": {
+    "customDomain": null
+  },
+  "seo": {
+    "siteName": null,
+    "twitterHandle": null
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "$schema": "../schema/profile.schema.json",
+  "locale": "it",
+  "meta": {
+    "name": "Il tuo nome",
+    "fullName": "Il tuo nome completo",
+    "role": "sviluppatore full-stack",
+    "tagline": "Costruisco prodotti web semplici da usare e difficili da rompere.",
+    "location": "La tua città, Italia",
+    "available": true,
+    "availability": "Disponibile per opportunità full-remote"
+  },
+  "about": {
+    "paragraphs": [
+      "Sviluppatore full-stack con esperienza nella progettazione e nella costruzione di applicazioni enterprise.",
+      "Tengo alla qualità del software: test, accessibilità, prestazioni e manutenibilità."
+    ]
+  },
+  "skills": {
+    "groups": [
+      {
+        "id": "languages",
+        "label": "Linguaggi",
+        "items": [
+          { "name": "TypeScript", "icon": "simple-icons:typescript" },
+          { "name": "Java", "icon": "simple-icons:openjdk" },
+          { "name": "SQL" }
+        ]
+      },
+      {
+        "id": "frameworks",
+        "label": "Framework e strumenti",
+        "items": [
+          { "name": "Vue", "icon": "simple-icons:vuedotjs" },
+          { "name": "Nuxt", "icon": "simple-icons:nuxt" },
+          { "name": "Spring Boot", "icon": "simple-icons:springboot" }
+        ]
+      },
+      {
+        "id": "platforms",
+        "label": "Piattaforme",
+        "items": [
+          { "name": "Git", "icon": "simple-icons:git" },
+          { "name": "Docker", "icon": "simple-icons:docker" },
+          { "name": "GitHub Actions", "icon": "simple-icons:githubactions" }
+        ]
+      }
+    ]
+  },
+  "experiences": [
+    {
+      "id": "acme",
+      "type": "work",
+      "title": "Sviluppatore Full-stack",
+      "organization": "Acme S.p.A.",
+      "location": "Napoli — Ibrido",
+      "start": "2024-07",
+      "end": null,
+      "description": "Costruisco applicazioni CRM e KPI personalizzate, dal backend al frontend.",
+      "highlights": [
+        "Applicazioni CRM e KPI per clienti enterprise",
+        "Responsabilità end-to-end dal modello dati alla UI accessibile"
+      ]
+    },
+    {
+      "id": "university",
+      "type": "education",
+      "title": "Laurea in Informatica",
+      "organization": "Università di Salerno",
+      "location": "Fisciano (SA), Italia",
+      "start": "2019-09",
+      "end": "2022-07",
+      "description": "Laurea triennale in Informatica.",
+      "highlights": []
+    }
+  ],
+  "milestones": [
+    {
+      "id": "first-release",
+      "type": "release",
+      "date": "2024-02",
+      "title": "Prima release enterprise",
+      "description": "Rilasciata un'applicazione enterprise usata da clienti reali.",
+      "tags": ["Java", "Angular"]
+    }
+  ]
+}

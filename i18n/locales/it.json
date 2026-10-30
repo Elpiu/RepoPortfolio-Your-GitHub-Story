@@ -1,0 +1,61 @@
+{
+  "app": {
+    "name": "RepoPortfolio",
+    "skipToContent": "Vai al contenuto"
+  },
+  "nav": {
+    "label": "Sezioni",
+    "home": "Home",
+    "about": "Chi sono",
+    "projects": "Progetti",
+    "skills": "Competenze",
+    "experience": "Esperienza",
+    "contact": "Contatti",
+    "openMenu": "Apri menu",
+    "closeMenu": "Chiudi menu"
+  },
+  "theme": {
+    "label": "Tema",
+    "light": "Chiaro",
+    "dark": "Scuro",
+    "system": "Sistema"
+  },
+  "language": {
+    "label": "Lingua"
+  },
+  "footer": {
+    "credit": "Costruito con Nuxt, TypeScript e Tailwind CSS.",
+    "source": "Sorgente su GitHub",
+    "version": "Versione"
+  },
+  "home": {
+    "available": "Disponibile per nuove opportunitÃ ",
+    "unavailable": "Non in cerca di lavoro",
+    "present": "in corso",
+    "years": "{count} anni di esperienza",
+    "about": "Chi sono",
+    "aboutEyebrow": "Profilo",
+    "projects": "Esplora tutti i repository",
+    "projectsEyebrow": "Lavoro",
+    "projectsEmpty": "Il motore dei progetti non Ã¨ ancora collegato. Arriva con la sincronizzazione GitHub.",
+    "skills": "Competenze tecniche",
+    "skillsEyebrow": "Strumenti",
+    "experience": "GitHub Story",
+    "experienceEyebrow": "Carriera",
+    "experienceEmpty": "Nessuna esperienza. Aggiungile in data/profile.",
+    "contact": "Parliamone",
+    "contactEyebrow": "Contatti",
+    "contactDescription": "Il modo piÃ¹ rapido per contattarmi Ã¨ via email.",
+    "email": "Scrivimi",
+    "github": "Profilo GitHub",
+    "viewProjects": "Guarda i progetti",
+    "readAbout": "Leggi chi sono"
+  },
+  "error": {
+    "notFoundTitle": "Pagina non trovata",
+    "notFoundDescription": "La pagina che cerchi non esiste o Ã¨ stata spostata.",
+    "genericTitle": "Qualcosa Ã¨ andato storto",
+    "genericDescription": "Si Ã¨ verificato un errore imprevisto. Riprova o torna alla home.",
+    "backHome": "Torna alla home"
+  }
+}

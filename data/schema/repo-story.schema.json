@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "preview": {
+      "type": "string",
+      "minLength": 1
+    },
+    "hidden": {
+      "default": false,
+      "type": "boolean"
+    },
+    "story": {
+      "default": true,
+      "type": "boolean"
+    }
+  }
+}

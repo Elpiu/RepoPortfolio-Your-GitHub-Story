@@ -14,12 +14,14 @@ Linear, Vercel and Raycast.
 
 ## Status
 
-**Pre-scaffold / design phase.** The legacy Next.js application has been removed
-from the working tree; Git history keeps it as an archive. There is no
-application code yet, so the commands below describe the target workflow.
-Product and technical decisions live in [`docs/`](docs/README.md).
+**M1 — scaffold and foundations.** The Nuxt 4 application is in place with the
+design tokens, dark-first theme, localized routes, validated `data/` JSON,
+one-command deploy and byte budgets. The GitHub sync, Explore grid, project
+detail, Bento/Story and CV arrive in the next milestones. The legacy Next.js
+application has been removed; Git history keeps it as an archive. Product and
+technical decisions live in [`docs/`](docs/README.md).
 
-## How it will work
+## How it works
 
 1. Clone the repository (or use it as a template).
 2. Edit the JSON files in `data/`. Nothing else.
@@ -36,13 +38,23 @@ data/
 Every JSON file points to a generated JSON Schema, so your editor autocompletes
 fields and flags mistakes as you type.
 
-### Quick start (target)
+### Quick start
 
 ```bash
 pnpm install
+pnpm dev
+```
+
+To generate and publish:
+
+```powershell
+# Windows (PowerShell)
+$env:GITHUB_TOKEN = gh auth token
+pnpm run deploy
 ```
 
 ```bash
+# macOS / Linux
 GITHUB_TOKEN=$(gh auth token) pnpm run deploy
 ```
 
@@ -120,9 +132,15 @@ are in English.
 ## Repository layout (today)
 
 ```text
+app/                                   Nuxt pages, layouts, components, composables
+data/                                  owner JSON + generated JSON Schemas
+modules/validate-data.ts               build-time validation and schema generation
+shared/                                zod schemas, domain types, pure utilities
+i18n/locales/                          UI strings supplied by the engine
+scripts/                               deploy, repo context, byte budgets
+tests/unit/                            fast tests for data and pure logic
 docs/                                  documentation (Italian)
 public/repo-placeholder/               deterministic project placeholders
-public/favicon.ico
 .github/RepoPortfolio-.../index.png    repository preview (legacy path, still detected)
 ```
 

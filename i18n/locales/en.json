@@ -1,0 +1,61 @@
+{
+  "app": {
+    "name": "RepoPortfolio",
+    "skipToContent": "Skip to content"
+  },
+  "nav": {
+    "label": "Sections",
+    "home": "Home",
+    "about": "About",
+    "projects": "Projects",
+    "skills": "Skills",
+    "experience": "Experience",
+    "contact": "Contact",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "theme": {
+    "label": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "language": {
+    "label": "Language"
+  },
+  "footer": {
+    "credit": "Engineered with Nuxt, TypeScript and Tailwind CSS.",
+    "source": "Source on GitHub",
+    "version": "Version"
+  },
+  "home": {
+    "available": "Available for new opportunities",
+    "unavailable": "Not currently looking",
+    "present": "present",
+    "years": "{count} years of experience",
+    "about": "About",
+    "aboutEyebrow": "Profile",
+    "projects": "Explore all repositories",
+    "projectsEyebrow": "Work",
+    "projectsEmpty": "The project engine is not connected yet. It arrives with the GitHub sync.",
+    "skills": "Tech stack",
+    "skillsEyebrow": "Tools",
+    "experience": "GitHub Story",
+    "experienceEyebrow": "Career",
+    "experienceEmpty": "No experiences yet. Add them in data/profile.",
+    "contact": "Let's talk",
+    "contactEyebrow": "Contact",
+    "contactDescription": "The fastest way to reach me is by email.",
+    "email": "Email me",
+    "github": "GitHub profile",
+    "viewProjects": "View projects",
+    "readAbout": "Read about me"
+  },
+  "error": {
+    "notFoundTitle": "Page not found",
+    "notFoundDescription": "The page you are looking for does not exist or has moved.",
+    "genericTitle": "Something went wrong",
+    "genericDescription": "An unexpected error occurred. Try again or go back home.",
+    "backHome": "Back to home"
+  }
+}

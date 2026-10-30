@@ -172,7 +172,7 @@ Regole:
 | Body large | Geist | 400 | 1.125rem | 1.75 |
 | Small / meta | Geist | 500 | 0.875rem | 1.5 |
 | Micro / badge | Geist | 600 | 0.75rem | 1.2 |
-| Mono / tecnico | Geist Mono | 400/500 | 0.75–0.875rem | 1.4 |
+| Mono / tecnico | Geist Mono | 400 | 0.75–0.875rem | 1.4 |
 
 - Una sola famiglia sans: la gerarchia nasce da peso, dimensione e tracking,
   non da un secondo font.
@@ -250,9 +250,9 @@ Regole:
 | `AppHeader` | Navigazione, logo, tema, lingua | `<header>`, sticky |
 | `AppFooter` | Copyright, crediti stack, link | `<footer>` |
 | `SkipLink` | Salta al contenuto | Primo elemento focusabile |
-| `ThemeToggle` | system/light/dark | `UButton` + `UDropdownMenu` |
-| `LocaleSwitcher` | Lingue supportate, mantenendo la pagina | `UDropdownMenu` |
-| `MobileMenu` | Navigazione mobile | `USlideover` o `UDropdownMenu` |
+| `ThemeToggle` | system/light/dark | `UButton` + disclosure nativo |
+| `LocaleSwitcher` | Lingue supportate, mantenendo la pagina | `<select>` nativo |
+| `MobileMenu` | Navigazione mobile | Disclosure nativo (`<details>`) |
 
 ### UI
 

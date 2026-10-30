@@ -1,0 +1,55 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Restore GitHub snapshot
+        uses: actions/cache@v4
+        with:
+          path: .cache/github
+          key: github-${{ github.repository }}-${{ github.run_id }}
+          restore-keys: |
+            github-${{ github.repository }}-
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Generate and publish
+        run: pnpm run deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Smoke test
+        run: |
+          set -e
+          base="$(node -p "require('./.output/public/build.json').siteUrl")"
+          for i in $(seq 1 30); do
+            if curl -fsS "${base}build.json" | grep -q "$GITHUB_SHA"; then break; fi
+            sleep 10
+          done
+          curl -fsS "${base}build.json" | grep -q "$GITHUB_SHA"
+          curl -fsS "${base}sitemap.xml" > /dev/null
+          test "$(curl -s -o /dev/null -w '%{http_code}' "${base}this-does-not-exist")" = "404"

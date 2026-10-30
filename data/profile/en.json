@@ -1,0 +1,87 @@
+{
+  "$schema": "../schema/profile.schema.json",
+  "locale": "en",
+  "meta": {
+    "name": "Your Name",
+    "fullName": "Your Full Name",
+    "role": "full-stack developer",
+    "tagline": "I build web products that are simple to use and hard to break.",
+    "location": "Your City, Country",
+    "available": true,
+    "availability": "Open to full-remote opportunities"
+  },
+  "about": {
+    "paragraphs": [
+      "Full-stack developer with experience designing and building enterprise applications.",
+      "I care about software quality: testing, accessibility, performance and maintainability."
+    ]
+  },
+  "skills": {
+    "groups": [
+      {
+        "id": "languages",
+        "label": "Languages",
+        "items": [
+          { "name": "TypeScript", "icon": "simple-icons:typescript" },
+          { "name": "Java", "icon": "simple-icons:openjdk" },
+          { "name": "SQL" }
+        ]
+      },
+      {
+        "id": "frameworks",
+        "label": "Frameworks & tools",
+        "items": [
+          { "name": "Vue", "icon": "simple-icons:vuedotjs" },
+          { "name": "Nuxt", "icon": "simple-icons:nuxt" },
+          { "name": "Spring Boot", "icon": "simple-icons:springboot" }
+        ]
+      },
+      {
+        "id": "platforms",
+        "label": "Platforms",
+        "items": [
+          { "name": "Git", "icon": "simple-icons:git" },
+          { "name": "Docker", "icon": "simple-icons:docker" },
+          { "name": "GitHub Actions", "icon": "simple-icons:githubactions" }
+        ]
+      }
+    ]
+  },
+  "experiences": [
+    {
+      "id": "acme",
+      "type": "work",
+      "title": "Full-stack Developer",
+      "organization": "Acme S.p.A.",
+      "location": "Naples — Hybrid",
+      "start": "2024-07",
+      "end": null,
+      "description": "Building custom CRM and KPI applications from backend to frontend.",
+      "highlights": [
+        "CRM and KPI applications for enterprise customers",
+        "End-to-end ownership from data model to accessible UI"
+      ]
+    },
+    {
+      "id": "university",
+      "type": "education",
+      "title": "BSc in Computer Science",
+      "organization": "University of Salerno",
+      "location": "Fisciano (SA), Italy",
+      "start": "2019-09",
+      "end": "2022-07",
+      "description": "Bachelor's degree in Computer Science.",
+      "highlights": []
+    }
+  ],
+  "milestones": [
+    {
+      "id": "first-release",
+      "type": "release",
+      "date": "2024-02",
+      "title": "First enterprise release",
+      "description": "Shipped an enterprise application used by real customers.",
+      "tags": ["Java", "Angular"]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # RepoPortfolio — Documentazione di progetto
 
-> **Stato:** Fase 0 — Design e pianificazione
+> **Stato:** Fase 1 — M1 (scaffold e fondamenta) completata, sviluppo in corso
 > **Ultimo aggiornamento:** 30 ottobre 2026
 > **Destinatari:** maintainer, contributor, reviewer
 
