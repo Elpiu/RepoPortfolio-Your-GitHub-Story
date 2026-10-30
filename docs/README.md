@@ -107,6 +107,8 @@ Le decisioni sono raccolte in [09 — Roadmap e decisioni](09-roadmap-e-adr.md).
 - Ogni modifica architetturale aggiorna il registro ADR e la data in testa a
   questo file.
 - I diagrammi sono in ASCII/Mermaid e devono restare versionabili nel repo.
+- Le regole operative per i coding agent (fonti, vincoli, comandi, git, report)
+  sono in [`AGENTS.md`](../AGENTS.md) alla root; `CLAUDE.md` lo importa.
 
 ## Stato del repository
 
