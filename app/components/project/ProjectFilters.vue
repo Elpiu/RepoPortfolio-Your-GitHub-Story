@@ -61,31 +61,45 @@ function onSort(event: Event) {
       <span class="font-mono text-xs uppercase tracking-[0.14em] text-foreground-subtle">
         {{ t('projects.filters.languageLabel') }}
       </span>
-      <select
-        id="project-language"
-        :value="language ?? ''"
-        class="rounded-control border border-border bg-surface px-3 py-2 text-sm text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-        @change="onLanguage"
-      >
-        <option value="">{{ t('projects.filters.allLanguages') }}</option>
-        <option v-for="entry in languages" :key="entry" :value="entry">{{ entry }}</option>
-      </select>
+      <span class="relative block">
+        <select
+          id="project-language"
+          :value="language ?? ''"
+          class="w-full cursor-pointer appearance-none rounded-control border border-border bg-surface py-2 pr-9 pl-3 text-sm text-foreground transition-colors hover:border-border-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          @change="onLanguage"
+        >
+          <option value="">{{ t('projects.filters.allLanguages') }}</option>
+          <option v-for="entry in languages" :key="entry" :value="entry">{{ entry }}</option>
+        </select>
+        <UIcon
+          name="i-lucide-chevron-down"
+          class="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-foreground-subtle"
+          aria-hidden="true"
+        />
+      </span>
     </label>
 
     <label class="flex flex-col gap-1.5" for="project-sort">
       <span class="font-mono text-xs uppercase tracking-[0.14em] text-foreground-subtle">
         {{ t('projects.filters.sortLabel') }}
       </span>
-      <select
-        id="project-sort"
-        :value="sort"
-        class="rounded-control border border-border bg-surface px-3 py-2 text-sm text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-        @change="onSort"
-      >
-        <option v-for="option in sortOptions" :key="option.value" :value="option.value">
-          {{ option.label }}
-        </option>
-      </select>
+      <span class="relative block">
+        <select
+          id="project-sort"
+          :value="sort"
+          class="w-full cursor-pointer appearance-none rounded-control border border-border bg-surface py-2 pr-9 pl-3 text-sm text-foreground transition-colors hover:border-border-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          @change="onSort"
+        >
+          <option v-for="option in sortOptions" :key="option.value" :value="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+        <UIcon
+          name="i-lucide-chevron-down"
+          class="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-foreground-subtle"
+          aria-hidden="true"
+        />
+      </span>
     </label>
 
     <AppButton
