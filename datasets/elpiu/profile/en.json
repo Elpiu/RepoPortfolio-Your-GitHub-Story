@@ -1,0 +1,125 @@
+{
+  "$schema": "../../../data/schema/profile.schema.json",
+  "locale": "en",
+  "meta": {
+    "name": "Elpidio",
+    "fullName": "Elpidio Mazza",
+    "role": "Full-stack developer",
+    "tagline": "Computer science is one of my greatest passions: it always brings new challenges, and it never gets boring.",
+    "location": "Ravello (SA), Italy",
+    "available": false
+  },
+  "about": {
+    "paragraphs": [
+      "Born in 1997 and based in Ravello (SA), Italy. I'm a full-stack developer who is always ready to take on new challenges and keep growing, with a particular focus on the web.",
+      "Since 2022 I have been building enterprise applications with Java, Spring, TypeScript and Angular; today I develop CRM, KPI and IoT solutions from backend to frontend.",
+      "My mission is to make people's lives simpler through software."
+    ]
+  },
+  "skills": {
+    "groups": [
+      {
+        "id": "languages",
+        "label": "Languages",
+        "items": [
+          { "name": "TypeScript", "icon": "simple-icons:typescript" },
+          { "name": "Java", "icon": "simple-icons:openjdk" },
+          { "name": "JavaScript", "icon": "simple-icons:javascript" },
+          { "name": "Python", "icon": "simple-icons:python" },
+          { "name": "HTML", "icon": "simple-icons:html5" },
+          { "name": "CSS", "icon": "simple-icons:css" }
+        ]
+      },
+      {
+        "id": "frameworks",
+        "label": "Frameworks & libraries",
+        "items": [
+          { "name": "Angular", "icon": "simple-icons:angular" },
+          { "name": "Spring Boot", "icon": "simple-icons:springboot" },
+          { "name": "PrimeNG", "icon": "simple-icons:primeng" },
+          { "name": "Tailwind CSS", "icon": "simple-icons:tailwindcss" },
+          { "name": "Flask", "icon": "simple-icons:flask" }
+        ]
+      },
+      {
+        "id": "platforms",
+        "label": "Tools & platforms",
+        "items": [
+          { "name": "Git", "icon": "simple-icons:git" },
+          { "name": "GitHub Actions", "icon": "simple-icons:githubactions" },
+          { "name": "Maven", "icon": "simple-icons:apachemaven" },
+          { "name": "npm", "icon": "simple-icons:npm" },
+          { "name": "AWS Amplify", "icon": "simple-icons:awsamplify" }
+        ]
+      },
+      {
+        "id": "soft-skills",
+        "label": "Soft skills",
+        "items": [
+          { "name": "Planning" },
+          { "name": "Proactivity" },
+          { "name": "Determination" },
+          { "name": "Teamwork" },
+          { "name": "Problem solving" },
+          { "name": "Autonomy" },
+          { "name": "Punctuality" },
+          { "name": "Curiosity" },
+          { "name": "Love for challenges" }
+        ]
+      }
+    ]
+  },
+  "experiences": [
+    {
+      "id": "system-management",
+      "type": "work",
+      "title": "Full-stack Developer",
+      "organization": "System Management S.p.A.",
+      "location": "Naples — Hybrid",
+      "start": "2024-07",
+      "end": null,
+      "description": "I build custom CRM and KPI applications for clients across backend and frontend, with a strong focus on smart IoT solutions that let heterogeneous devices communicate.",
+      "highlights": [
+        "Custom CRM and KPI applications for clients",
+        "IoT solutions connecting heterogeneous devices",
+        "End-to-end development, from backend to frontend"
+      ]
+    },
+    {
+      "id": "nexsoft",
+      "type": "work",
+      "title": "Software Developer",
+      "organization": "Nexsoft S.p.A.",
+      "location": "Salerno — Full remote",
+      "start": "2022-07",
+      "end": "2024-06",
+      "description": "Outsourced professional at CCH Tagetik: design, development, porting and testing of an enterprise application within my functional area.",
+      "highlights": [
+        "Design, development, porting and testing of an enterprise application",
+        "Java and Spring on the backend, TypeScript and Angular on the frontend"
+      ]
+    },
+    {
+      "id": "unisa",
+      "type": "education",
+      "title": "BSc in Computer Science (L-31)",
+      "organization": "University of Salerno",
+      "location": "Fisciano (SA), Italy",
+      "start": "2019-09",
+      "end": "2022-07",
+      "description": "Bachelor's degree in Computer Science (class L-31), final grade 100/110.",
+      "highlights": ["Thesis: a CNN model to assess the progression of Parkinson's disease"]
+    }
+  ],
+  "milestones": [
+    {
+      "id": "thesis",
+      "type": "repo",
+      "date": "2022-03",
+      "title": "Thesis: a CNN for Parkinson's disease",
+      "description": "A convolutional neural network that assesses the progression of Parkinson's disease, built for my thesis and later served by a Flask application.",
+      "repo": "cnn-evaluate-parkinson-bd",
+      "tags": ["Python", "CNN", "Flask"]
+    }
+  ]
+}

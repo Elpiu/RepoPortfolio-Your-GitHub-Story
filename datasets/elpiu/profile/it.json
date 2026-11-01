@@ -1,0 +1,125 @@
+{
+  "$schema": "../../../data/schema/profile.schema.json",
+  "locale": "it",
+  "meta": {
+    "name": "Elpidio",
+    "fullName": "Elpidio Mazza",
+    "role": "Sviluppatore full-stack",
+    "tagline": "L'informatica è una delle mie più grandi passioni: propone sempre nuove sfide e non ci si annoia mai.",
+    "location": "Ravello (SA), Italia",
+    "available": false
+  },
+  "about": {
+    "paragraphs": [
+      "Classe '97, vivo a Ravello (SA). Sono uno sviluppatore full-stack sempre pronto ad accettare nuove sfide e ad arricchire il mio bagaglio professionale, con un'attenzione particolare al mondo web.",
+      "Dal 2022 lavoro su applicazioni enterprise con Java, Spring, TypeScript e Angular; oggi sviluppo soluzioni CRM, KPI e IoT dal backend al frontend.",
+      "La mia missione è semplificare la vita delle persone con l'informatica."
+    ]
+  },
+  "skills": {
+    "groups": [
+      {
+        "id": "languages",
+        "label": "Linguaggi",
+        "items": [
+          { "name": "TypeScript", "icon": "simple-icons:typescript" },
+          { "name": "Java", "icon": "simple-icons:openjdk" },
+          { "name": "JavaScript", "icon": "simple-icons:javascript" },
+          { "name": "Python", "icon": "simple-icons:python" },
+          { "name": "HTML", "icon": "simple-icons:html5" },
+          { "name": "CSS", "icon": "simple-icons:css" }
+        ]
+      },
+      {
+        "id": "frameworks",
+        "label": "Framework e librerie",
+        "items": [
+          { "name": "Angular", "icon": "simple-icons:angular" },
+          { "name": "Spring Boot", "icon": "simple-icons:springboot" },
+          { "name": "PrimeNG", "icon": "simple-icons:primeng" },
+          { "name": "Tailwind CSS", "icon": "simple-icons:tailwindcss" },
+          { "name": "Flask", "icon": "simple-icons:flask" }
+        ]
+      },
+      {
+        "id": "platforms",
+        "label": "Strumenti e piattaforme",
+        "items": [
+          { "name": "Git", "icon": "simple-icons:git" },
+          { "name": "GitHub Actions", "icon": "simple-icons:githubactions" },
+          { "name": "Maven", "icon": "simple-icons:apachemaven" },
+          { "name": "npm", "icon": "simple-icons:npm" },
+          { "name": "AWS Amplify", "icon": "simple-icons:awsamplify" }
+        ]
+      },
+      {
+        "id": "soft-skills",
+        "label": "Competenze trasversali",
+        "items": [
+          { "name": "Capacità di pianificazione" },
+          { "name": "Proattività" },
+          { "name": "Determinazione" },
+          { "name": "Lavoro di squadra" },
+          { "name": "Problem solving" },
+          { "name": "Autonomia" },
+          { "name": "Puntualità" },
+          { "name": "Curiosità" },
+          { "name": "Amore per le sfide" }
+        ]
+      }
+    ]
+  },
+  "experiences": [
+    {
+      "id": "system-management",
+      "type": "work",
+      "title": "Sviluppatore full-stack",
+      "organization": "System Management S.p.A.",
+      "location": "Napoli — Ibrido",
+      "start": "2024-07",
+      "end": null,
+      "description": "Sviluppo applicazioni CRM e KPI personalizzate per i clienti, lavorando sia sul backend sia sul frontend, con un focus particolare su soluzioni IoT intelligenti che facilitano la comunicazione tra dispositivi eterogenei.",
+      "highlights": [
+        "Applicazioni CRM e KPI su misura per i clienti",
+        "Soluzioni IoT per la comunicazione tra dispositivi eterogenei",
+        "Sviluppo end-to-end, dal backend al frontend"
+      ]
+    },
+    {
+      "id": "nexsoft",
+      "type": "work",
+      "title": "Sviluppatore software",
+      "organization": "Nexsoft S.p.A.",
+      "location": "Salerno — Full remote",
+      "start": "2022-07",
+      "end": "2024-06",
+      "description": "Professionista in outsourcing presso CCH Tagetik: progettazione, sviluppo, porting e testing di un'applicazione enterprise nella mia area funzionale.",
+      "highlights": [
+        "Progettazione, sviluppo, porting e testing di un'applicazione enterprise",
+        "Backend Java con Spring, frontend TypeScript con Angular"
+      ]
+    },
+    {
+      "id": "unisa",
+      "type": "education",
+      "title": "Laurea triennale in Informatica (L-31)",
+      "organization": "Università degli Studi di Salerno",
+      "location": "Fisciano (SA)",
+      "start": "2019-09",
+      "end": "2022-07",
+      "description": "Laurea di primo livello in Informatica (classe L-31), con votazione 100/110.",
+      "highlights": ["Tesi: modello CNN per la valutazione della progressione del Parkinson"]
+    }
+  ],
+  "milestones": [
+    {
+      "id": "thesis",
+      "type": "repo",
+      "date": "2022-03",
+      "title": "Tesi di laurea: CNN per il Parkinson",
+      "description": "Rete neurale convoluzionale che valuta la progressione del morbo di Parkinson, sviluppata per la tesi e poi servita da un'applicazione Flask.",
+      "repo": "cnn-evaluate-parkinson-bd",
+      "tags": ["Python", "CNN", "Flask"]
+    }
+  ]
+}

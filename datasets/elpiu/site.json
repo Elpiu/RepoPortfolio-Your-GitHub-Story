@@ -1,0 +1,37 @@
+{
+  "$schema": "../../data/schema/site.schema.json",
+  "github": {
+    "username": "Elpiu",
+    "excludedRepos": [],
+    "includeForks": false,
+    "includeArchived": false,
+    "excludeProfileRepo": true,
+    "maxRepos": 300,
+    "readmeMaxBytes": 200000
+  },
+  "links": {
+    "email": "elpidio.mazza97@gmail.com",
+    "phone": "+39 366 399 7645",
+    "linkedin": "https://www.linkedin.com/in/elpidio-mazza-72b641155/",
+    "website": null,
+    "cvUrl": null
+  },
+  "career": {
+    "start": "2022-07"
+  },
+  "story": {
+    "autoEvents": true,
+    "maxAutoEvents": 8
+  },
+  "locales": [
+    { "code": "en", "language": "en-US", "name": "English", "default": true },
+    { "code": "it", "language": "it-IT", "name": "Italiano", "default": false }
+  ],
+  "deploy": {
+    "customDomain": null
+  },
+  "seo": {
+    "siteName": null,
+    "twitterHandle": null
+  }
+}
