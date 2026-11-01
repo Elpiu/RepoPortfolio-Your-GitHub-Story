@@ -257,10 +257,13 @@ Regole:
 ├─ app/
 │  ├─ app.vue
 │  ├─ app.config.ts
+│  ├─ router.options.ts           # scroll: ancore sotto l'header, filtri senza salti
 │  ├─ error.vue
 │  ├─ assets/css/main.css
+│  ├─ utils/scroll.ts             # replaceQueryInPlace, scrollToSectionInPlace
 │  ├─ components/
 │  │  ├─ layout/
+│  │  │  ├─ SectionLink.vue
 │  │  │  ├─ AppHeader.vue
 │  │  │  ├─ AppFooter.vue
 │  │  │  ├─ LocaleSwitcher.vue

@@ -66,7 +66,13 @@ questa, si costruiscono componenti duplicati e stringhe sparse.
 **Scope MVP**
 
 - Layout `default` con header sticky, main e footer.
-- Navigazione a sezioni con stato attivo basato su IntersectionObserver.
+- Navigazione a sezioni con stato attivo basato su IntersectionObserver. Il
+  link porta la sezione subito sotto l'header (offset unico:
+  `scroll-padding-top` = altezza dell'header) e funziona anche ricliccando la
+  sezione già nell'URL. Filtri, tab e "carica altri" aggiornano la query string
+  senza spostare la pagina.
+- Ordine della home: Home (Bento) → About → Skills → Experience (GitHub Story)
+  → Projects (Explore) → Contact (footer).
 - Container e ritmo verticale delle sezioni.
 - Token colore/tipografia (Geist Sans + Geist Mono)/spaziature in Tailwind 4,
   dark-first.
@@ -303,12 +309,14 @@ identità umana e identità GitHub in un'unica narrazione visiva.
   - Ogni nodo è una card espandibile con descrizione, badge tecnologie, link
     demo/repo.
   - Icone/nodi distinti per tipo (work, education, release, repo, milestone).
-  - **Filtri per tipo** (Lavoro, Formazione, Progetti, Traguardi, Tutto) al
-    posto della legenda: pulsanti `aria-pressed` con le stesse icone dei nodi e
-    il conteggio. **Default: Lavoro** (se non ci sono esperienze di lavoro,
-    tutto). Almeno un filtro resta attivo; le lane si ricalcolano sui soli tipi
-    visibili. Stato in query string (`?story=work,education`, il default non
-    viene scritto); senza JavaScript si vede la storia del lavoro.
+  - **Viste per tipo, una alla volta** (Lavoro, Formazione, Progetti,
+    Traguardi, Tutto) al posto della legenda: tab ARIA con le stesse icone dei
+    nodi e il conteggio; i tipi senza nodi non compaiono. **Default: Lavoro**
+    (se non ci sono esperienze di lavoro, Tutto). La scelta è singola: la
+    selezione cumulativa si è rivelata confusa in revisione (01/11/2026). Le
+    lane si ricalcolano sui soli tipi visibili. Stato in query string
+    (`?story=education`, il default non viene scritto); senza JavaScript si
+    vede la storia del lavoro.
   - Grafo SVG calcolato in build, nessun JS necessario per disegnarlo.
 - Anni di esperienza calcolati da `career.start`, mai hardcoded.
 

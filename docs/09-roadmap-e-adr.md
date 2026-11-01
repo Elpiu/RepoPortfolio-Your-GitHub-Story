@@ -238,6 +238,7 @@ Stima: 3–5 giorni.
 | P3 | Filtro per topic | Basso | S | M2 |
 | P3 | Vista tabella/lista | Basso | S | M2 |
 | P3 | Progetti correlati | Basso | S | M4 |
+| P3 | Letture (libri) come sezione opzionale dai dati, nascosta se vuota | Basso | S | — |
 | P3 | View Transitions | Basso | S | M3 |
 | P4 | Supporto repo privati | Fuori modello | XL | Backend |
 
