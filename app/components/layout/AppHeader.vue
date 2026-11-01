@@ -2,9 +2,8 @@
 const { t } = useI18n()
 const localePath = useLocalePath()
 const { site } = useSiteData()
-const activeId = useActiveSection(['home', 'experience', 'projects', 'about', 'skills', 'contact'])
-
-const sections = ['home', 'experience', 'projects', 'about', 'skills', 'contact'] as const
+const sections = ['home', 'about', 'skills', 'experience', 'projects', 'contact'] as const
+const activeId = useActiveSection(sections)
 </script>
 
 <template>
@@ -23,8 +22,8 @@ const sections = ['home', 'experience', 'projects', 'about', 'skills', 'contact'
       <nav :aria-label="t('nav.label')" class="hidden md:block">
         <ul class="flex items-center gap-1">
           <li v-for="section in sections" :key="section">
-            <NuxtLink
-              :to="{ path: localePath('/'), hash: `#${section}` }"
+            <SectionLink
+              :section="section"
               :aria-current="activeId === section ? 'location' : undefined"
               class="rounded-control px-3 py-2 text-sm transition-colors"
               :class="
@@ -34,7 +33,7 @@ const sections = ['home', 'experience', 'projects', 'about', 'skills', 'contact'
               "
             >
               {{ t(`nav.${section}`) }}
-            </NuxtLink>
+            </SectionLink>
           </li>
         </ul>
       </nav>

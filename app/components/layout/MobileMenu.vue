@@ -1,9 +1,8 @@
 <script setup lang="ts">
 const { t } = useI18n()
-const localePath = useLocalePath()
 const details = ref<HTMLDetailsElement | null>(null)
 
-const sections = ['home', 'experience', 'projects', 'about', 'skills', 'contact'] as const
+const sections = ['home', 'about', 'skills', 'experience', 'projects', 'contact'] as const
 
 function close() {
   details.value?.removeAttribute('open')
@@ -25,13 +24,13 @@ function close() {
     >
       <ul>
         <li v-for="section in sections" :key="section">
-          <NuxtLink
-            :to="{ path: localePath('/'), hash: `#${section}` }"
+          <SectionLink
+            :section="section"
             class="block rounded-md px-3 py-2 text-sm text-foreground-muted transition-colors hover:bg-surface-muted hover:text-foreground"
-            @click="close"
+            @navigate="close"
           >
             {{ t(`nav.${section}`) }}
-          </NuxtLink>
+          </SectionLink>
         </li>
       </ul>
     </nav>

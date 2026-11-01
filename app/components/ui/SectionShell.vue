@@ -8,7 +8,7 @@ defineProps<{
 </script>
 
 <template>
-  <section :id="id" :aria-labelledby="`${id}-title`" class="scroll-mt-24 py-16 md:py-24">
+  <section :id="id" :aria-labelledby="`${id}-title`" class="py-16 md:py-24">
     <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
       <SectionHeading
         :id="`${id}-title`"

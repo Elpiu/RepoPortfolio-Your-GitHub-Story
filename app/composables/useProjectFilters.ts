@@ -155,7 +155,7 @@ export function useProjectFilters(repositories: MaybeRefOrGetter<readonly Reposi
     if (activeTab.value !== ALL_TAB) query.tab = activeTab.value
     if (sort.value !== 'relevance') query.sort = sort.value
     if (page.value > 1) query.page = String(page.value)
-    void router.replace({ query })
+    replaceQueryInPlace(router, route, query)
   }
 
   watch([q, lang, tab, sort, page], syncQuery)

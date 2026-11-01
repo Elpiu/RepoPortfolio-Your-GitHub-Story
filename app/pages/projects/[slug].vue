@@ -38,7 +38,7 @@ usePageSeo({
 
 <template>
   <div v-if="detail">
-    <section aria-labelledby="project-title" class="scroll-mt-24 py-12 md:py-16">
+    <section aria-labelledby="project-title" class="py-12 md:py-16">
       <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <nav :aria-label="t('project.breadcrumb')" class="mb-8">
           <NuxtLink

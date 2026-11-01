@@ -9,7 +9,7 @@ const version = config.public.version
   <footer
     id="contact"
     aria-labelledby="contact-title"
-    class="scroll-mt-24 border-t border-border bg-surface-muted/40"
+    class="border-t border-border bg-surface-muted/40"
   >
     <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
       <h2 id="contact-title" class="sr-only">{{ t('nav.contact') }}</h2>

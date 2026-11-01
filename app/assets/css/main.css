@@ -55,7 +55,8 @@
 html {
   color-scheme: light;
   scroll-behavior: smooth;
-  scroll-padding-top: 5rem;
+  /* Altezza dell'header (h-18): unico offset per le ancore, nativo e del router. */
+  scroll-padding-top: calc(4.5rem + 1px);
 }
 
 html.dark {
