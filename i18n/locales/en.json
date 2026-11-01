@@ -36,7 +36,7 @@
     "about": "About",
     "aboutEyebrow": "Profile",
     "projects": "Explore all repositories",
-    "projectsEyebrow": "Work",
+    "projectsEyebrow": "Repositories",
     "projectsEmpty": "The project engine is not connected yet. It arrives with the GitHub sync.",
     "skills": "Tech stack",
     "skillsEyebrow": "Tools",
@@ -98,8 +98,7 @@
       "projects": "Projects",
       "milestones": "Milestones",
       "all": "All"
-    },
-    "shown": "{count} entries shown | {count} entry shown | {count} entries shown"
+    }
   },
   "projects": {
     "tabs": {

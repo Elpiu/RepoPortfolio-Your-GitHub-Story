@@ -36,7 +36,7 @@
     "about": "Chi sono",
     "aboutEyebrow": "Profilo",
     "projects": "Esplora tutti i repository",
-    "projectsEyebrow": "Lavoro",
+    "projectsEyebrow": "Repository",
     "projectsEmpty": "Il motore dei progetti non è ancora collegato. Arriva con la sincronizzazione GitHub.",
     "skills": "Competenze tecniche",
     "skillsEyebrow": "Strumenti",
@@ -98,8 +98,7 @@
       "projects": "Progetti",
       "milestones": "Traguardi",
       "all": "Tutto"
-    },
-    "shown": "{count} voci mostrate | {count} voce mostrata | {count} voci mostrate"
+    }
   },
   "projects": {
     "tabs": {

@@ -4,11 +4,11 @@ import type { StoryEvent } from '../../shared/types'
 import { layoutStory } from '../../shared/utils/story-graph'
 import {
   countStoryFilters,
-  defaultStoryFilters,
+  defaultStoryView,
   filterStoryInput,
-  parseStoryFilters,
-  serializeStoryFilters,
-  toggleStoryFilter,
+  parseStoryView,
+  serializeStoryView,
+  storyViews,
 } from '../../shared/utils/story-filters'
 
 const experience = (id: string, type: Experience['type'], start: string, end: string | null) =>
@@ -45,44 +45,49 @@ const storyEvents: StoryEvent[] = [
   },
 ]
 
-describe('story filters', () => {
+const layout = (view: Parameters<typeof filterStoryInput>[1]) => {
+  const input = filterStoryInput({ experiences, milestones, storyEvents }, view)
+  return layoutStory(input.experiences, input.milestones, {
+    now: '2026-11',
+    storyEvents: input.storyEvents,
+  })
+}
+
+describe('story views', () => {
   it('il default è il lavoro, oppure tutto se non c è lavoro', () => {
-    expect(defaultStoryFilters(['work', 'education', 'projects'])).toEqual(['work'])
-    expect(defaultStoryFilters(['education', 'projects'])).toEqual(['education', 'projects'])
+    expect(defaultStoryView(['work', 'education', 'projects'])).toBe('work')
+    expect(defaultStoryView(['education', 'projects'])).toBe('all')
+  })
+
+  it('offre "tutto" solo con più di un tipo', () => {
+    expect(storyViews(['work', 'education'])).toEqual(['work', 'education', 'all'])
+    expect(storyViews(['work'])).toEqual(['work'])
   })
 
   it('legge la query ignorando valori sconosciuti o non disponibili', () => {
     const available = ['work', 'education', 'projects'] as const
-    expect(parseStoryFilters('education,work', available)).toEqual(['work', 'education'])
-    expect(parseStoryFilters('milestones,nope', available)).toBeNull()
-    expect(parseStoryFilters('', available)).toBeNull()
+    expect(parseStoryView('education', available)).toBe('education')
+    expect(parseStoryView('all', available)).toBe('all')
+    expect(parseStoryView('milestones', available)).toBeNull()
+    expect(parseStoryView('work,education', available)).toBeNull()
   })
 
   it('non scrive nella query il default', () => {
     const available = ['work', 'education'] as const
-    expect(serializeStoryFilters(['work'], available)).toBeNull()
-    expect(serializeStoryFilters(['education', 'work'], available)).toBe('work,education')
+    expect(serializeStoryView('work', available)).toBeNull()
+    expect(serializeStoryView('education', available)).toBe('education')
   })
 
-  it('il toggle lascia sempre almeno un filtro', () => {
-    expect(toggleStoryFilter(['work'], 'education')).toEqual(['work', 'education'])
-    expect(toggleStoryFilter(['work', 'education'], 'work')).toEqual(['education'])
-    expect(toggleStoryFilter(['work'], 'work')).toEqual(['work'])
+  it('una vista sola alla volta, con lane ricalcolate', () => {
+    const work = layout('work')
+    expect(work.nodes.map((node) => node.kind)).toEqual(['work', 'work'])
+    expect(work.laneCount).toBe(1)
+    expect(layout('education').nodes.map((node) => node.kind)).toEqual(['education'])
+    expect(layout('all').nodes).toHaveLength(5)
   })
 
-  it('filtra prima del layout: solo lavoro, lane ricalcolate', () => {
-    const input = filterStoryInput({ experiences, milestones, storyEvents }, ['work'])
-    const graph = layoutStory(input.experiences, input.milestones, {
-      now: '2026-11',
-      storyEvents: input.storyEvents,
-    })
-    expect(graph.nodes.map((node) => node.kind)).toEqual(['work', 'work'])
-    expect(graph.laneCount).toBe(1)
-  })
-
-  it('conta i nodi per filtro', () => {
-    const graph = layoutStory(experiences, milestones, { now: '2026-11', storyEvents })
-    expect(countStoryFilters(graph.nodes)).toEqual({
+  it('conta i nodi per tipo', () => {
+    expect(countStoryFilters(layout('all').nodes)).toEqual({
       work: 2,
       education: 1,
       projects: 1,

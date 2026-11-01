@@ -13,11 +13,11 @@ const story = useStory(
   () => props.profile,
   () => props.storyEvents,
   () => props.syncedAt,
-  () => filters.selected.value,
+  () => filters.view.value,
 )
 const filters = useStoryFilters(story.available)
-const { nodes, counts, available } = story
-const { selected, isAll, toggle, selectAll } = filters
+const { nodes, counts } = story
+const { view, views, select } = filters
 </script>
 
 <template>
@@ -28,20 +28,23 @@ const { selected, isAll, toggle, selectAll } = filters
     :description="t('story.description')"
   >
     <StoryFilters
-      v-if="available.length > 0"
-      :available="available"
-      :selected="selected"
+      v-if="views.length > 1"
+      :views="views"
+      :model-value="view"
       :counts="counts"
-      :is-all="isAll"
-      @toggle="toggle"
-      @all="selectAll"
+      @update:model-value="select"
     />
 
-    <p class="sr-only" aria-live="polite">{{ t('story.shown', { count: nodes.length }) }}</p>
-
-    <ol v-if="nodes.length > 0" class="mt-6 space-y-3">
-      <StoryNode v-for="node in nodes" :key="`${node.source}-${node.id}`" :node="node" />
-    </ol>
-    <EmptyState v-else class="mt-6" :title="t('story.empty')" />
+    <div
+      id="story-panel"
+      :role="views.length > 1 ? 'tabpanel' : undefined"
+      :aria-labelledby="views.length > 1 ? `story-tab-${view}` : undefined"
+      class="mt-6"
+    >
+      <ol v-if="nodes.length > 0" class="space-y-3">
+        <StoryNode v-for="node in nodes" :key="`${node.source}-${node.id}`" :node="node" />
+      </ol>
+      <EmptyState v-else :title="t('story.empty')" />
+    </div>
   </SectionShell>
 </template>

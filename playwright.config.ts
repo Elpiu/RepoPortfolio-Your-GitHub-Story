@@ -2,7 +2,8 @@ import { defineConfig, devices } from '@playwright/test'
 
 // Gli E2E girano sull'output statico di `pnpm generate` (offline in CI), servito
 // come GitHub Pages da scripts/serve-static.mjs.
-const PORT = 4173
+// E2E_PORT se la 4173 è occupata (es. da un `pnpm serve:static` già aperto).
+const PORT = Number(process.env.E2E_PORT) || 4173
 
 export default defineConfig({
   testDir: 'tests/e2e',

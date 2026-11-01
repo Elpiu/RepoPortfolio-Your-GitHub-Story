@@ -6,14 +6,14 @@ import {
   STORY_FILTERS,
   countStoryFilters,
   filterStoryInput,
-  type StoryFilter,
+  type StoryView,
 } from '~~/shared/utils/story-filters'
 
 export function useStory(
   profile: MaybeRefOrGetter<Profile>,
   storyEvents: MaybeRefOrGetter<readonly StoryEvent[]>,
   syncedAt: MaybeRefOrGetter<string>,
-  selected: MaybeRefOrGetter<readonly StoryFilter[]>,
+  view: MaybeRefOrGetter<StoryView>,
 ) {
   const input = computed(() => ({
     experiences: toValue(profile).experiences,
@@ -32,7 +32,7 @@ export function useStory(
   const available = computed(() => STORY_FILTERS.filter((filter) => counts.value[filter] > 0))
 
   const graph = computed(() => {
-    const filtered = filterStoryInput(input.value, toValue(selected))
+    const filtered = filterStoryInput(input.value, toValue(view))
     return layoutStory(filtered.experiences, filtered.milestones, {
       now: now.value,
       storyEvents: filtered.storyEvents,

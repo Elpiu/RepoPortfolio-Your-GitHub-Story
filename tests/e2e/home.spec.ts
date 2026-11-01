@@ -54,20 +54,76 @@ test('la GitHub Story parte dal lavoro e si filtra per tipo', async ({ page }) =
   const kinds = () => nodes.evaluateAll((items) => items.map((item) => item.dataset.kind))
   expect(new Set(await kinds())).toEqual(new Set(['work']))
 
-  const filters = page.getByRole('group', { name: ui('story.filters.label') })
-  await expect(filters.getByRole('button', { name: ui('story.filters.work') })).toHaveAttribute(
-    'aria-pressed',
-    'true',
-  )
-  await filters.getByRole('button', { name: ui('story.filters.education') }).click()
-  await expect(page).toHaveURL(/[?&]story=work%2Ceducation|[?&]story=work,education/)
-  await expect(page.locator('#experience li[data-kind="education"]').first()).toBeVisible()
+  const tabs = page.getByRole('tablist', { name: ui('story.filters.label') })
+  const tab = (key: string) => tabs.getByRole('tab', { name: new RegExp(`^${ui(key)}`) })
+  await expect(tab('story.filters.work')).toHaveAttribute('aria-selected', 'true')
+
+  // Scelta singola: Formazione sostituisce Lavoro, non si somma.
+  await tab('story.filters.education').click()
+  await expect(page).toHaveURL(/[?&]story=education/)
+  await expect.poll(async () => new Set(await kinds())).toEqual(new Set(['education']))
 
   await page.reload()
-  await expect(page.locator('#experience li[data-kind="education"]').first()).toBeVisible()
+  await expect.poll(async () => new Set(await kinds())).toEqual(new Set(['education']))
 
-  await filters.getByRole('button', { name: ui('story.filters.all'), exact: true }).click()
-  expect((await kinds()).length).toBeGreaterThan(2)
+  await tab('story.filters.all').click()
+  await expect.poll(async () => (await kinds()).length).toBeGreaterThan(2)
+  await tab('story.filters.all').press('Home')
+  await expect(tab('story.filters.work')).toBeFocused()
+  await expect(page).not.toHaveURL(/[?&]story=/)
+})
+
+test('i filtri non spostano la pagina, anche dopo un link di sezione', async ({ page }) => {
+  await page.goto('/')
+  await page
+    .locator('header nav')
+    .getByRole('link', { name: ui('nav.experience') })
+    .click()
+  await expect(page).toHaveURL(/#experience$/)
+  const tabs = page.getByRole('tablist', { name: ui('story.filters.label') })
+  await expect(tabs).toBeInViewport()
+  // Attende la fine dello scroll smooth del link di sezione.
+  let before = -1
+  await expect
+    .poll(async () => {
+      const current = await page.evaluate(() => Math.round(window.scrollY))
+      const stable = current === before
+      before = current
+      return stable
+    })
+    .toBe(true)
+  await tabs.getByRole('tab').last().click()
+  await expect(page).toHaveURL(/[?&]story=/)
+  await page.waitForTimeout(300)
+  expect(Math.abs((await page.evaluate(() => window.scrollY)) - before)).toBeLessThan(4)
+})
+
+test('un link di sezione porta il titolo appena sotto l header', async ({ page }) => {
+  await page.goto('/')
+  for (const section of ['projects', 'about']) {
+    await page
+      .locator('header nav')
+      .getByRole('link', { name: ui(`nav.${section}`) })
+      .click()
+    await expect(page).toHaveURL(new RegExp(`#${section}$`))
+    await expect
+      .poll(() =>
+        page.evaluate((id) => {
+          const header = document.querySelector('header')!.getBoundingClientRect().bottom
+          return Math.abs(
+            Math.round(document.getElementById(id)!.getBoundingClientRect().top - header),
+          )
+        }, section),
+      )
+      .toBeLessThanOrEqual(2)
+  }
+  // Ricliccare la sezione già nell'URL riporta comunque lì.
+  await page.mouse.wheel(0, 1500)
+  await page
+    .locator('header nav')
+    .getByRole('link', { name: ui('nav.about') })
+    .click()
+  await expect(page.locator('#about')).toBeInViewport()
 })
 
 test('la GitHub Story si espande e collassa', async ({ page }) => {

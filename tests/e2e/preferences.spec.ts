@@ -64,8 +64,13 @@ test('tema scuro di default, scelta persistita al reload', async ({ page }) => {
 test('la copia email è annunciata', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write'])
   await page.goto('/')
-  await page.getByRole('button', { name: ui('bento.copyEmail') }).click()
-  await expect(page.getByRole('button', { name: ui('bento.copied') })).toBeVisible()
+  // Un click prima dell'idratazione non ha effetto: si ritenta finché il bottone risponde.
+  await expect(async () => {
+    await page.getByRole('button', { name: ui('bento.copyEmail') }).click()
+    await expect(page.getByRole('button', { name: ui('bento.copied') })).toBeVisible({
+      timeout: 1000,
+    })
+  }).toPass()
   await expect(page.locator('[aria-live="polite"]', { hasText: ui('bento.copied') })).toHaveCount(1)
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(site.links.email)
 })
