@@ -6,7 +6,7 @@
 | --- | --- |
 | Deve essere ospitabile gratuitamente e senza server | Generazione statica (`nuxt generate`) |
 | I dati devono essere SEO-friendly e indicizzabili | Contenuto nel payload/HTML di build, non fetch client-side |
-| GitHub ha rate limit e il token non può stare nel browser | Integrazione GitHub solo a build time, lato Nitro |
+| GitHub REST pubblico ha rate limit; il token è opzionale | Integrazione GitHub solo a build time, lato Nitro |
 | Chi clona deve poter ripubblicare senza toccare il codice | Dati owner solo in `data/*.json`; deploy con un comando |
 | I dati si aggiornano a ogni push | Deploy su push + dispatch manuale + snapshot di fallback |
 | Inglese default + lingue estensibili, tema chiaro/scuro | Rotte localizzate, color mode con script anti-flash |
@@ -27,15 +27,15 @@ Build time (locale o GitHub Actions: `pnpm run deploy`)
 │ nuxt generate                                                │
 │  modules/validate-data ──► data/*.json (zod)                 │
 │                                                              │
-│  Nitro ──► /api/repositories ──► GitHub GraphQL (1 query     │
-│    │            │                  paginata)                 │
+│  Nitro ──► /api/repositories ──► GitHub REST pubblico      │
+│    │            │                  (/users/{username}/repos)│
 │    │            ├─ zod validation                            │
 │    │            ├─ normalizzazione + discovery preview       │
-│    │            ├─ pinned, linguaggi, activity, story events │
+│    │            ├─ featured per stelle, linguaggi, activity  │
 │    │            └─ snapshot .cache/github/last-good.json     │
 │    │                                                         │
 │    ├──► prerender "/" , "/cv"                                │
-│    ├──► prerender "/projects/:slug" ──► GitHub REST /readme  │
+│    ├──► prerender "/projects/:slug" ──► raw README (M3)      │
 │    ├──► prerender "/resume.json"                             │
 │    └──► prerender "/{locale}/..." per ogni lingua            │
 │                                                              │
@@ -72,8 +72,10 @@ semplicità (ADR-023): l'owner ha un solo comando e una sola cartella da toccare
 
 ```text
 data/site.json, data/profile/{locale}.json
+(oppure la cartella indicata da PORTFOLIO_DATA_DIR, es. datasets/me/ — ADR-029)
         ▼
 modules/validate-data.ts   (Nuxt module, gira in dev e in generate)
+  - risolve la cartella dati con scripts/data-dir.mjs
   - legge i file dal registry `locales` di site.json (nessun import a mano)
   - valida con gli schemi zod di shared/schemas
   - controlla parità tra lingue, id univoci, al massimo un lavoro corrente
@@ -81,29 +83,20 @@ modules/validate-data.ts   (Nuxt module, gira in dev e in generate)
   - riscrive data/schema/*.schema.json dagli schemi zod (z.toJSONSchema)
 ```
 
-### 2. Build — repository (GraphQL)
+### 2. Build — repository (REST pubblico)
 
 ```text
-GitHub GraphQL API  POST https://api.github.com/graphql
-  Authorization: Bearer ${NUXT_GITHUB_TOKEN}
-
-  user(login) {
-    pinnedItems(first: 6)
-    repositories(first: 50, after: $cursor, ownerAffiliations: OWNER,
-                 privacy: PUBLIC, orderBy: PUSHED_AT DESC) {
-      metadati, licenza, topics, linguaggi (byte + colore),
-      ultimo commit del default branch, ultima release,
-      openGraphImageUrl, alberi root/.github/docs,
-      contenuto di .repo-story.json
-    }
-  }
+GitHub REST API  GET https://api.github.com/users/{username}/repos
+  per_page=100&page=N&sort=pushed&direction=desc&type=owner
+  Authorization opzionale: Bearer ${GITHUB_TOKEN} (solo rate limit)
 
         ▼
 
-server/utils/github-graphql.ts
-  - paginazione su pageInfo fino a maxRepos
+server/utils/github-rest.ts
+  - paginazione fino a maxRepos
   - retry con backoff su 5xx, 429 e rate limit secondario
   - timeout per richiesta
+  - log di x-ratelimit-remaining / reset
 
         ▼
 
@@ -117,23 +110,23 @@ server/utils/normalize.ts
   - esclude fork / archived / profilo / excludedRepos /
     topic portfolio-hidden / .repo-story.json hidden
   - slug, size, license, pushedAt, defaultBranch
-  - featured = pinned (fallback: stelle)
   - produce Repository[] (modello di dominio)
+  - isPinned=false, lastCommit=null, latestRelease=null
 
         ▼
 
 server/utils/preview.ts
-  - discovery della preview (manifest → convenzione → README →
-    social image custom → placeholder)
+  - discovery della preview (manifest → convenzione per i featured →
+    prima immagine del README → placeholder)
 
 server/utils/languages.ts
-  - aggregato dei byte per linguaggio, colori dall'API
+  - distribuzione per linguaggio principale, colori noti/fallback
 
 server/utils/activity.ts
-  - ultimo push e ultimo commit dal repository aggiornato più di recente
+  - ultimo push dal repository aggiornato più di recente (commit null)
 
 server/utils/story-events.ts
-  - nodi automatici dai pinned (creazione) e dalle loro ultime release
+  - nodi automatici dai repository featured per stelle
 
         ▼
 
@@ -144,16 +137,16 @@ server/api/repositories.get.ts
     (repositories + languageStats + activity + storyEvents + syncedAt)
 ```
 
-### 3. Build — README
+### 3. Build — README (M3)
 
 ```text
-Per ogni repository incluso:
-  GET /repos/{owner}/{repo}/readme
-  Accept: application/vnd.github.raw+json
+Per ogni repository incluso (M3):
+  GET raw.githubusercontent.com/{owner}/{repo}/{branch}/README.md
+  (varianti README.md, readme.md, README.markdown, README.rst)
 
         ▼
 
-server/utils/readme.ts  (memoizzato per build: serve anche alla discovery)
+server/utils/readme.ts  (memoizzato per build: serve anche alla preview)
   - limite dimensione (200 KB)
   - markdown-it + plugin GFM
   - risoluzione immagini e link relativi → raw/blob sul default branch
@@ -189,7 +182,7 @@ useProjectFilters(projects)
 ProjectGrid
   └─ renderizza solo i risultati visibili (12 + "carica altri")
 
-useStory(profile, storyEvents)
+useStory(profile, storyEvents, syncedAt)
   └─ unisce esperienze, milestone ed eventi automatici;
      shared/utils/story-graph.ts calcola le lane (funzione pura)
 ```
@@ -225,7 +218,7 @@ presenti, non viene interrogata alcuna API.
                                │
 ┌──────────────────────────────▼───────────────────────────────┐
 │ server/ — integrazione e build                               │
-│  API routes, client GraphQL/REST, normalizzazione, markdown, │
+│  API routes, client REST, normalizzazione, markdown, │
 │  cache. Può usare shared/. Non può importare componenti Vue. │
 └──────────────────────────────────────────────────────────────┘
 
@@ -259,6 +252,8 @@ Regole:
 │     ├─ site.schema.json
 │     ├─ profile.schema.json
 │     └─ repo-story.schema.json
+├─ datasets/                     # payload alternativi, stessa forma di data/ (ADR-029)
+│  └─ {nome}/site.json, profile/{locale}.json
 ├─ app/
 │  ├─ app.vue
 │  ├─ app.config.ts
@@ -282,8 +277,8 @@ Regole:
 │  │  │  ├─ LanguageBar.vue
 │  │  │  └─ ActivityCard.vue
 │  │  ├─ story/
-│  │  │  ├─ GitGraph.vue
-│  │  │  ├─ StoryNode.vue
+│  │  │  ├─ StorySection.vue
+│  │  │  ├─ StoryNode.vue        # nodo + segmento SVG del grafo a lane
 │  │  │  └─ StoryLegend.vue
 │  │  ├─ project/
 │  │  │  ├─ ProjectCard.vue
@@ -305,16 +300,17 @@ Regole:
 │  │     ├─ StatusDot.vue
 │  │     ├─ CopyButton.vue
 │  │     ├─ TechDate.vue
+│  │     ├─ DataIcon.vue          # icone dei dati dal payload, senza v-html
 │  │     └─ AppLink.vue
 │  ├─ composables/
 │  │  ├─ useSiteData.ts
 │  │  ├─ useProjects.ts
 │  │  ├─ useProjectFilters.ts
 │  │  ├─ useStory.ts
-│  │  ├─ useLanguageStats.ts
 │  │  ├─ useSpotlight.ts
+│  │  ├─ useActiveSection.ts
 │  │  ├─ useRelativeTime.ts
-│  │  └─ useSeo.ts
+│  │  └─ usePageSeo.ts
 │  ├─ layouts/
 │  │  ├─ default.vue
 │  │  └─ print.vue
@@ -322,29 +318,32 @@ Regole:
 │  │  ├─ index.vue
 │  │  ├─ cv.vue
 │  │  └─ projects/[slug].vue
-│  └─ plugins/
-│     └─ auto-animate.client.ts
 ├─ modules/
-│  └─ validate-data.ts
+│  ├─ validate-data.ts
+│  ├─ prerender-routes.ts
+│  └─ icon-bundle.ts             # bundle icone client limitato a quelle usate in app/
 ├─ server/
 │  ├─ api/
 │  │  ├─ repositories.get.ts
-│  │  └─ repositories/[slug].get.ts
+│  │  ├─ repositories/[slug].get.ts
+│  │  ├─ data-icons.get.ts       # icone delle competenze → payload della home
+│  │  └─ __sitemap__/urls.ts
 │  ├─ routes/
 │  │  ├─ resume.json.ts
 │  │  └─ [locale]/resume.json.ts
 │  └─ utils/
-│     ├─ github-graphql.ts
 │     ├─ github-rest.ts
-│     ├─ queries.ts
+│     ├─ http.ts
+│     ├─ concurrency.ts
 │     ├─ normalize.ts
 │     ├─ preview.ts
 │     ├─ languages.ts
 │     ├─ activity.ts
 │     ├─ story-events.ts
+│     ├─ dataset.ts
 │     ├─ readme.ts
-│     ├─ resume.ts
-│     └─ cache.ts
+│     ├─ data-icons.ts
+│     └─ resume.ts
 ├─ shared/
 │  ├─ schemas/
 │  │  ├─ github.ts
@@ -356,34 +355,45 @@ Regole:
 │  │  └─ index.ts
 │  └─ utils/
 │     ├─ placeholder.ts
-│     ├─ language-colors.ts      # solo fallback per colori null
+│     ├─ language-colors.ts      # colori noti + fallback deterministico
 │     ├─ repo.ts
+│     ├─ preview.ts
+│     ├─ project-filters.ts
 │     ├─ format.ts
+│     ├─ profile.ts              # avatar e URL GitHub del profilo
+│     ├─ svg-icon.ts             # body Iconify → nodi SVG con allowlist
+│     ├─ validation.ts           # loadDataDir: validazione di una cartella dati
 │     └─ story-graph.ts
 ├─ scripts/
 │  ├─ deploy.mjs
+│  ├─ data-dir.mjs               # PORTFOLIO_DATA_DIR / --data
 │  ├─ repo-context.mjs
+│  ├─ serve-static.mjs           # output statico come GitHub Pages (E2E, Lighthouse)
 │  └─ check-budget.mjs
 ├─ i18n/locales/
 │  ├─ en.json
 │  └─ it.json
 ├─ public/
 │  ├─ favicon.ico
-│  ├─ og/og-default.png
 │  └─ repo-placeholder/
 ├─ tests/
 │  ├─ unit/
-│  ├─ components/
-│  ├─ e2e/
-│  └─ fixtures/github.json
+│  ├─ e2e/                       # Playwright + axe sull'output generato
+│  ├─ helpers/
+│  └─ fixtures/                  # github.json, readmes.json
 ├─ docs/
 ├─ nuxt.config.ts
+├─ playwright.config.ts
+├─ lighthouserc.json
 ├─ package.json
 ├─ tsconfig.json
 └─ .github/workflows/
    ├─ ci.yml
-   └─ deploy.yml
+   ├─ deploy.yml
+   └─ weekly.yml                 # lychee + pnpm audit
 ```
+
+> Nessuna `og-default.png`: l'immagine Open Graph è l'avatar del profilo (Q17).
 
 > Nuxt 4 usa `app/` come `srcDir`. Il codice condiviso tra client e server vive
 > in `shared/` ed è auto-importato per tipi e utility pure. Gli schemi zod
@@ -439,14 +449,14 @@ Regole:
   progetto.
 - OG image: `public/og/og-default.png` se presente, altrimenti l'avatar del
   profilo. Nessuna immagine generata in build.
-- `sitemap.xml` e `robots.txt` generati a build time.
+- `sitemap.xml` e `robots.txt` generati a build time. La sorgente dinamica\n  `/api/__sitemap__/urls` aggiunge i dettagli progetto per tutte le lingue.
 - La 404 è servita come `404.html` con status 404.
 
 ## Sicurezza
 
 | Superficie | Misura |
 | --- | --- |
-| Token GitHub | Solo variabile d'ambiente della build; mai `NUXT_PUBLIC_*` |
+| Token GitHub (opzionale) | Solo variabile d'ambiente della build; mai `NUXT_PUBLIC_*` |
 | README HTML | Sanitizzazione con allowlist a build time; niente script/iframe/event handler |
 | `.repo-story.json` di altri repository | Validato con zod; campi sconosciuti ignorati; se invalido, warning e ignorato |
 | Link esterni | `rel="noopener noreferrer"`, `target="_blank"` |
@@ -460,11 +470,11 @@ Regole:
 
 | Scenario | Comportamento |
 | --- | --- |
-| Token assente | Build rossa con istruzioni (`gh auth token`), salvo `GITHUB_OFFLINE=1` |
+| Token assente | Normale: usa REST pubblico (60 richieste/ora); `GITHUB_OFFLINE=1` usa snapshot o fixture |
 | GitHub 5xx/429 durante la build | Retry con backoff; poi snapshot `.cache` se valido; altrimenti build rossa |
 | Schema GitHub cambiato | Build rossa con campo e repo; niente deploy silenzioso |
 | `.repo-story.json` invalido | Warning con repository e campo; file ignorato |
-| README > 200 KB | Troncamento con avviso e link a GitHub |
+| README > 200 KB | Troncamento con avviso e link a GitHub (M3) |
 | Nessuna preview trovata | Placeholder locale deterministico |
 | JSON in `data/` invalido | Build rossa con file e percorso del campo |
 | Stringhe UI mancanti per una lingua | Fallback inglese + warning |
@@ -475,8 +485,8 @@ Regole:
 ## Osservabilità
 
 - Log di build strutturati (`consola`) con conteggi: repository letti, esclusi
-  (con motivo), pinned, preview per sorgente (manifest, convenzione, README,
-  social, placeholder), README recuperati, fallback usati.
+  (con motivo), preview per sorgente (manifest, convenzione, README,
+  placeholder), README recuperati, fallback usati.
 - In GitHub Actions gli stessi numeri finiscono nel job summary
   (`$GITHUB_STEP_SUMMARY`).
 - Report Lighthouse CI informativo.
@@ -489,7 +499,7 @@ Regole:
 | SSR Nuxt su Vercel/Netlify | Costo e complessità inutili per dati uguali per tutti |
 | Fetch client-side come il legacy | SEO assente, rate limit, token impossibile |
 | Script di sync separato dal sito | Un passaggio in più per l'owner; tutto resta nella build Nuxt |
-| Solo API REST | ~2N+3 chiamate contro una query paginata; colori e pinned non disponibili |
+| GitHub GraphQL | Richiede un token e pinned/release; scartato perché l'owner vuole funzionare senza token |
 | `@nuxt/content` per i contenuti | Overkill per pochi file JSON |
 | Pinia | Lo stato vive nell'URL e in localStorage; uno store lo duplicherebbe |
 | Database/CMS headless | Contro il principio content-as-code e zero backend |

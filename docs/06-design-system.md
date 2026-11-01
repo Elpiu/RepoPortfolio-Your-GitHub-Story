@@ -23,7 +23,7 @@ Regole:
 3. **Griglia visibile.** Bento asimmetrica, bordi sottili, allineamenti
    rigorosi. Le card non sono contenitori generici: hanno una gerarchia.
 4. **Tocchi Git.** Monospazio per metadati, nodi a commit, language bar,
-   `git:` hash, date `YYYY.MM.DD`. Il codice è parte dell'estetica, non un
+   `git:` branch, date `YYYY.MM.DD`. Il codice è parte dell'estetica, non un
    costume.
 5. **Effetti subordinati al contenuto.** Spotlight, glass e pulse sono
    impercettibili finché non servono; non devono competere con i progetti.
@@ -36,7 +36,7 @@ Regole:
 | **Git Graph** | La GitHub Story come grafo a lane parallele (branch e merge), non come lista di pallini |
 | **Spotlight hover** | Alone radiale che segue il puntatore sulle card |
 | **Status dot** | Disponibilità con pulse discreto + testo, non solo colore |
-| **Mono metadata** | Versioni, date, hash, path: il sito sembra uno strumento |
+| **Mono metadata** | Versioni, date, branch, path: il sito sembra uno strumento |
 
 ## Principi di design
 
@@ -48,7 +48,7 @@ Regole:
    tipografia curata, respiro, niente widget inutili.
 4. **Scuro e chiaro equivalenti.** Non un tema principale e uno di ripiego.
 5. **Movimento con uno scopo.** Pulse per lo stato, spotlight per l'hover,
-   auto-animate per il riordino. Nessuna animazione di comparsa allo scroll,
+   transizioni CSS per hover e disclosure. Nessuna animazione di comparsa allo scroll,
    mai autoplay o scroll hijacking.
 6. **Accessibile per costruzione.** Focus, contrasto e tastiera non sono un
    passaggio finale.
@@ -95,10 +95,10 @@ documento che definisce i token: gli altri vi rimandano.
   --color-border-strong: #d4d4d8;
   --color-foreground: #18181b;
   --color-foreground-muted: #52525b;
-  --color-foreground-subtle: #71717a;
+  --color-foreground-subtle: #67676f;
 
-  --color-accent: #059669;
-  --color-accent-hover: #047857;
+  --color-accent: #047857;
+  --color-accent-hover: #065f46;
   --color-on-accent: #ecfdf5;
 
   --color-available: #059669;
@@ -123,7 +123,7 @@ documento che definisce i token: gli altri vi rimandano.
   --color-border-strong: rgb(255 255 255 / 0.18);
   --color-foreground: #fafafa;
   --color-foreground-muted: #a1a1aa;
-  --color-foreground-subtle: #71717a;
+  --color-foreground-subtle: #8a8a93;
 
   --color-accent: #34d399;
   --color-accent-hover: #6ee7b7;
@@ -149,14 +149,21 @@ Regole:
 - I token semantici sostituiscono i colori grezzi nei componenti:
   `bg-surface`, `text-foreground-muted`, `border-border`.
 - `accent` è il token custom per gli elementi brand; i componenti Nuxt UI usano
-  `primary` configurato in `app.config.ts` (**emerald**). Non sovrascrivere
-  `--color-primary` di Tailwind/Nuxt UI con un colore piatto.
+  `primary` configurato in `app.config.ts` (**emerald**), ma `--ui-primary` e
+  `--ui-text-inverted` puntano a `--color-accent` e `--color-on-accent`
+  (`main.css`): il solid di default di Nuxt UI (emerald-500 con testo bianco,
+  2.5:1) non passa AA. Non sovrascrivere `--color-primary` con un colore piatto:
+  si mappa sempre a un token che cambia con il tema.
 - Il vetro è espresso con `bg-surface/50`, `backdrop-blur` e `border-border`;
   non creare un token "glass" separato per ogni card.
 - Lo spotlight usa due variabili locali sulla card, aggiornate dal puntatore:
   `--spotlight-x` e `--spotlight-y`. Se il puntatore non è disponibile, resta
   un bordo/hover statico.
 - I colori di accento devono passare il contrasto AA sia su chiaro sia su scuro.
+  Verifica del 01/11/2026 (axe in E2E): `foreground-subtle` è `#67676f` in
+  chiaro (≥ 4.9:1 su `surface-muted`) e `#8a8a93` in scuro (≥ 5.1:1 su
+  `surface-raised`); l'accento chiaro è `#047857` (5.5:1 su bianco, 5.2:1 con
+  `on-accent`). I valori precedenti (`#71717a`, `#059669`) erano sotto 4.5:1.
 - `--color-on-accent` esiste perché il testo su emerald cambia tra i temi.
 - Ogni nuovo token deve avere una controparte dark.
 
@@ -181,7 +188,7 @@ Regole:
 - Nessun testo sotto 12 px.
 - I numeri nelle statistiche usano `font-variant-numeric: tabular-nums`.
 - Il monospazio è **solo** per metadati tecnici: versione (`v1.2.0`), data
-  (`2024.10.15`), hash (`git: 4f8a2b`), path, comandi, percentuali della
+  (`2024.10.15`), branch, path, comandi, percentuali della
   language bar. Mai per paragrafi o titoli.
 - Le date tecniche usano `YYYY.MM.DD` e sono quelle scritte nell'HTML statico.
   Le date relative ("2 ore fa") compaiono solo dopo il mount, con
@@ -213,8 +220,8 @@ Comportamenti:
 - **GitHub Story:** grafo a sinistra (fino a 3 lane) e card a destra. Sotto `md`
   le lane si stringono (8 px di passo) e le card occupano tutta la larghezza
   rimanente.
-- **Featured:** il Top Repo (primo pinned) è nella Bento; gli altri pinned
-  hanno un badge `Pinned` e ordinano per primi in Explore. Nessun carousel.
+- **Featured:** il Top Repo (più stellato) è nella Bento; gli altri featured
+  ordinano per primi in Explore. Nessun carousel.
 - Header: logo + sezioni su desktop; menu compatto su mobile.
 - Niente scroll orizzontale a 320 px.
 
@@ -228,7 +235,7 @@ desktop (4 colonne)
 │ badge, quick actions  │ linguaggio, link      │
 ├───────────────────────┼───────────────────────┤
 │ Tech Stack (2 col)    │ Activity (2 col)      │
-│ language bar + chips  │ ultimo push / commit  │
+│ language bar          │ ultimo push           │
 └───────────────────────┴───────────────────────┘
 ```
 
@@ -264,7 +271,7 @@ Regole:
 | `AppLink` | Link interni/esterni con rel sicuro | `NuxtLink` / `<a>` |
 | `EmptyState` | Zero risultati, azione di reset | Custom |
 | `ErrorState` | Errore recuperabile | Custom + `UButton` |
-| `CopyButton` | Copia negli appunti con feedback | `UButton` + `useClipboard` |
+| `CopyButton` | Copia negli appunti con feedback | `UButton` + Clipboard API |
 | `StatusDot` | Disponibilità con pulse + testo | Custom |
 | `TechDate` | Data assoluta in mono, relativa dopo il mount | `<time>` + `useRelativeTime` |
 
@@ -274,9 +281,9 @@ Regole:
 | --- | --- |
 | `BentoGrid` | Layout asimmetrico 1/2/4 colonne |
 | `ProfileCard` | Avatar, nome, ruolo, bio, status, quick actions |
-| `TopRepoCard` | Primo pinned con preview e stats |
+| `TopRepoCard` | Repository più stellato con preview e stats |
 | `LanguageBar` | Percentuali multi-colore + legenda accessibile |
-| `ActivityCard` | Ultimo push, branch, commit, "Last synced" |
+| `ActivityCard` | Ultimo push, branch, "Last synced" |
 | `GitGraph` | SVG a lane (tronco, fork, merge) calcolato in build |
 | `StoryNode` | Card espandibile con data, badge, link |
 | `StoryLegend` | Legenda dei tipi di nodo |
@@ -286,11 +293,11 @@ Regole:
 | Componente | Responsabilità |
 | --- | --- |
 | `ProjectCard` | Anteprima, nome, descrizione, topics, stats, spotlight |
-| `ProjectGrid` | Griglia 2 colonne, auto-animate, "carica altri" |
+| `ProjectGrid` | Griglia 2 colonne, "carica altri" |
 | `ExploreTabs` | Tab Tutti / linguaggi / Open Source |
 | `ProjectFilters` | Ricerca, linguaggio, sort, reset |
 | `ProjectStats` | Stelle, fork, linguaggio, size, aggiornamento |
-| `ProjectHero` | Titolo, descrizione, link repo, linguaggi, ultimo commit e release |
+| `ProjectHero` | Titolo, descrizione, link repo, linguaggio principale, push, licenza |
 | `ReadmeContent` | HTML sanificato + stili prose |
 | `ProjectImage` | Preview o placeholder deterministico |
 
@@ -308,7 +315,7 @@ Regole:
 │  Preview 16:9 (o placeholder)       │
 │  - border-bottom                    │
 ├─────────────────────────────────────┤
-│  [lang icon] Nome progetto  Pinned ↗│
+│  [lang icon] Nome progetto          │
 │  Descrizione su max 3 righe         │
 │  [Topic] [Topic] [Topic] +2         │
 │  ─────────────────────────────────  │
@@ -322,7 +329,6 @@ Regole:
   icona esterna per la demo live.
 - Metadati compatti in mono, tutti in `foreground-muted`: stelle
   (`lucide:star`), fork (`lucide:git-fork`), linguaggio, size.
-- Badge `Pinned` in mono, bordo sottile, solo per i repository pinned.
 - Hover: bordo più marcato, ombra, leggero sollevamento; niente trasformazioni
   che spostano il layout.
 - Focus: ring visibile sull'intera card.
@@ -373,7 +379,7 @@ progetto sostituisce. Il differenziatore sono le **lane**:
   │
   ○            2024.02  repo-name v1.0              (release, da GitHub)
   │
-  ○            2023.05  repo-name                   (repo pinned, da GitHub)
+  ○            2023.05  repo-name                   (repo featured, da GitHub)
   │
   ├──●         2022.07  BSc Computer Science        (education: merge nel tronco)
   │  │
@@ -431,7 +437,6 @@ progetto sostituisce. Il differenziatore sono le **lane**:
 | --- | --- | --- |
 | Hover card | translateY -2px, shadow | 150 ms |
 | Spotlight | radial gradient segue il puntatore | immediata |
-| Filtro/riordino | auto-animate | 180 ms |
 | Disclosure nodo story | altezza + opacity | 200 ms |
 | Feedback copia | fade + icona check | 150 ms |
 | Status dot | pulse discreto | 2 s, solo se disponibile |
@@ -439,8 +444,8 @@ progetto sostituisce. Il differenziatore sono le **lane**:
 
 Regole:
 
-- `@media (prefers-reduced-motion: reduce)` disattiva auto-animate, pulse,
-  spotlight e transizioni non essenziali.
+- `@media (prefers-reduced-motion: reduce)` disattiva pulse, spotlight e
+  transizioni non essenziali.
 - Nessuna animazione di comparsa allo scroll: il contenuto è visibile dal primo
   paint, anche senza JS.
 - Nessun parallax, nessuno scroll hijacking, nessun autoplay.
@@ -542,7 +547,7 @@ Tono: diretto, prima persona, niente superlativo. Esempi:
 | Activity | "Ultima sincronizzazione" | "Last synced" |
 | Story | "GitHub Story" | "GitHub Story" |
 | Evento automatico | "da GitHub" | "from GitHub" |
-| Repo in evidenza | "Pinned" | "Pinned" |
+| Repo in evidenza | "Featured" | "Featured" |
 | CV | "Scarica PDF" | "Download PDF" |
 
 Le stringhe vivono in `i18n/locales/*.json`; i contenuti editoriali in

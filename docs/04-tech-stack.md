@@ -58,7 +58,7 @@ possibile.
 | `@nuxt/icon` | Icone Lucide + Simple Icons | `clientBundle.scan`, `serverBundle: 'local'` |
 | `@nuxt/fonts` | Self-hosting di Geist e Geist Mono | Provider Google solo a build time |
 | `@nuxtjs/i18n` | Lingue da `data/site.json`, rotte localizzate | `prefix_except_default`, nessun rilevamento |
-| `@vueuse/nuxt` | Composable per clipboard, storage, intersection, media query | Auto-import |
+| `@vueuse/nuxt` | Composable per storage, intersection, media query | Auto-import |
 | `@nuxtjs/sitemap` + `@nuxtjs/robots` | Sitemap e robots dal set di rotte prerenderizzate | `site.url` da `NUXT_PUBLIC_SITE_URL` |
 | `@nuxt/eslint` | Lint e regole Nuxt/Vue/TS | Flat config generata |
 
@@ -169,7 +169,7 @@ i18n: {
   })),
   langDir: 'locales',
   detectBrowserLanguage: false,
-  baseUrl: process.env.NUXT_PUBLIC_SITE_URL,
+  baseUrl: new URL(process.env.NUXT_PUBLIC_SITE_URL ?? 'http://localhost:3000/').origin,
 },
 ```
 
@@ -189,7 +189,6 @@ Composable effettivamente previsti:
 
 | Composable | Uso |
 | --- | --- |
-| `useClipboard` | Copia email |
 | `useStorage` | Preferenza vista (con `initOnMounted: true`) |
 | `useIntersectionObserver` | Sezione attiva nell'header |
 | `useMediaQuery` | `prefers-reduced-motion`, puntatore fine |
@@ -203,7 +202,6 @@ Non usare VueUse per cose già risolte da Nuxt (es. `useFetch`, `useHead`).
 | Pacchetto | Versione | Ruolo | Dove vive |
 | --- | --- | --- | --- |
 | `zod` | 4.x | Validazione, inferenza tipi, generazione JSON Schema | Build/server |
-| `@formkit/auto-animate` | 0.x | Animazione riordino/filtro della griglia | Client |
 
 ### `zod`
 
@@ -222,63 +220,37 @@ Regola di bundle: gli schemi **non** vengono importati dai componenti. I
 componenti importano solo tipi (`import type`) dal modello di dominio, così zod
 non entra nel bundle client.
 
-Esempio (forma grezza GraphQL, estratto):
+Esempio (forma grezza REST pubblica, estratto):
 
 ```ts
 // shared/schemas/github.ts
 import { z } from 'zod'
 
-const treeEntry = z.object({ name: z.string(), type: z.string(), path: z.string() })
-const tree = z.object({ entries: z.array(treeEntry) }).nullable()
-
-export const githubRepoNodeSchema = z.object({
-  databaseId: z.number(),
+export const githubRestRepoNodeSchema = z.object({
+  id: z.number().int(),
   name: z.string(),
+  full_name: z.string(),
+  owner: z.object({ login: z.string() }),
   description: z.string().nullable(),
-  url: z.string().url(),
-  homepageUrl: z.string().nullable(),
-  isFork: z.boolean(),
-  isArchived: z.boolean(),
-  stargazerCount: z.number(),
-  forkCount: z.number(),
-  diskUsage: z.number().nullable(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-  pushedAt: z.string().datetime().nullable(),
-  licenseInfo: z.object({ spdxId: z.string().nullable(), name: z.string() }).nullable(),
-  languages: z.object({
-    edges: z.array(z.object({
-      size: z.number(),
-      node: z.object({ name: z.string(), color: z.string().nullable() }),
-    })),
-  }),
-  repositoryTopics: z.object({
-    nodes: z.array(z.object({ topic: z.object({ name: z.string() }) })),
-  }),
-  openGraphImageUrl: z.string().url(),
-  usesCustomOpenGraphImage: z.boolean(),
-  latestRelease: z.object({
-    name: z.string().nullable(),
-    tagName: z.string(),
-    publishedAt: z.string().datetime().nullable(),
-    url: z.string().url(),
-  }).nullable(),
-  defaultBranchRef: z.object({
-    name: z.string(),
-    target: z.object({
-      oid: z.string(),
-      abbreviatedOid: z.string(),
-      messageHeadline: z.string(),
-      committedDate: z.string().datetime(),
-    }).nullable(),
-  }).nullable(),
-  rootTree: tree,
-  githubTree: tree,
-  docsTree: tree,
-  repoStory: z.object({ text: z.string().nullable() }).nullable(),
+  html_url: z.string().url(),
+  homepage: z.string().nullable(),
+  fork: z.boolean(),
+  archived: z.boolean(),
+  stargazers_count: z.number(),
+  forks_count: z.number(),
+  size: z.number(),
+  language: z.string().nullable(),
+  topics: z.array(z.string()).default([]),
+  license: z
+    .object({ spdx_id: z.string().nullable(), name: z.string().nullable() })
+    .nullable(),
+  default_branch: z.string(),
+  created_at: z.string().datetime(),
+  updated_at: z.string().datetime(),
+  pushed_at: z.string().datetime().nullable(),
 })
 
-export type GitHubRepoNode = z.infer<typeof githubRepoNodeSchema>
+export type GitHubRestRepoNode = z.infer<typeof githubRestRepoNodeSchema>
 ```
 
 ### Date: `Intl`, nessuna libreria
@@ -295,34 +267,19 @@ export type GitHubRepoNode = z.infer<typeof githubRepoNodeSchema>
   sostituisce con il relativo nella lingua corrente, lasciando l'assoluta in
   `datetime` e `title`.
 
-### `@formkit/auto-animate`
-
-```ts
-// app/plugins/auto-animate.client.ts
-import { autoAnimatePlugin } from '@formkit/auto-animate/vue'
-
-export default defineNuxtPlugin((nuxtApp) => {
-  nuxtApp.vueApp.use(autoAnimatePlugin)
-})
-```
-
-- Direttiva `v-auto-animate` sul contenitore della griglia.
-- Durata breve (150–200 ms) e rispetto di `prefers-reduced-motion`.
-- Solo per riordino/filtro di liste.
-
 ## Dipendenze di build e sviluppo
 
 | Pacchetto | Necessità | Perché |
 | --- | --- | --- |
 | `markdown-it` + `@shikijs/markdown-it` + `sanitize-html` | **Necessario** | Rendering README e code highlighting a build time |
 | `gh-pages` | **Necessario** | Pubblica `.output/public` sul branch `gh-pages` (`pnpm run deploy`) |
-| `@iconify-json/lucide` + `@iconify-json/simple-icons` | **Necessario** | Collezioni locali per `@nuxt/icon` |
+| `@iconify-json/lucide` + `@iconify-json/simple-icons` | **Necessario** | Collezioni locali per `@nuxt/icon` e per le icone dei dati (`/api/data-icons`) |
 | `@nuxt/eslint` | **Necessario** | Qualità del codice in CI |
 | `prettier` + `eslint-config-prettier` | **Necessario** | Formattazione coerente |
 | `vue-tsc` | **Necessario** | `nuxt typecheck` |
 | `vitest` + `@nuxt/test-utils` + `happy-dom` | **Necessario** | Unit e component test |
-| `@playwright/test` + `@axe-core/playwright` | **Raccomandato** | E2E, accessibilità |
-| `@lhci/cli` | **Opzionale** | Report Lighthouse informativo, non bloccante |
+| `@playwright/test` + `@axe-core/playwright` | **Raccomandato** (installati in M6) | E2E, accessibilità |
+| `@lhci/cli` | **Opzionale** | Report Lighthouse informativo, non bloccante; eseguito con `pnpm dlx` in CI, non installato |
 
 La verifica dei budget in byte è uno script locale (`scripts/check-budget.mjs`,
 solo `node:zlib` e `node:fs`): nessuna dipendenza in più.
@@ -332,8 +289,9 @@ solo `node:zlib` e `node:fs`): nessuna dipendenza in più.
 | Tecnologia legacy / alternativa | Sostituita da | Motivo |
 | --- | --- | --- |
 | Next.js + React | Nuxt 4 + Vue 3 | Stack scelto |
+| GitHub GraphQL | REST pubblico | Richiede sempre un token; l'owner vuole zero credenziali (ADR-028) |
 | daisyUI | Nuxt UI | Design system unico, accessibile |
-| Framer Motion | CSS transitions + auto-animate | Meno JS, stesse necessità |
+| Framer Motion | CSS transitions | Meno JS, stesse necessità |
 | `react-vertical-timeline-component` | Git Graph SVG a lane, calcolato in build | La timeline è un grafo, non una lista di pallini |
 | `react-hot-toast` | `useToast` di Nuxt UI | Già nel design system |
 | `axios` | `$fetch` / `ofetch` | Incluso in Nuxt |
@@ -384,7 +342,7 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    githubToken: '',
+    githubToken: '', // opzionale: alza solo il rate limit REST
     public: {
       siteUrl: '',
       githubUsername: '', // risolto da scripts/repo-context.mjs se vuoto in data/site.json

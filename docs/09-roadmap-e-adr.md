@@ -62,11 +62,11 @@ Accettazione:
 - [ ] `pnpm dev` e `pnpm generate` funzionano.
 - [ ] `pnpm run deploy` pubblica su `gh-pages` con base URL corretto e
       `.nojekyll`.
-- [ ] Home EN e `/it/` renderizzano con header/footer; con una sola lingua lo
+- [x] Home EN e `/it/` renderizzano con header/footer; con una sola lingua lo
       switcher sparisce.
-- [ ] Un JSON in `data/` invalido produce un errore con file e campo.
-- [ ] Il tema scuro è il default; chiaro e scuro sono leggibili.
-- [ ] Font self-hosted, nessuna richiesta a Google a runtime.
+- [x] Un JSON in `data/` invalido produce un errore con file e campo.
+- [x] Il tema scuro è il default; chiaro e scuro sono leggibili.
+- [x] Font self-hosted, nessuna richiesta a Google a runtime.
 - [ ] Nessuna stringa hardcoded nei componenti.
 - [ ] CI verde su una PR di prova.
 
@@ -76,18 +76,17 @@ Stima: 4–6 giorni.
 
 ### M2 — Project Engine & Explore
 
-**Obiettivo:** dati GitHub reali via GraphQL, validati, e sezione Explore
-filtrabile.
+**Obiettivo:** dati GitHub reali via REST pubblico, validati, e sezione
+Explore filtrabile.
 
 Attività:
 
-- `server/utils/github-graphql.ts` con paginazione, retry, timeout, token,
-  log del `rateLimit`.
-- Query in `server/utils/queries.ts`; schemi `githubRepoNodeSchema`,
-  `repositorySchema`, `repoStorySchema`.
+- `server/utils/github-rest.ts` con paginazione, retry, timeout, token
+  opzionale, log di `x-ratelimit-remaining`.
+- Schema `githubRestRepoNodeSchema`, `repositorySchema`, `repoStorySchema`.
 - `normalize.ts`: esclusioni (fork, archived, profilo, topic, manifest), slug,
-  pinned, size, license, lastCommit, latestRelease.
-- `preview.ts`: discovery (manifest → convenzione → README → social →
+  size, license; `lastCommit`/`latestRelease` null.
+- `preview.ts`: discovery (manifest → convenzione per i featured → README →
   placeholder).
 - `languages.ts`, `activity.ts`.
 - Cache `.cache/github/last-good.json` e modalità `GITHUB_OFFLINE`.
@@ -96,20 +95,20 @@ Attività:
 - `ProjectCard`, `ProjectGrid`, `ProjectStats`, `ProjectImage`, `ExploreTabs`,
   `ProjectFilters`.
 - `useProjectFilters` sulla query string, ricerca debounced, linguaggio, sort,
-  reset, tab Open Source, "carica altri", auto-animate.
+  reset, tab Open Source, "carica altri".
 - Spotlight delegato (`useSpotlight`), `TechDate`.
 - Test unit/component/E2E; stringhe UI in tutte le lingue fornite.
 
 Accettazione:
 
-- [ ] Build con API reale produce repository, pinned, language stats e
-      activity.
-- [ ] Build offline usa snapshot o fixture.
+- [ ] Build con API reale produce repository, featured per stelle, language
+      stats e activity.
+- [x] Build offline usa snapshot o fixture.
 - [ ] Un payload invalido fa fallire la build con messaggio utile.
 - [ ] La preview viene trovata senza configurazione nei casi di convenzione e
       README; il log riporta la sorgente.
-- [ ] Il browser non chiama GitHub.
-- [ ] Tab e filtri sono reattivi, accessibili e condivisibili via URL.
+- [x] Il browser non chiama GitHub.
+- [x] Tab e filtri sono reattivi, accessibili e condivisibili via URL.
 - [ ] CLS < 0,1 sul filtro.
 
 Stima: 6–8 giorni.
@@ -126,15 +125,18 @@ Attività:
   condiviso con la discovery).
 - `server/api/repositories/[slug].get.ts`.
 - Pagina `/projects/[slug]` per ogni lingua supportata.
-- `ReadmeContent`, `ProjectHero` (linguaggi del repository, ultimo commit,
-  ultima release), breadcrumb.
+- `ReadmeContent`, `ProjectHero` (linguaggio principale, push, licenza, topics;
+  commit e release non disponibili in REST pubblico), breadcrumb.
 - Gestione README mancante/troncato e immagini relative.
+- `server/plugins/prerender-routes.ts` per le rotte dei dettagli e
+  `server/api/__sitemap__/urls.ts` per la sitemap dinamica.
+- Fixture README (`tests/fixtures/readmes.json`) per la modalità offline.
 - Sitemap, canonical, hreflang, JSON-LD.
 - Test sanitizzazione, E2E dettaglio.
 
 Accettazione:
 
-- [ ] Ogni repository ha una pagina statica.
+- [x] Ogni repository ha una pagina statica.
 - [ ] README sicuro e leggibile in chiaro/scuro.
 - [ ] SEO del dettaglio corretta.
 
@@ -149,25 +151,25 @@ Stima: 3–5 giorni.
 Attività:
 
 - `BentoGrid`, `ProfileCard`, `TopRepoCard`, `LanguageBar`, `ActivityCard`.
-- Top Repo = primo pinned, fallback per stelle.
+- Top Repo = repository con più stelle.
 - Status dot di disponibilità con testo e reduced motion.
-- Quick actions `mailto:`, `tel:`, CV (`/cv` o `cvUrl`).
-- `story-events.ts`: eventi automatici da pinned e release, deduplicazione con
-  i milestone curati.
+- Quick actions `mailto:`, `tel:`, copia email, GitHub, LinkedIn; CV se\n  `links.cvUrl` è valorizzato (`/cv` arriva in M5).
+- `story-events.ts`: eventi automatici dai featured (stelle), deduplicazione
+  con i milestone curati.
 - `shared/utils/story-graph.ts`: lane, fork, merge (funzione pura).
 - `GitGraph` (SVG in build), `StoryNode`, `StoryLegend`.
 - Calcolo anni di esperienza da `career.start` e `syncedAt`.
-- Test componenti, a11y e responsive.
+- Test unitari di lane/anni; component/E2E e a11y in M6.
 
 Accettazione:
 
-- [ ] La Bento contiene profilo, top repo, language bar e activity.
-- [ ] Il Top Repo è il primo pinned o il più stellato.
-- [ ] La language bar ha percentuali e legenda accessibile.
-- [ ] Esperienze sovrapposte su lane diverse; massimo 3 lane.
-- [ ] I pinned compaiono come nodi automatici senza toccare il JSON.
-- [ ] Il Git Graph è leggibile come lista e da tastiera.
-- [ ] Quick actions funzionanti; telefono solo se configurato.
+- [x] La Bento contiene profilo, top repo, language bar e activity.
+- [x] Il Top Repo è il repository con più stelle.
+- [x] La language bar ha percentuali e legenda accessibile.
+- [x] Esperienze sovrapposte su lane diverse; massimo 3 lane.
+- [x] I featured compaiono come nodi automatici senza toccare il JSON.
+- [x] Il Git Graph è leggibile come lista e da tastiera.
+- [x] Quick actions funzionanti; telefono solo se configurato.
 
 Stima: 6–8 giorni.
 
@@ -183,11 +185,11 @@ Attività:
 - `PrintButton` (`window.print()`).
 - `server/utils/resume.ts` e server route `/resume.json`,
   `/{locale}/resume.json` (JSON Resume).
-- Test E2E di stampa ed export.
+- Test unitario dell'export JSON Resume; E2E di stampa ed export in M6.
 
 Accettazione:
 
-- [ ] `/cv` mostra gli stessi dati della home, senza duplicazioni in `data/`.
+- [x] `/cv` mostra gli stessi dati della home, senza duplicazioni in `data/`.
 - [ ] L'anteprima di stampa è pulita su A4.
 - [ ] `/resume.json` è valido rispetto allo schema JSON Resume.
 
@@ -212,9 +214,10 @@ Attività:
 Accettazione:
 
 - [ ] Deploy su push verde e smoke test verde.
-- [ ] Budget rispettati; report Lighthouse ≥ 95 / a11y 100.
+- [ ] Budget rispettati (verificato in locale); report Lighthouse ≥ 95 / a11y 100
+      (da leggere in CI).
 - [ ] Sito raggiungibile all'URL pubblico con base URL corretto.
-- [ ] Vecchi hash URL atterrano sulle sezioni giuste.
+- [x] Vecchi hash URL atterrano sulle sezioni giuste.
 - [ ] Rollback provato.
 - [ ] Un clone pulito va online seguendo solo il README.
 
@@ -424,38 +427,40 @@ rollback.
 
 ### ADR-020 — Featured = pinned del profilo GitHub
 
-**Stato:** Accettata (30/10/2026) — sostituisce ADR-014
+**Stato:** Superata da ADR-028 (30/10/2026)
 **Contesto:** la gerarchia dei progetti deve seguire l'identità GitHub senza
 configurazione.
-**Decisione:** featured = pinned nell'ordine del profilo; fallback per stelle;
-il primo è il Top Repo; nessuna lista manuale.
-**Conseguenze:** curare il portfolio = pinnare su GitHub; il carousel non serve
-più.
+**Decisione originale:** featured = pinned nell'ordine del profilo; fallback per
+stelle; il primo è il Top Repo; nessuna lista manuale.
+**Motivo della revisione:** senza token GraphQL non è possibile leggere i
+pinned; la modalità pubblica usa le stelle come unica gerarchia.
 **Alternative:** lista `featured` in config (scartata).
 
 ### ADR-021 — GraphQL come fonte primaria
 
-**Stato:** Accettata (30/10/2026)
+**Stato:** Superata da ADR-028 (30/10/2026)
 **Contesto:** con REST servivano circa 2N+3 chiamate; pinned e colori dei
 linguaggi non erano disponibili.
-**Decisione:** una query GraphQL paginata per repository, linguaggi con colori,
-topics, ultimo commit, ultima release, pinned, alberi dei file e manifest; REST
-solo per `/readme`.
-**Conseguenze:** meno chiamate e meno codice; il token è obbligatorio anche in
-locale (`gh auth token`) salvo modalità offline.
-**Alternative:** solo REST.
+**Decisione originale:** una query GraphQL paginata per repository, linguaggi
+con colori, topics, ultimo commit, ultima release, pinned, alberi dei file e
+manifest; REST solo per `/readme`.
+**Motivo della revisione:** GraphQL richiede sempre un token, anche per dati
+pubblici. L'owner ha scelto di funzionare senza token con REST pubblico.
+**Alternative:** solo REST (ora scelta), GraphQL con token.
 
 ### ADR-022 — Discovery automatica delle preview
 
-**Stato:** Accettata (30/10/2026)
+**Stato:** Accettata (rivista il 30/10/2026 per REST pubblico)
 **Contesto:** il path fisso `previewImagePath` obbligava a mettere un'immagine in
 un posto preciso di ogni repository.
 **Decisione:** discovery in ordine: `.repo-story.json` → file per convenzione in
-`.github/`, root, `docs/` (più il path legacy) → prima immagine non badge del
-README → social image custom → placeholder. Il manifest `.repo-story.json` è
-**opzionale**: il motore deve adattarsi senza.
+`.github/`, root, `docs/` (più il path legacy) per i repository featured → prima
+immagine non badge del README → placeholder. La social image custom non è
+disponibile via REST pubblico. Il manifest `.repo-story.json` è **opzionale**: il
+motore deve adattarsi senza.
 **Conseguenze:** zero configurazione nel caso comune; un'euristica può
-sbagliare, e il manifest esiste per quei casi.
+sbagliare, e il manifest esiste per quei casi. La convenzione si applica solo ai
+featured per contenere le richieste raw.
 **Alternative:** path fisso (scartato), screenshot automatici (fuori scope).
 
 ### ADR-023 — Dati owner solo in `data/`, una sola build
@@ -478,10 +483,10 @@ come Nuxt Layer su npm (rimandato).
 progetto sostituisce; la story non deve richiedere manutenzione per ogni nuovo
 progetto.
 **Decisione:** grafo a lane (esperienze sovrapposte come branch, massimo 3),
-calcolato in build e disegnato in SVG; eventi automatici da pinned e ultime
-release, con il curato che vince sull'automatico.
-**Conseguenze:** la story cresce da sola con i pinned; il testo degli eventi
-automatici non è tradotto.
+calcolato in build e disegnato in SVG; eventi automatici dai repository
+featured (per stelle), con il curato che vince sull'automatico.
+**Conseguenze:** la story cresce da sola con i featured; il testo degli eventi
+automatici non è tradotto. Le release non sono disponibili in REST pubblico.
 **Alternative:** solo eventi curati, timeline lineare.
 
 ### ADR-025 — CV ed export dagli stessi dati
@@ -490,7 +495,7 @@ automatici non è tradotto.
 **Contesto:** un PDF del CV mantenuto a parte diverge dal sito.
 **Decisione:** pagina `/cv` stampabile (PDF tramite la stampa del browser) e
 `/resume.json` in formato JSON Resume, generati dai JSON in `data/` e dai
-pinned. `links.cvUrl` resta opzionale.
+repository featured. `links.cvUrl` resta opzionale.
 **Conseguenze:** nessun PDF da aggiornare a mano; nessuna generazione di PDF in
 build.
 **Alternative:** PDF generato con Playwright in build (scartato), solo link
@@ -517,6 +522,42 @@ Nessuna libreria di date.
 **Conseguenze:** nessun mismatch, una dipendenza in meno.
 **Alternative:** `date-fns` (scartato).
 
+### ADR-028 — REST pubblico senza token
+
+**Stato:** Accettata (30/10/2026) — sostituisce ADR-020 e ADR-021
+**Contesto:** GraphQL richiede sempre un token, anche per repository pubblici;
+l'owner vuole che il portfolio funzioni senza configurare credenziali. La lista
+REST pubblica restituisce metadati, topics, licenza, linguaggio principale,
+stelle e date con 1–3 richieste.
+**Decisione:** usare `GET /users/{username}/repos` senza token; un token in sola
+lettura è opzionale e serve solo ad alzare il rate limit. Featured = repository
+con più stelle. Pinned, release, ultimo commit e breakdown per byte non sono
+disponibili e restano fuori scope finché non si aggiunge una fonte autenticata.
+Le preview usano manifest, convenzione per i featured e prima immagine del
+README; altrimenti placeholder.
+**Conseguenze:** zero credenziali obbligatorie, build semplice e portabile;
+i dati sono meno ricchi di GraphQL e il limite non autenticato è 60 richieste/ora
+(la pipeline usa 1–3 richieste API per la lista).
+**Alternative:** GraphQL con token (scartato dall'owner), REST autenticato
+(possible evoluzione).
+
+### ADR-029 — Dataset alternativi selezionabili (`PORTFOLIO_DATA_DIR`)
+
+**Stato:** Proposta (01/11/2026) — da confermare dal maintainer
+**Contesto:** il repository è insieme il motore/template per chi clona e il
+portfolio reale dell'owner. `data/` deve restare un template generico, ma
+l'owner vuole pubblicare i propri dati senza un fork.
+**Decisione:** `data/` resta il payload di default. Payload alternativi con la
+stessa forma stanno in `datasets/{nome}/` e si selezionano con
+`PORTFOLIO_DATA_DIR` (`.env`, variabile di repository in Actions) o con
+`pnpm run deploy -- --data <dir>`. Gli schemi restano in `data/schema/`. I test
+validano tutte le cartelle. Lo snapshot GitHub è legato allo username.
+**Conseguenze:** nessun codice da toccare per cambiare dataset; ADR-023 resta
+valido (i dati owner sono solo JSON, fuori dal codice). La CI di qualità usa
+sempre `data/`; il deploy usa la variabile di repository.
+**Alternative:** sostituire `data/` con i dati reali (scartato: si perde il
+template), branch separato per i dati (scartato: due storie da mantenere).
+
 ## Decisioni chiuse
 
 | # | Domanda | Decisione | Data |
@@ -533,11 +574,11 @@ Nessuna libreria di date.
 | Q11 | Rebuild programmato? | No: il refresh segue i push e il deploy manuale | 2026-10-30 |
 | Q12 | Identità dal profilo GitHub? | No: il racconto personale si legge dal JSON | 2026-10-30 |
 | Q13 | Separare motore e sito? | No: una sola build; dati owner in `data/` | 2026-10-30 |
-| Q14 | GraphQL? | Sì, fonte primaria; REST solo per il README | 2026-10-30 |
+| Q14 | GraphQL? | No: REST pubblico senza token (ADR-028) | 2026-10-30 |
 | Q15 | Scaricare le immagini in build? | No: restano remote | 2026-10-30 |
 | Q16 | Contribution heatmap? | No: sarebbe ferma tra un deploy e l'altro | 2026-10-30 |
 | Q17 | OG image per progetto? | No: nessuna generazione di immagini in build | 2026-10-30 |
-| Q18 | Featured | Pinned del profilo, fallback per stelle; preview per discovery + `.repo-story.json` opzionale | 2026-10-30 |
+| Q18 | Featured | Stelle (REST pubblico); pinned/release richiedono GraphQL | 2026-10-30 |
 
 ## Domande aperte
 
@@ -553,8 +594,8 @@ due criteri non entra.
 
 | Elemento | Verdetto | Motivo |
 | --- | --- | --- |
-| Sync GraphQL (repo, linguaggi, pinned, activity) | **Core** | È la regola d'oro |
-| Pinned come featured | **Core** | Curatela fatta su GitHub, zero config |
+| Sync REST (repo, stelle, linguaggio principale, activity) | **Core** | È la regola d'oro |
+| Featured per stelle | **Core** | Zero configurazione, niente token |
 | Discovery delle preview | **Core** | Nessuna immagine da mettere in un path fisso |
 | Bento Grid | **Core** | Identità in pochi secondi; elemento firma |
 | Git Graph a lane + eventi automatici | **Core** | Differenziatore; cresce da solo |
@@ -564,7 +605,7 @@ due criteri non entra.
 | Deploy con un comando | **Core** | "Facile da rideployare" |
 | i18n dal registry | **Core** | Requisito esplicito; nessun codice da toccare |
 | CV & Export | **Should** | Elimina il drift del PDF; il sito diventa esportabile |
-| Featured carousel | **Rimosso** | Ridondante con Top Repo e pinned |
+| Featured carousel | **Rimosso** | Ridondante con Top Repo e featured |
 | Heatmap contributi | **Rimossa** | Statica tra i deploy |
 | OG per progetto, immagini ottimizzate in build | **Rimosse** | Nessuna generazione di immagini in build |
 | Pinia, date-fns, Embla | **Rimosse** | Dipendenze senza bisogno reale |
@@ -587,8 +628,8 @@ Queste cose possono essere progetti separati, non parti di questo motore.
 
 | Rischio | Probabilità | Impatto | Mitigazione |
 | --- | --- | --- | --- |
-| Token assente in locale | Alta | Build rossa | Messaggio con `gh auth token`; modalità `GITHUB_OFFLINE` |
-| Rate limit GitHub | Bassa | Build rossa | Una query GraphQL, log del `rateLimit`, snapshot, retry |
+| Rate limit REST raggiunto | Media | Dati non aggiornati | Snapshot < 7 giorni, `GITHUB_OFFLINE`, token opzionale |
+| GitHub API down | Bassa | Build rossa | REST pubblico, snapshot, retry, deploy locale |
 | Cambio schema API | Bassa | Build rossa | zod, fixture, messaggi precisi |
 | XSS da README | Bassa | Alto | Sanitizzazione allowlist, test |
 | Discovery preview sbagliata | Media | Basso | Ordine di sorgenti documentato, log `previewSource`, `.repo-story.json` |
@@ -606,17 +647,32 @@ Queste cose possono essere progetti separati, non parti di questo motore.
 | Dipendenze che cambiano | Media | Basso/Medio | Poche dipendenze, lockfile, Renovate |
 | Aggiornare il motore rompe i JSON dei cloni | Media | Medio | Schema version + migrazioni (backlog P1) |
 
+## Stato dell'implementazione (01/11/2026)
+
+M1–M5 sono implementati; M6 è implementato per tutto ciò che si verifica in
+locale. Verificato in locale (Windows, Node 24): lint, typecheck, 77 test
+unitari, `pnpm generate` offline, budget in byte, 44 test E2E Playwright + axe
+(tema chiaro e scuro, 320 px, motion ridotto) sia con `data/` sia con
+`datasets/elpiu/`.
+
+Restano da fare, perché richiedono push o accesso al repository remoto:
+
+- [ ] CI verde su una PR reale (`ci.yml` con E2E e Lighthouse).
+- [ ] Primo `pnpm run deploy` e Pages impostato su `gh-pages`.
+- [ ] Smoke test di `deploy.yml` verde all'URL pubblico.
+- [ ] Rollback provato sul branch `gh-pages`.
+- [ ] Variabile di repository `PORTFOLIO_DATA_DIR` se il sito pubblico deve
+      usare un dataset diverso da `data/` (ADR-029).
+- [ ] Report Lighthouse letto (≥ 95 / a11y 100).
+
+Correzioni emerse in M6: contrasto di `foreground-subtle` (scuro) e
+dell'accento (chiaro) portato ad AA, primary di Nuxt UI riallineato ai token,
+filtri da query string applicati dopo l'idratazione, overflow a 320 px,
+icone delle competenze spostate dal bundle JS al payload, nessun fallback
+all'API Iconify a runtime.
+
 ## Prossimo passo
 
-Dopo la conferma finale delle dipendenze (documento 04):
-
-```bash
-# 1. Scaffold Nuxt 4 in una cartella temporanea, poi unire con docs/ e public/
-npx nuxi@latest init repo-portfolio --packageManager pnpm
-# 2. Spostare i file nella root del repo
-# 3. Installare i moduli del tech stack e gh-pages
-# 4. Creare data/ e il primo `pnpm run deploy` (M1)
-```
-
-Il legacy è già rimosso: lo scaffold parte da una base pulita. `docs/` e gli
-asset utili restano; tutto il resto verrà creato ex novo.
+Dopo la revisione dell'owner: commit per intenzione su `feat/m1-scaffold`, PR
+verso `main`, CI verde, primo deploy (`pnpm run deploy`) e checklist di cutover
+in [07](07-infrastruttura-deploy.md#checklist-di-cutover).

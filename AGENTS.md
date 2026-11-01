@@ -12,11 +12,12 @@ RepoPortfolio è un portfolio statico generato dai dati GitHub dell'owner.
 > landing page ad alte prestazioni.
 
 - Stack: Nuxt 4 (SSG) · Vue 3 · TypeScript strict · Tailwind 4 · Nuxt UI ·
-  zod · GitHub GraphQL · `gh-pages`.
+  zod · GitHub REST pubblico (ADR-028) · `gh-pages`.
 - Stile: **Engineered Minimalism** (Linear/Vercel/Raycast), dark-first, un solo
   accento emerald, Geist + Geist Mono.
 - Chi clona modifica **solo** i JSON in `data/` e pubblica con
-  `pnpm run deploy`.
+  `pnpm run deploy`. Payload alternativi con la stessa forma stanno in
+  `datasets/{nome}/` e si scelgono con `PORTFOLIO_DATA_DIR` (ADR-029).
 
 ## Prima di toccare il codice
 
@@ -50,11 +51,12 @@ iniziativa.
 
 ```text
 data/      JSON dell'owner (site.json, profile/{locale}.json) + schema/ generati
+datasets/  payload alternativi con la stessa forma di data/ (PORTFOLIO_DATA_DIR)
 app/       presentazione: pages, layouts, components, composables
 shared/    schemi zod, tipi di dominio, utility pure — nessun import da app/ o server/
 server/    integrazione GitHub, normalizzazione, README, cache — solo build time
-modules/   moduli Nuxt locali (validate-data)
-scripts/   deploy, repo-context, check-budget (Node puro, .mjs)
+modules/   moduli Nuxt locali (validate-data, prerender-routes, icon-bundle)
+scripts/   deploy, data-dir, repo-context, check-budget, serve-static (Node puro, .mjs)
 i18n/      stringhe UI del motore
 docs/      specifica
 ```
@@ -68,8 +70,8 @@ docs/      specifica
 ## Regole non negoziabili
 
 - **Solo `data/` per l'owner.** Nessun dato personale, nome, link o testo
-  biografico nel codice. Una feature che obbliga chi clona a toccare file fuori
-  da `data/` è sbagliata.
+  biografico nel codice (i JSON in `datasets/` sono dati, non codice). Una
+  feature che obbliga chi clona a toccare file fuori da `data/` è sbagliata.
 - **Nessuna richiesta esterna a runtime**, tranne le immagini GitHub. Niente
   chiamate a `api.github.com` dal browser, font e icone self-hosted.
 - **Dipendenze:** solo quelle in `docs/04-tech-stack.md`. Niente Pinia,
@@ -101,21 +103,25 @@ Gli script esistono dopo lo scaffold (M1); l'elenco completo è in
 
 ```bash
 pnpm install
-pnpm dev                            # GITHUB_OFFLINE=1 per lavorare senza token
+pnpm dev                            # GITHUB_OFFLINE=1 per lavorare senza rete
 pnpm lint
 pnpm typecheck
 pnpm test:unit
 pnpm generate
 pnpm check:budget
-pnpm test:e2e
+pnpm exec playwright install chromium   # una volta
+pnpm test:e2e                       # sull'output di pnpm generate
 pnpm run deploy -- --dry-run        # genera senza pubblicare
 ```
 
 - **`pnpm run deploy`, mai `pnpm deploy`**: quest'ultimo è un comando interno
   di pnpm.
-- La sync GitHub usa GraphQL, che richiede sempre un token:
-  `GITHUB_TOKEN=$(gh auth token)`. Senza token si lavora con
-  `GITHUB_OFFLINE=1` (snapshot o `tests/fixtures/github.json`).
+- La sync GitHub usa il REST pubblico e **non richiede token** (ADR-028); un
+  token in sola lettura alza solo il rate limit. Senza rete si lavora con
+  `GITHUB_OFFLINE=1` (snapshot dello stesso username o
+  `tests/fixtures/github.json`).
+- Per un dataset diverso da `data/`: `PORTFOLIO_DATA_DIR=datasets/{nome}` in
+  `.env`, oppure `pnpm run deploy -- --data datasets/{nome}`.
 - L'owner lavora su **Windows**: gli script in `package.json` devono essere
   cross-platform. Niente `VAR=x cmd` né comandi Unix negli script; le variabili
   d'ambiente si passano dagli script Node in `scripts/`.

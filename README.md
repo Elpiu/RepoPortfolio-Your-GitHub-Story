@@ -4,7 +4,7 @@
 > high-performance landing page.**
 
 RepoPortfolio is **not another portfolio template**. It turns repositories,
-pinned projects, languages and activity into a deliberate product experience: a
+starred projects, primary languages and activity into a deliberate product experience: a
 Bento profile, a GitHub Story drawn as a Git graph with parallel lanes, an
 explorable project archive and a printable CV generated from the same data.
 
@@ -14,12 +14,15 @@ Linear, Vercel and Raycast.
 
 ## Status
 
-**M1 — scaffold and foundations.** The Nuxt 4 application is in place with the
-design tokens, dark-first theme, localized routes, validated `data/` JSON,
-one-command deploy and byte budgets. The GitHub sync, Explore grid, project
-detail, Bento/Story and CV arrive in the next milestones. The legacy Next.js
-application has been removed; Git history keeps it as an archive. Product and
-technical decisions live in [`docs/`](docs/README.md).
+**M6 — Quality and cutover.** The full feature set is in place: dark-first
+design tokens, localized routes, validated `data/` JSON, a public REST sync (no
+token required), the Bento grid, the GitHub Story with lanes, the explorable
+repository grid, static project pages with sanitized READMEs, a printable CV and
+a JSON Resume export. Quality gates run locally and in CI: lint, typecheck,
+unit tests, byte budgets, Playwright E2E with axe (light and dark themes, 320
+px, reduced motion) and a Lighthouse report. The first public deploy is the
+remaining step. Product and technical decisions live in
+[`docs/`](docs/README.md).
 
 ## How it works
 
@@ -36,7 +39,8 @@ data/
 ```
 
 Every JSON file points to a generated JSON Schema, so your editor autocompletes
-fields and flags mistakes as you type.
+fields and flags mistakes as you type. An invalid file stops `pnpm dev` and
+`pnpm generate` with the file, the field path and a readable message.
 
 ### Quick start
 
@@ -45,18 +49,38 @@ pnpm install
 pnpm dev
 ```
 
-To generate and publish:
+No network? `GITHUB_OFFLINE=1 pnpm dev` uses the last GitHub snapshot or the
+bundled fixture.
 
-```powershell
-# Windows (PowerShell)
-$env:GITHUB_TOKEN = gh auth token
-pnpm run deploy
+### More than one dataset
+
+`data/` is the default payload. You can keep other payloads with the same shape
+in `datasets/{name}/` (this repository ships the owner's own in
+`datasets/elpiu/`) and pick one without touching any code:
+
+```bash
+# .env (dev and generate)
+PORTFOLIO_DATA_DIR=datasets/elpiu
 ```
 
 ```bash
-# macOS / Linux
-GITHUB_TOKEN=$(gh auth token) pnpm run deploy
+pnpm run deploy -- --data datasets/elpiu
 ```
+
+In GitHub Actions, set the repository variable `PORTFOLIO_DATA_DIR`
+(Settings → Secrets and variables → Actions → Variables). Unit tests validate
+`data/` and every folder in `datasets/`. If you cloned this repository for
+yourself, delete `datasets/`.
+
+To generate and publish:
+
+```bash
+pnpm run deploy
+```
+
+No GitHub token is required: the build reads public repositories through the
+unauthenticated REST API. A read-only `GITHUB_TOKEN` is optional and only raises
+the hourly rate limit.
 
 Then, once: **Settings → Pages → Deploy from a branch → `gh-pages` / `(root)`**.
 
@@ -70,16 +94,18 @@ domains (`deploy.customDomain` in `data/site.json`).
 
 ### What syncs from GitHub
 
-- **Repositories** via a single paginated GraphQL query: stars, topics,
-  languages with official colors, last commit, latest release, license.
-- **Pinned repositories** become your featured projects and the Top Repo of the
-  Bento grid. To change what is highlighted, change your pins on GitHub.
-- **Preview images** are discovered automatically: a `preview`, `screenshot`,
-  `cover`, `hero`, `banner` or `social-preview` image in `.github/`, the repo
-  root or `docs/`; otherwise the first non-badge image of the README; otherwise
-  the repository's custom social image; otherwise a local placeholder.
-- **Story events**: pinned repositories and their latest releases appear in the
-  GitHub Story on their own.
+- **Repositories** via the public REST API (no token required, optional token
+  for a higher rate limit): stars, forks, topics, license, primary language,
+  size and dates.
+- **Featured projects** are the repositories with the most stars. Pinned
+  repositories are a GraphQL-only feature and are not read in public mode.
+- **Preview images** are discovered automatically: an optional
+  `.repo-story.json`, known preview files for the featured repositories, the
+  first non-badge image of the README, otherwise a local placeholder.
+- **Story events**: the featured repositories appear in the GitHub Story on
+  their own. Latest releases are not available through the public REST list.
+- **Activity**: the most recently pushed repository, without the last commit
+  hash or message.
 
 Need to override something for a single repository? Add an optional
 `.repo-story.json` to its root:
@@ -90,11 +116,20 @@ Need to override something for a single repository? Add an optional
 
 You can also hide a repository with the `portfolio-hidden` topic.
 
+### Quality checks
+
+```bash
+pnpm lint && pnpm typecheck && pnpm test:unit
+pnpm generate && pnpm check:budget
+pnpm exec playwright install chromium   # once
+pnpm test:e2e                           # E2E + axe on the generated site
+```
+
 ## Features
 
 - Bento grid: profile, availability, Top Repo, language bar, latest activity.
-- GitHub Story: work, education, milestones, pinned repos and releases as a
-  Git graph with lanes for overlapping experiences.
+- GitHub Story: work, education, featured repositories and milestones as a Git
+  graph with lanes for overlapping experiences.
 - Explore all repositories: tabs, search, language filter, sort, shareable URLs.
 - Static, SEO-friendly detail page per project with a sanitized README.
 - `/cv` print-ready page (save as PDF from the browser) and `/resume.json` in
@@ -105,7 +140,7 @@ You can also hide a repository with the `portfolio-hidden` topic.
 ## Stack
 
 Nuxt 4 (SSG) · Vue 3 · TypeScript strict · Tailwind CSS 4 · Nuxt UI · Nuxt Icon ·
-Nuxt Fonts · Nuxt i18n · VueUse · Zod · AutoAnimate · GitHub GraphQL API ·
+Nuxt Fonts · Nuxt i18n · VueUse · Zod · GitHub REST API ·
 `gh-pages`
 
 Build-time only: `markdown-it` + Shiki + `sanitize-html`. Quality: Vitest,
@@ -118,7 +153,7 @@ Playwright + axe, byte budgets, Lighthouse CI (report).
 | [docs/README.md](docs/README.md) | Index, golden rule, review rules |
 | [01 — Vision](docs/01-visione-e-obiettivi.md) | Problem, positioning, users, metrics |
 | [02 — Features](docs/02-feature.md) | Pillars, acceptance criteria, backlog |
-| [03 — Architecture](docs/03-architettura.md) | Rendering, GraphQL data flow, layers |
+| [03 — Architecture](docs/03-architettura.md) | Rendering, public REST data flow, layers |
 | [04 — Tech stack](docs/04-tech-stack.md) | Libraries and configuration |
 | [05 — Data](docs/05-dati-e-contenuti.md) | `data/`, schemas, preview discovery, story |
 | [06 — Design](docs/06-design-system.md) | Engineered Minimalism, tokens, Git graph, a11y |
@@ -129,16 +164,19 @@ Playwright + axe, byte budgets, Lighthouse CI (report).
 The documentation is written in Italian; code, file names and commit messages
 are in English.
 
-## Repository layout (today)
+## Repository layout
 
 ```text
 app/                                   Nuxt pages, layouts, components, composables
-data/                                  owner JSON + generated JSON Schemas
-modules/validate-data.ts               build-time validation and schema generation
+data/                                  default owner JSON + generated JSON Schemas
+datasets/                              alternative payloads (PORTFOLIO_DATA_DIR)
+modules/                               data validation, prerender routes, icon bundle
+server/                                build-time GitHub sync, README rendering, exports
 shared/                                zod schemas, domain types, pure utilities
 i18n/locales/                          UI strings supplied by the engine
-scripts/                               deploy, repo context, byte budgets
+scripts/                               deploy, data dir, repo context, budgets, static server
 tests/unit/                            fast tests for data and pure logic
+tests/e2e/                             Playwright + axe on the generated site
 docs/                                  documentation (Italian)
 public/repo-placeholder/               deterministic project placeholders
 .github/RepoPortfolio-.../index.png    repository preview (legacy path, still detected)
@@ -147,7 +185,7 @@ public/repo-placeholder/               deterministic project placeholders
 ## Roadmap snapshot
 
 1. **M1** — Nuxt scaffold, `data/`, dark-first tokens, i18n, one-command deploy.
-2. **M2** — GraphQL engine, preview discovery, Explore.
+2. **M2** — Public REST engine, preview discovery, Explore.
 3. **M3** — Project detail + README.
 4. **M4** — Bento grid + GitHub Story with lanes and automatic events.
 5. **M5** — CV & export.

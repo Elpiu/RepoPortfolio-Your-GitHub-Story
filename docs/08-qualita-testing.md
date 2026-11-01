@@ -31,7 +31,8 @@ test.
 | `@playwright/test` | E2E su output statico |
 | `@axe-core/playwright` | Accessibilità automatica |
 | `scripts/check-budget.mjs` | Budget in byte (gate deterministico) |
-| `@lhci/cli` | Report Lighthouse (informativo, non bloccante) |
+| `scripts/serve-static.mjs` | Serve `.output/public` come GitHub Pages per E2E e Lighthouse |
+| `@lhci/cli` | Report Lighthouse (informativo, non bloccante; via `pnpm dlx`) |
 | `lychee` | Link rotti (settimanale) |
 | `eslint` + `prettier` | Stile e qualità statica |
 | `vue-tsc` (`nuxt typecheck`) | Tipi |
@@ -70,15 +71,15 @@ aggiornati con `git diff --exit-code data/schema`.
 
 | Area | Unit | Component | E2E | Note |
 | --- | :---: | :---: | :---: | --- |
-| Normalizzazione GitHub (GraphQL) | ✓ | | | Fixture con edge case |
+| Normalizzazione GitHub (REST) | ✓ | | | Fixture con edge case |
 | Esclusioni (fork, archived, profilo, topic, manifest) | ✓ | | | Motivo loggato |
-| Pinned / featured / fallback stelle | ✓ | | | Ordine del profilo |
+| Featured per stelle | ✓ | | | Ordine stelle/aggiornamento |
 | Slug e collisioni | ✓ | | | |
 | Discovery preview / placeholder | ✓ | | | Ordine delle sorgenti, badge scartati, determinismo |
 | `.repo-story.json` | ✓ | | | Valido, invalido, troppo grande |
-| Language stats | ✓ | | | Percentuali, colori, "Other" |
-| Activity | ✓ | | | Commit opzionale |
-| Story events + deduplicazione | ✓ | | | Curato vince su automatico |
+| Language stats | ✓ | | | Conteggi per linguaggio principale, colori, "Other" |
+| Activity | ✓ | | | Solo `pushedAt`, commit null |
+| Story events + deduplicazione | ✓ | | | Curato vince su automatico; featured per stelle |
 | Lane del grafo | ✓ | ✓ | | Sovrapposizioni, massimo 3 lane |
 | Filtri/ricerca/sort | ✓ | ✓ | ✓ | Tab + URL |
 | Validazione `data/` (tutte le lingue) | ✓ | | | Parità chiavi, errori leggibili |
@@ -90,7 +91,7 @@ aggiornati con `git diff --exit-code data/schema`.
 | LanguageBar | | ✓ | | Legenda, percentuali |
 | GitGraph | | ✓ | ✓ | Nodi, lane, disclosure |
 | StatusDot | | ✓ | | Testo, reduced motion |
-| ProjectCard | | ✓ | | Stati vuoti, badge Pinned, spotlight |
+| ProjectCard | | ✓ | | Stati vuoti, spotlight, topic overflow |
 | ProjectFilters | | ✓ | ✓ | Reset, tastiera |
 | ExploreTabs | | ✓ | ✓ | Pattern ARIA tabs |
 | CV | | ✓ | ✓ | Stampa, struttura |
@@ -119,31 +120,34 @@ const config = {
   excludeProfileRepo: true,
 }
 
-// node GraphQL ridotti; il resto dei campi viene dalla fixture
+// node REST ridotti; il resto dei campi viene dalla fixture
 const nodes = [
-  repoNode({ databaseId: 1, name: 'alpha', defaultBranchRef: { name: 'develop' } }),
-  repoNode({ databaseId: 2, name: 'forked', isFork: true }),
-  repoNode({ databaseId: 3, name: 'old', isArchived: true }),
-  repoNode({ databaseId: 4, name: 'hidden' }),
-  repoNode({ databaseId: 5, name: 'me' }), // repository profilo
-  repoNode({ databaseId: 6, name: 'secret', topics: ['portfolio-hidden'] }),
-  repoNode({ databaseId: 7, name: 'quiet', repoStory: '{ "hidden": true }' }),
+  repoNode({ id: 1, name: 'alpha', default_branch: 'develop' }),
+  repoNode({ id: 2, name: 'forked', fork: true }),
+  repoNode({ id: 3, name: 'old', archived: true }),
+  repoNode({ id: 4, name: 'hidden' }),
+  repoNode({ id: 5, name: 'me' }), // repository profilo
+  repoNode({ id: 6, name: 'secret', topics: ['portfolio-hidden'] }),
+  repoNode({ id: 7, name: 'quiet' }),
 ]
 
 describe('normalizeRepositories', () => {
   it('applica tutte le regole di esclusione', () => {
-    const result = normalizeRepositories(nodes, [], config)
+    const result = normalizeRepositories(nodes, config).repositories
     expect(result.map((r) => r.name)).toEqual(['alpha'])
   })
 
   it('non assume il branch main', () => {
-    const result = normalizeRepositories(nodes, [], config)
+    const result = normalizeRepositories(nodes, config).repositories
     expect(result[0]?.defaultBranch).toBe('develop')
   })
 
-  it('marca i pinned nell\'ordine del profilo', () => {
-    const result = normalizeRepositories(nodes, ['alpha'], config)
-    expect(result[0]).toMatchObject({ isPinned: true, pinnedOrder: 0 })
+  it('esclude il manifest hidden', () => {
+    const result = normalizeRepositories(nodes, {
+      ...config,
+      manifests: new Map([['alpha', { hidden: true, story: true }]]),
+    }).repositories
+    expect(result).toHaveLength(0)
   })
 })
 ```
@@ -156,21 +160,29 @@ import { describe, expect, it } from 'vitest'
 import { resolvePreview } from '~~/server/utils/preview'
 
 describe('resolvePreview', () => {
-  it('trova un file per convenzione in .github senza configurazione', () => {
-    const result = resolvePreview(repoNode({ githubTree: ['preview.png'] }), { readme: null })
-    expect(result.source).toBe('convention')
-    expect(result.url).toMatch(/\/\.github\/preview\.png$/)
+  it('trova un file per convenzione in .github per i featured', async () => {
+    const result = await resolvePreview(repoNode({}), {
+      featured: true,
+      head: async (url) => url.endsWith('/.github/preview.png'),
+    })
+    expect(result.previewSource).toBe('convention')
+    expect(result.previewImage).toMatch(/\/\.github\/preview\.png$/)
   })
 
-  it('scarta i badge del README', () => {
+  it('scarta i badge del README', async () => {
     const readme = '![ci](https://img.shields.io/badge/x.svg)\n![shot](docs/shot.png)'
-    const result = resolvePreview(repoNode({}), { readme })
-    expect(result.url).toMatch(/docs\/shot\.png$/)
+    const result = await resolvePreview(repoNode({}), {
+      readme,
+      head: async () => true,
+    })
+    expect(result.previewImage).toMatch(/docs\/shot\.png$/)
   })
 
-  it('ricade sul placeholder deterministico', () => {
-    const result = resolvePreview(repoNode({ databaseId: 10 }), { readme: null })
-    expect(result).toMatchObject({ source: 'placeholder', url: null })
+  it('ricade sul placeholder deterministico', async () => {
+    const result = await resolvePreview(repoNode({}), {
+      head: async () => false,
+    })
+    expect(result).toMatchObject({ previewSource: 'placeholder', previewImage: null })
   })
 })
 ```
@@ -303,26 +315,31 @@ describe('data/', () => {
 ### Markdown e XSS
 
 ```ts
-// tests/unit/markdown.spec.ts
+// tests/unit/readme.spec.ts
 import { describe, expect, it } from 'vitest'
 import { renderReadme } from '~~/server/utils/readme'
+import { fixtureRepositories } from '../helpers/repositories'
 
-const ctx = { owner: 'me', repo: 'demo', branch: 'main' }
+const repository = fixtureRepositories().find((repo) => repo.name === 'alpha')!
 
 describe('renderReadme', () => {
-  it('rimuove script e handler', () => {
-    const html = renderReadme('<script>alert(1)</script><img src=x onerror=alert(1)>', ctx)
+  it('rimuove script e handler', async () => {
+    const { html } = await renderReadme(
+      '<script>alert(1)</script><img src=x onerror=alert(1)>',
+      repository,
+      'Elpiu',
+    )
     expect(html).not.toContain('<script')
     expect(html).not.toContain('onerror')
   })
 
-  it('risolve le immagini relative', () => {
-    const html = renderReadme('![x](img/a.png)', ctx)
-    expect(html).toContain('https://raw.githubusercontent.com/me/demo/main/img/a.png')
+  it('risolve le immagini relative', async () => {
+    const { html } = await renderReadme('![x](img/a.png)', repository, 'Elpiu')
+    expect(html).toContain('https://raw.githubusercontent.com/Elpiu/alpha/develop/img/a.png')
   })
 
-  it('rende i link esterni sicuri', () => {
-    const html = renderReadme('[x](https://example.com)', ctx)
+  it('rende i link esterni sicuri', async () => {
+    const { html } = await renderReadme('[x](https://example.com)', repository, 'Elpiu')
     expect(html).toContain('rel="noopener noreferrer"')
   })
 })
@@ -340,7 +357,7 @@ Casi minimi:
 - `GitGraph`: nodi nell'ordine corretto, lane per esperienze sovrapposte,
   SVG `aria-hidden`, disclosure accessibile, link.
 - `StatusDot`: testo obbligatorio, pulse assente con reduced motion.
-- `BentoGrid`: ordine mobile, Top Repo (primo pinned), Activity con "Last
+- `BentoGrid`: ordine mobile, Top Repo (più stellato), Activity con "Last
   synced", quick actions.
 - `TechDate`: in SSR solo data assoluta; dopo il mount relativa, assoluta in
   `datetime` e `title`.
@@ -350,6 +367,23 @@ Casi minimi:
 - `PrintButton`: chiama `window.print()`, nascosto in `@media print`.
 
 ## E2E
+
+Gli E2E girano sull'output di `pnpm generate` (in CI offline, con la fixture),
+serviti da `scripts/serve-static.mjs` su `localhost:4173`. Le richieste fuori da
+localhost vengono registrate e bloccate (fixture `externalRequests`), quindi i
+test sono ermetici e verificano che a runtime partano solo immagini GitHub. I
+dati attesi si leggono dalla stessa cartella dati della build:
+`PORTFOLIO_DATA_DIR=datasets/me pnpm test:e2e` verifica un dataset alternativo.
+
+Implementati (`tests/e2e/*.spec.ts`, 44 test): home/Bento, nessuna richiesta
+esterna, id legacy e hash, date assolute nell'HTML, story espandibile, ricerca
+con URL e reload, stato vuoto, tab ARIA da tastiera, filtro linguaggio,
+dettaglio e ritorno, README senza script, 404 (status, `noindex`), lingua senza
+redirect e switch sulla pagina equivalente senza cookie, tema persistito, copia
+email annunciata, motion ridotto, CV in stampa, `/resume.json` e
+`/{locale}/resume.json`, SEO (canonical, hreflang, OG, JSON-LD), sitemap e
+robots, axe in tema chiaro e scuro su home, CV, dettaglio, 404 e lingue
+aggiuntive, 320 px senza scroll orizzontale, skip link.
 
 Scenari Playwright (`tests/e2e/`):
 
@@ -455,9 +489,10 @@ condivisi i punteggi variano da un run all'altro.
 {
   "ci": {
     "collect": {
-      "staticDistDir": ".output/public",
-      "numberOfRuns": 3,
-      "url": ["/", "/it/", "/cv"]
+      "startServerCommand": "node scripts/serve-static.mjs --port 4180",
+      "startServerReadyPattern": "serve-static",
+      "url": ["http://localhost:4180/", "http://localhost:4180/it/", "http://localhost:4180/cv"],
+      "numberOfRuns": 3
     },
     "assert": {
       "assertions": {
@@ -529,7 +564,7 @@ condivisi i punteggi variano da un run all'altro.
 
 | Livello | Comportamento |
 | --- | --- |
-| Build — token assente | Errore bloccante con istruzioni (`gh auth token`, `GITHUB_OFFLINE=1`) |
+| Build — rate limit REST | Snapshot < 7 giorni + warning; altrimenti errore con reset del limite |
 | Build — schema GitHub | Errore bloccante, messaggio con repo/campo |
 | Build — `data/` | Errore bloccante, messaggio con file e percorso del campo |
 | Build — `.repo-story.json` invalido | Warning con repo/campo, file ignorato |

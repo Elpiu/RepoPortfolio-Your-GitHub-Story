@@ -27,7 +27,7 @@ processo di deploy separato. Il risultato tipico è un portfolio che invecchia
 più velocemente del profilo GitHub che dovrebbe rappresentare.
 
 RepoPortfolio riduce il divario: **GitHub è la fonte di verità per i
-progetti** (repository, pinned, linguaggi, release), un JSON validato lo è per
+progetti** (repository, stelle, linguaggio principale, date), un JSON validato lo è per
 il racconto personale. Il sito viene rigenerato a ogni push e ripubblicato con
 un solo comando.
 
@@ -115,7 +115,7 @@ l'architettura statica.
 2. Vede un **Bento Grid** con profilo, disponibilità, top repo, language bar e
    ultima attività GitHub: capisce chi è e cosa sa fare a colpo d'occhio.
 3. Scorre la **GitHub Story**: un git graph con lane parallele, in cui
-   esperienze, milestone, repository pinned e release sono nodi/commit.
+   esperienze, milestone e repository featured sono nodi/commit.
 4. Arriva a **Explore All Repositories**, filtra per linguaggio o cerca una
    tecnologia.
 5. Apre il dettaglio di un progetto e legge il README.
@@ -128,7 +128,7 @@ l'architettura statica.
 1. Clona il progetto (o usa il template).
 2. Modifica `data/site.json` e `data/profile/en.json`; l'editor suggerisce i
    campi grazie al JSON Schema.
-3. Lancia `pnpm run deploy` con un token GitHub (`gh auth token`).
+3. Lancia `pnpm run deploy` (nessun token richiesto).
 4. Imposta una volta GitHub Pages sul branch `gh-pages`.
 
 ### Owner — aggiornare il portfolio
@@ -157,7 +157,7 @@ l'architettura statica.
 
 | Rischio | Impatto | Mitigazione |
 | --- | --- | --- |
-| GitHub API rate limit o down durante la build | Deploy bloccato | Una query GraphQL, snapshot dell'ultimo dato valido, retry con dispatch o deploy locale |
+| GitHub API rate limit o down durante la build | Deploy bloccato | REST pubblico (1–3 richieste), snapshot dell'ultimo dato valido, retry con dispatch o deploy locale |
 | README troppo grandi o con HTML malevolo | Build lenta / XSS | Limite dimensione, sanitizzazione, allowlist di tag |
 | Progetti senza descrizione o immagine | Card povere | Discovery automatica delle preview, copy di default, placeholder locali |
 | Primo deploy che non va online | Abbandono di chi clona | Base URL dedotto, guida nel README, runbook "Pages su `gh-pages`" |

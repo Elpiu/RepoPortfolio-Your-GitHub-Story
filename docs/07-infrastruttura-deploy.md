@@ -12,8 +12,8 @@ ogni push su `main`: non esistono due modi diversi di pubblicare.
 
 | Ambiente | Dove | Scopo | Dati GitHub |
 | --- | --- | --- | --- |
-| Locale | `pnpm dev` | Sviluppo | API reale con token (`gh auth token`) o `GITHUB_OFFLINE=1` |
-| Deploy locale | `pnpm run deploy` | Pubblicazione manuale | API reale con token |
+| Locale | `pnpm dev` | Sviluppo | REST pubblico (nessun token) o `GITHUB_OFFLINE=1` |
+| Deploy locale | `pnpm run deploy` | Pubblicazione manuale | REST pubblico (token opzionale) |
 | CI pull request | GitHub Actions `ci.yml` | Lint, typecheck, test, build, budget | Fixture, niente segreti |
 | Produzione | GitHub Pages, branch `gh-pages` | Sito pubblico | Generato da `deploy.yml` o da un deploy locale |
 
@@ -120,14 +120,21 @@ if (!dryRun) {
 
 Regole:
 
-- In locale la pubblicazione usa le credenziali git dell'utente; il token
-  serve solo per leggere GitHub (GraphQL).
+- In locale la pubblicazione usa le credenziali git dell'utente; il token è
+  opzionale e serve solo ad alzare il rate limit REST.
 - In CI la pubblicazione usa il `GITHUB_TOKEN` del workflow
   (`contents: write`).
 - Il token non viene mai stampato; gli errori di `gh-pages` vengono ripuliti
   dall'URL con credenziali prima di essere loggati.
 - La storia del branch `gh-pages` viene mantenuta (default della libreria):
   serve al rollback.
+- Il dataset si sceglie con `--data <dir>` o `PORTFOLIO_DATA_DIR` (default
+  `data/`, ADR-029); `site.json` di quella cartella decide anche il dominio
+  custom. In Actions vale la variabile di repository `PORTFOLIO_DATA_DIR`.
+
+```bash
+pnpm run deploy -- --dry-run --data datasets/me   # genera con un altro dataset
+```
 
 ## Base URL e dominio
 
@@ -154,8 +161,9 @@ Regole:
 
 | Variabile | Dove | Segreta | Note |
 | --- | --- | --- | --- |
-| `GITHUB_TOKEN` o `NUXT_GITHUB_TOKEN` | build | Sì | Lettura GitHub. In locale `$(gh auth token)`; in CI `secrets.GITHUB_TOKEN` |
+| `GITHUB_TOKEN` o `NUXT_GITHUB_TOKEN` | build | Sì (opzionale) | Alza il rate limit REST; la build funziona anche senza |
 | `GITHUB_OFFLINE` | locale / CI PR | No | `1` = snapshot o fixture, nessuna rete |
+| `PORTFOLIO_DATA_DIR` | locale / deploy | No | Cartella dati alternativa (es. `datasets/me`); vuota = `data/` (ADR-029). In Actions: variabile di repository |
 | `NUXT_APP_BASE_URL`, `NUXT_PUBLIC_SITE_URL` | build | No | Impostate da `scripts/deploy.mjs`; servono a mano solo per `nuxt generate` diretto |
 | `NUXT_PUBLIC_PLAUSIBLE_DOMAIN` | build | No | Opzionale, vuoto di default |
 
@@ -163,10 +171,10 @@ Note:
 
 - `runtimeConfig.githubToken` è **server-only**. Non usare il prefisso
   `NUXT_PUBLIC_` per il token.
-- Il `GITHUB_TOKEN` di Actions basta per leggere dati pubblici via GraphQL e
-  REST (limite REST: 1.000 richieste/ora per repository). Un token personale
-  serve solo per deploy locali o per limiti più alti; se usato, deve avere solo
-  accesso in lettura ai repository pubblici.
+- Senza token GitHub REST consente **60 richieste/ora** per IP. La pipeline usa
+  solo 1–3 richieste API per la lista, quindi il limite è sufficiente. Un token
+  in sola lettura alza il limite a 5.000/ora; in CI il `GITHUB_TOKEN` del
+  workflow è già disponibile.
 - `.env` è ignorato da git; `.env.example` documenta le chiavi.
 
 ## Primo deploy (per chi clona)
@@ -175,7 +183,7 @@ Note:
 1. Fork o clone del repository (o "Use this template").
 2. Modificare data/site.json e data/profile/en.json.
 3. pnpm install
-4. GITHUB_TOKEN=$(gh auth token) pnpm run deploy
+4. pnpm run deploy
 5. Una sola volta: Settings → Pages → Source "Deploy from a branch",
    branch gh-pages, cartella / (root).
 ```
@@ -234,9 +242,22 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e
 
-      - run: pnpm exec lhci autorun
+      # Report informativo, non bloccante (ADR-026).
+      - name: Lighthouse CI (report)
+        run: pnpm dlx @lhci/cli@0.15.1 autorun
         continue-on-error: true
 ```
+
+`@lhci/cli` non è una devDependency: gira con `pnpm dlx` a versione fissata, così
+non appesantisce ogni `pnpm install`. Gli E2E e Lighthouse servono l'output con
+`scripts/serve-static.mjs`, che si comporta come GitHub Pages (cartelle con
+`index.html`, `404.html` con status 404).
+
+### Controlli settimanali (`weekly.yml`)
+
+Ogni lunedì (e su dispatch manuale): `pnpm generate` con lo stesso dataset del
+deploy, lychee sull'HTML generato (action pinnata a SHA) e `pnpm audit --prod`.
+Non ripubblica nulla: il deploy resta legato ai push (ADR-002).
 
 Scelte:
 
@@ -306,6 +327,9 @@ jobs:
             sleep 10
           done
           curl -fsS "${base}build.json" | grep -q "$GITHUB_SHA"
+          curl -fsS "${base}" | grep -q 'data-testid="project-card"'
+          curl -fsS "${base}cv/" > /dev/null
+          curl -fsS "${base}resume.json" | grep -q '"basics"'
           curl -fsS "${base}sitemap.xml" > /dev/null
           test "$(curl -s -o /dev/null -w '%{http_code}' "${base}this-does-not-exist")" = "404"
 ```
@@ -425,21 +449,20 @@ Procedura di rollback:
 
 ## Runbook
 
-### La build fallisce per token mancante
+### La build non aggiorna i dati (rate limit o API giù)
 
-1. In locale: `GITHUB_TOKEN=$(gh auth token) pnpm run deploy` (serve la GitHub
-   CLI autenticata) oppure un token personale in sola lettura.
+1. In locale: `pnpm run deploy` funziona senza token; se il limite è stato
+   esaurito, attendi il reset o imposta un token in sola lettura.
 2. Per lavorare senza rete: `GITHUB_OFFLINE=1 pnpm dev`.
-3. In CI: verifica che lo step passi `secrets.GITHUB_TOKEN`.
+3. In CI: `GITHUB_OFFLINE=1` usa fixture/snapshot e non richiede segreti.
 
 ### La build fallisce per rate limit GitHub (403/429)
 
-1. Controlla nei log il `rateLimit` della query GraphQL e il numero di README
-   richiesti.
+1. Controlla nei log `x-ratelimit-remaining` e `x-ratelimit-reset`.
 2. Se lo snapshot è valido (< 7 giorni), la build prosegue con warning. Se non
    lo fa, verifica la cache.
-3. Se persiste, riduci `github.maxRepos` o attendi la finestra successiva; non
-   disattivare la validazione.
+3. Se persiste, riduci `github.maxRepos`, attendi la finestra successiva o
+   imposta un token in sola lettura; non disattivare la validazione.
 
 ### Il sito mostra il README del repository invece del portfolio
 
@@ -516,11 +539,11 @@ giusta, nella lingua di default. Non c'è redirect automatico verso `/it/`
 | Legacy | Nuovo (lingua default) | Nuovo (IT) |
 | --- | --- | --- |
 | `/#home` | `/` (Bento con `id="home"`) | `/it/` |
-| `/#about` | `/#about` (Profile/Bento) | `/it/#about` |
+| `/#about` | `/#about` (About) | `/it/#about` |
 | `/#projects` | `/#projects` (Explore) | `/it/#projects` |
-| `/#skills` | `/#skills` (Tech Stack) | `/it/#skills` |
+| `/#skills` | `/#skills` (Skills) | `/it/#skills` |
 | `/#experience` | `/#experience` (GitHub Story) | `/it/#experience` |
-| `/#contact` | `/#contact` (quick actions) | `/it/#contact` |
+| `/#contact` | `/#contact` (footer contatti) | `/it/#contact` |
 | Dialog progetto | `/projects/{slug}` | `/it/projects/{slug}` |
 
 ### Checklist di cutover
@@ -530,10 +553,10 @@ giusta, nella lingua di default. Non c'è redirect automatico verso `/it/`
 - [ ] `pnpm run deploy -- --dry-run` produce `.output/public` con `.nojekyll`.
 - [ ] Pages impostato su "Deploy from a branch" → `gh-pages`.
 - [ ] Base URL corretto (project site, user site o dominio custom).
-- [ ] Smoke test su home, dettaglio, sitemap, 404.
-- [ ] Gli `id` di sezione legacy esistono nella nuova landing.
+- [ ] Smoke test su home, CV, export, sitemap, 404 (in `deploy.yml`; il dettaglio è coperto dagli E2E).
+- [x] Gli `id` di sezione legacy esistono nella nuova landing (E2E).
 - [ ] Dominio custom (se presente) verificato.
-- [ ] Vecchia workflow rimossa.
+- [x] Vecchia workflow rimossa.
 - [ ] Badge e link nel README aggiornati.
 
 ## Costi e quote

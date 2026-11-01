@@ -1,7 +1,7 @@
 # RepoPortfolio — Documentazione di progetto
 
-> **Stato:** Fase 1 — M1 (scaffold e fondamenta) completata, sviluppo in corso
-> **Ultimo aggiornamento:** 30 ottobre 2026
+> **Stato:** Fase 1 — M6 (qualità e cutover): implementato e verificato in locale; restano CI reale, primo deploy e rollback
+> **Ultimo aggiornamento:** 1 novembre 2026
 > **Destinatari:** maintainer, contributor, reviewer
 
 RepoPortfolio è un portfolio statico che racconta la storia professionale di uno
@@ -24,9 +24,9 @@ nessun backend, nessuna API key esposta al browser.
 > sembrare deliberata, non decorativa. Se una feature o un effetto non rafforza
 > "identità GitHub + alte prestazioni + manutenzione zero", non entra.
 
-Questa cartella contiene le decisioni di prodotto e tecniche **prima** della
-riscrittura. Il codice del progetto legacy (Next.js) è stato rimosso e resta
-solo nella storia git.
+Questa cartella contiene le decisioni di prodotto e tecniche della riscrittura
+Nuxt ed è la specifica del codice. Il progetto legacy (Next.js) è stato rimosso
+e resta solo nella storia git.
 
 ---
 
@@ -36,9 +36,9 @@ solo nella storia git.
 | --- | --- |
 | [01 — Visione e obiettivi](01-visione-e-obiettivi.md) | Regola d'oro, posizionamento, utenti, obiettivi misurabili, rischi |
 | [02 — Feature](02-feature.md) | Feature pilastro, Bento, GitHub Story, Explore, CV, criteri di accettazione |
-| [03 — Architettura](03-architettura.md) | Rendering, flusso dati GraphQL, layer, struttura cartelle |
+| [03 — Architettura](03-architettura.md) | Rendering, flusso dati REST pubblico, layer, struttura cartelle |
 | [04 — Tech stack](04-tech-stack.md) | Ogni libreria, ruolo, configurazione |
-| [05 — Dati e contenuti](05-dati-e-contenuti.md) | `data/`, schemi, query GraphQL, discovery preview, story |
+| [05 — Dati e contenuti](05-dati-e-contenuti.md) | `data/`, schemi, API REST pubblica, discovery preview, story |
 | [06 — Design system e UX](06-design-system.md) | Engineered Minimalism, token, Bento, Git graph a lane, accessibilità |
 | [07 — Infrastruttura e deploy](07-infrastruttura-deploy.md) | `pnpm run deploy`, GitHub Pages, Actions, sicurezza, runbook |
 | [08 — Qualità e testing](08-qualita-testing.md) | Test, quality gate, budget, convenzioni |
@@ -112,16 +112,16 @@ Le decisioni sono raccolte in [09 — Roadmap e decisioni](09-roadmap-e-adr.md).
 
 ## Stato del repository
 
-Il legacy Next.js è stato **rimosso completamente**. Nel working tree restano
-solo:
+L'applicazione Nuxt 4 implementa M1–M6 (dettaglio e cose ancora da fare in
+[09 — Stato dell'implementazione](09-roadmap-e-adr.md#stato-dellimplementazione-01112026)):
 
-- `docs/` — questa documentazione;
-- `public/repo-placeholder/` — le immagini placeholder;
-- `public/favicon.ico` — favicon;
+- `data/` — template per chi clona; `datasets/` — payload alternativi
+  selezionabili con `PORTFOLIO_DATA_DIR` (ADR-029), incluso quello dell'owner;
+- `app/`, `server/`, `shared/`, `modules/`, `scripts/` — il motore;
+- `tests/unit` (Vitest) e `tests/e2e` (Playwright + axe);
+- `.github/workflows` — CI, deploy su push, controlli settimanali;
 - `.github/RepoPortfolio-Your-GitHub-Story/index.png` — preview del repository
-  (path legacy, riconosciuto dalla discovery automatica);
-- file di progetto minimi (`.gitignore`, `.editorconfig`, `LICENSE`, ecc.);
-- la storia git, che conserva il codice legacy come archivio.
+  (path legacy, riconosciuto dalla discovery automatica).
 
-Lo scaffold Nuxt parte da una base pulita. Dettagli nel runbook di
+Il legacy Next.js resta solo nella storia git. Il cutover è descritto in
 [07 — Infrastruttura e deploy](07-infrastruttura-deploy.md#cutover-dal-legacy).

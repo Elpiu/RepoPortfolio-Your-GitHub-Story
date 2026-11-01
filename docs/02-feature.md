@@ -18,7 +18,7 @@ backlog e non entrano nell'MVP.
 
 | Feature | Priorità | Nota |
 | --- | --- | --- |
-| F1 Project Engine | Must | GraphQL, pinned, discovery delle preview, linguaggi, attività |
+| F1 Project Engine | Must | REST pubblico, featured per stelle, discovery delle preview, linguaggi, attività |
 | F2 Explore All Repositories | Must | Tab + ricerca + linguaggio + sort; filtro topic rinviato |
 | F3 Project Detail | Must | Pagina dedicata con README |
 | F5 GitHub Identity & Story | Must | Bento Grid + Git Graph a lane + eventi automatici |
@@ -26,7 +26,7 @@ backlog e non entrano nell'MVP.
 | F9 CV & Export | Should | `/cv` stampabile e `/resume.json` dagli stessi dati |
 | F0/F7/F8 | Must | Fondamenta, preferenze, delivery con un comando |
 
-**Rimossa nella revisione:** F4 Featured Carousel (il Top Repo e i pinned
+**Rimossa nella revisione:** F4 Featured Carousel (il Top Repo e i featured
 coprono già la gerarchia; Embla esce dallo stack). L'ID `F4` non viene
 riutilizzato.
 
@@ -38,7 +38,7 @@ automatici della story → activity card.
 ```text
 F0 Fondamenta (Engineered Minimalism, shell, data/, validazione)
    |
-   +--> F1 Project Engine (GraphQL)
+   +--> F1 Project Engine (REST pubblico)
    |       |
    |       +--> F2 Explore All Repositories --> F3 Project Detail
    |       |
@@ -94,70 +94,69 @@ questa, si costruiscono componenti duplicati e stringhe sparse.
 ## F1 — Project Engine (GitHub come fonte di verità)
 
 **Cosa:** pipeline di build che legge i repository pubblici da GitHub tramite
-**GraphQL**, li valida, li normalizza e li rende disponibili al sito senza
-chiamate API dal browser.
+**REST pubblico**, li valida, li normalizza e li rende disponibili al sito senza
+chiamate API dal browser. Il token è opzionale e serve solo ad alzare il rate
+limit.
 
 **Perché è pilastro:** è il cuore del prodotto. Senza questa pipeline il sito è
 un portfolio statico qualunque.
 
 **Scope MVP**
 
-- Una query GraphQL paginata (50 repository per pagina, limite configurabile,
-  default 300) che restituisce in un colpo solo: metadati, linguaggi con byte e
-  colore ufficiale, topics, licenza, ultimo commit del branch di default,
-  ultima release, pinned del profilo, immagine social custom, elenco dei file
-  necessari alla discovery della preview e l'eventuale `.repo-story.json`.
-- REST solo per `GET /repos/{owner}/{repo}/readme` (gestisce le varianti del
-  nome file).
+- `GET /users/{username}/repos` paginata (100 repository per pagina, limite
+  configurabile, default 300) con metadati, topics, licenza, linguaggio
+  principale, stelle, fork, size, branch di default e date.
 - Esclusione di fork, archiviati, repository profilo (`{username}/{username}`),
   nomi in `excludedRepos`, repository con topic `portfolio-hidden` o con
   `"hidden": true` nel proprio `.repo-story.json`.
-- **Featured = pinned del profilo GitHub**, nell'ordine di GitHub; se non ci
-  sono pinned, i repository con più stelle. Nessuna lista manuale.
-- **Discovery automatica della preview** (nessuna configurazione richiesta):
-  `.repo-story.json` → file per convenzione (`preview`, `screenshot`, `cover`,
-  `banner`, `social-preview` in root, `.github/` o `docs/`) → prima immagine non
-  badge del README → immagine social custom del repository → placeholder
+- **Featured = repository con più stelle** (a parità, il più aggiornato). I
+  pinned del profilo richiedono GraphQL e non sono disponibili in modalità
+  pubblica.
+- **Discovery della preview:** `.repo-story.json` → file per convenzione
+  (`preview`, `screenshot`, `cover`, `hero`, `banner`, `social-preview`) per i
+  repository featured → prima immagine non badge del README → placeholder
   deterministico. Dettaglio in [05](05-dati-e-contenuti.md#preview-image).
 - Normalizzazione in un modello stabile e tipizzato; validazione zod al confine
   con l'API.
-- Aggregato linguaggi stile GitHub con colori presi dall'API, percentuali
-  normalizzate.
-- Activity: ultimo push globale e ultimo commit (hash, messaggio, data) del
-  repository aggiornato più di recente; nessuna chiamata extra.
+- Language bar derivata dal **linguaggio principale** dei repository inclusi,
+  con colori noti o fallback deterministico; percentuali normalizzate.
+- Activity: repository con `pushedAt` più recente. Hash e messaggio dell'ultimo
+  commit non sono disponibili nella lista REST pubblica.
 - Snapshot dell'ultimo dato valido per i rebuild in caso di API irraggiungibile.
 - Nessuna richiesta a `api.github.com` dal browser.
 
 **Criteri di accettazione**
 
-- [ ] Con un username valido e un token, la build produce un dataset di
+- [ ] Con un username valido, senza token, la build produce un dataset di
       repository normalizzati e validati.
-- [ ] Senza token la build fallisce con un messaggio che spiega come ottenerlo
-      (`gh auth token`), salvo modalità offline con snapshot o fixture.
+- [ ] Un token opzionale in sola lettura alza il rate limit senza cambiare il
+      modello dati.
 - [ ] Fork, archiviati, repository profilo, `excludedRepos`, topic
       `portfolio-hidden` e `hidden: true` non compaiono.
-- [ ] I pinned compaiono come featured nell'ordine del profilo; senza pinned il
-      fallback è per stelle (a parità, il più aggiornato).
+- [ ] I featured sono ordinati per stelle; a parità vince il repository più
+      aggiornato.
 - [ ] Il branch di default viene letto dall'API, non assunto come `main`.
 - [ ] Un payload API non conforme allo schema fa fallire la build con un
       messaggio che indica il repository e il campo.
 - [ ] Con API GitHub non raggiungibile, la build usa lo snapshot precedente se
       presente; altrimenti fallisce in modo esplicito.
-- [ ] Un repository con `.github/preview.png` ottiene quella preview senza
-      alcuna configurazione; uno senza immagini ottiene il placeholder.
+- [ ] Un repository featured con `.github/preview.png` ottiene quella preview
+      senza configurazione; uno senza immagini ottiene il placeholder.
 - [ ] Il placeholder è deterministico (`id % 8`), mai `Math.random()`.
 - [ ] Le percentuali dei linguaggi sommano a 100 (o 0 se non ci sono dati) e
       sono calcolate solo dai repository inclusi.
-- [ ] L'activity card mostra repo, branch, commit e data coerenti con il
-      dataset; se il commit manca degrada su `pushedAt`.
+- [ ] L'activity card mostra repo, branch e data coerenti con `pushedAt`; il
+      commit è `null` in modalità pubblica.
+- [ ] Il rate limit REST viene loggato e non esaurito dalla pipeline.
 
 **Fuori scope**
 
 - Repository privati.
+- Pinned, release e ultimo commit (richiedono GraphQL o chiamate REST per repo).
 - Webhook o aggiornamento in tempo reale.
 - Contributi, issue, pull request.
 
-**Decisioni collegate:** ADR-002, ADR-012, ADR-020, ADR-021, ADR-022.
+**Decisioni collegate:** ADR-002, ADR-012, ADR-022, ADR-028.
 
 ---
 
@@ -172,22 +171,22 @@ per lui. Con molti repository, una lista non filtrata è inutile.
 
 **Scope MVP**
 
-- Card progetto: icona del linguaggio, nome repo, badge `Pinned` se in
-  evidenza, link esterno alla demo, descrizione breve, fino a 5 topics, stelle,
-  fork, linguaggio, size, data di aggiornamento, preview image.
+- Card progetto: icona del linguaggio, nome repo, link esterno alla demo,
+  descrizione breve, fino a 5 topics, stelle, fork, linguaggio, size, data di
+  aggiornamento, preview image.
 - Tab quick filter: `Tutti`, i 3 linguaggi più usati, `Open Source` (repository
   con licenza riconosciuta). I tab sono derivati dai dati, non hardcoded.
 - Ricerca su nome, descrizione e topics (case-insensitive, debounce 200 ms).
 - Filtro per linguaggio (valori derivati dai dati) sincronizzato con i tab.
-- Ordinamento: rilevanza (pinned prima, poi stelle), stelle, ultimo
+- Ordinamento: rilevanza (stelle, poi aggiornamento), stelle, ultimo
   aggiornamento, nome.
 - Contatore risultati e stato vuoto con azione "azzera filtri".
 - Griglia a 2 colonne su desktop, 1 su mobile.
 - "Carica altri" a blocchi di 12 (o "mostra tutti" se il dataset è piccolo).
 - Stato in query string (`q`, `lang`, `tab`, `sort`, `page`) come **unica fonte
   di verità**: nessuno store globale.
-- Animazione di riordino/filtro con `@formkit/auto-animate`, disattivata con
-  `prefers-reduced-motion`.
+- Il riordino è immediato e senza dipendenze di animazione, per rispettare il
+  budget JS; con `prefers-reduced-motion` non cambia nulla.
 - Rendering SSR della lista di default (senza filtri) per SEO e assenza di CLS.
 
 **Criteri di accettazione**
@@ -231,9 +230,9 @@ il "perché". È anche la pagina che dà valore SEO e link condivisibili.
 - Route localizzate `/projects/[slug]` e `/{locale}/projects/[slug]`,
   prerenderizzate per ogni repository incluso e per ogni lingua supportata.
 - Metadati: nome, descrizione, breakdown dei linguaggi del repository, stelle,
-  fork, date di creazione/aggiornamento, ultimo commit, ultima release, topics,
-  link a GitHub e alla homepage se presente.
-- README letto dal branch di default tramite API REST.
+  fork, date di creazione/aggiornamento/push, topics, link a GitHub e alla
+  homepage se presente. Commit e release non sono disponibili in REST pubblico.
+- README letto dal branch di default tramite `raw.githubusercontent.com` (varianti del nome file).
 - Rendering markdown con GitHub Flavored Markdown, code highlighting e immagini.
 - Risoluzione delle immagini e dei link relativi del README verso URL assoluti.
 - Sanitizzazione dell'HTML: niente script, iframe o attributi pericolosi.
@@ -271,7 +270,7 @@ il "perché". È anche la pagina che dà valore SEO e link condivisibili.
 1. **Bento Grid** in cima: profilo, disponibilità, top repo, language bar e
    ultima attività GitHub.
 2. **GitHub Story** al centro: un git graph con lane parallele, in cui
-   esperienze, milestone, repository e release sono nodi/commit.
+   esperienze, milestone e repository featured sono nodi/commit.
 
 **Perché è pilastro:** è ciò che distingue RepoPortfolio da un template. Unisce
 identità umana e identità GitHub in un'unica narrazione visiva.
@@ -281,15 +280,16 @@ identità umana e identità GitHub in un'unica narrazione visiva.
 - Bento asimmetrica (4 riquadri):
   - **Profile (2 colonne):** avatar, nome, ruolo, anni di esperienza calcolati,
     bio breve, badge di disponibilità con pallino, quick actions (`mailto:`,
-    `tel:`, CV, GitHub, LinkedIn). Tutto letto da `data/profile/{locale}.json`
+    `tel:`, copia email, GitHub, LinkedIn e CV (`/cv` o `links.cvUrl`).\n    Tutto letto da `data/profile/{locale}.json`
     e `data/site.json`.
-  - **Top Repo:** il primo pinned o, in assenza di pinned, il più stellato, con
-    preview, stelle, linguaggio e link al dettaglio.
-  - **Tech Stack:** language bar orizzontale con i colori GitHub, percentuali e
-    legenda; sotto, chip delle competenze per gruppo.
-  - **Activity:** ultimo push con repo, branch e data; hash e messaggio
-    dell'ultimo commit in monospazio; etichetta "Last synced" con la data della
-    build.
+  - **Top Repo:** il repository con più stelle, con preview, stelle, linguaggio
+    e link al dettaglio.
+  - **Tech Stack:** language bar orizzontale con colori noti/fallback,
+    percentuali e legenda accessibile. Le chip delle competenze vivono nella
+    sezione Skills.
+  - **Activity:** ultimo push con repo, branch e data; etichetta "Last synced"
+    con la data della build. Hash e messaggio non sono disponibili in REST
+    pubblico.
 - Bento responsive: 1 colonna mobile, 2 tablet, 4 desktop con riquadri che
   occupano 2 colonne.
 - GitHub Story:
@@ -297,9 +297,9 @@ identità umana e identità GitHub in un'unica narrazione visiva.
     mentre lavori, due ruoli) diventano branch paralleli che si staccano e
     fanno merge; massimo 3 lane, calcolate dalle date.
   - Eventi curati nel JSON (lavoro, studio, milestone) più **eventi
-    automatici**: ogni repository pinned diventa un nodo `repo` alla data di
-    creazione, la sua ultima release un nodo `release`. Un evento curato che
-    cita lo stesso repository vince su quello automatico.
+    automatici**: ogni repository featured (per stelle) diventa un nodo `repo`
+    alla data di creazione. Le release non sono disponibili via REST pubblico.
+    Un evento curato che cita lo stesso repository vince su quello automatico.
   - Ogni nodo è una card espandibile con descrizione, badge tecnologie, link
     demo/repo.
   - Icone/nodi distinti per tipo (work, education, release, repo, milestone).
@@ -310,7 +310,7 @@ identità umana e identità GitHub in un'unica narrazione visiva.
 
 - [ ] La Bento contiene profilo, top repo, language bar e activity, con
       gerarchia visiva chiara.
-- [ ] Il Top Repo è il primo pinned o, in assenza, il più stellato.
+- [ ] Il Top Repo è il repository con più stelle.
 - [ ] Il badge di disponibilità è testo + indicatore, non solo un pallino
       animato; con reduced motion il pulse è disattivato.
 - [ ] La language bar ha percentuali verificabili e una legenda accessibile
@@ -319,7 +319,7 @@ identità umana e identità GitHub in un'unica narrazione visiva.
       sincronizzazione.
 - [ ] Due esperienze sovrapposte sono disegnate su lane diverse; mai più di 3
       lane.
-- [ ] I pinned compaiono come nodi automatici senza modificare il JSON; un
+- [ ] I featured compaiono come nodi automatici senza modificare il JSON; un
       milestone curato sullo stesso repository sostituisce il nodo automatico.
 - [ ] La GitHub Story è leggibile a 320 px senza scroll orizzontale.
 - [ ] Ogni nodo ha data semantica (`time`) e stato espanso/collassato
@@ -336,7 +336,7 @@ identità umana e identità GitHub in un'unica narrazione visiva.
   tra un deploy e l'altro).
 - Contributi/issue/PR nel grafo.
 
-**Decisioni collegate:** ADR-020, ADR-024.
+**Decisioni collegate:** ADR-020, ADR-024, ADR-028.
 
 ---
 
@@ -355,7 +355,7 @@ sezione separata.
 - Pulsante `mailto:` con l'email configurata.
 - Pulsante `tel:` con il numero configurato.
 - Copia email negli appunti con feedback accessibile (`aria-live`), tramite
-  `useClipboard` di VueUse.
+  Clipboard API nativa, con messaggio `aria-live`.
 - Link a LinkedIn, GitHub (derivato dallo username) e CV: per default la pagina
   `/cv` (F9); se `links.cvUrl` è valorizzato, il link punta a quel file.
 - Email e telefono visibili direttamente.
@@ -480,7 +480,7 @@ diverge dal sito. Generarlo dagli stessi JSON elimina il drift.
 **Scope**
 
 - Rotte `/cv` e `/{locale}/cv` prerenderizzate: nome, ruolo, contatti, about,
-  esperienze, competenze, progetti pinned.
+  esperienze, competenze, progetti featured.
 - Stylesheet `@media print` per A4: colori chiari forzati, niente navigazione,
   interruzioni di pagina controllate, URL dei link visibili.
 - Pulsante "Download PDF" che apre la stampa del browser (`window.print()`):
@@ -533,7 +533,7 @@ diverge dal sito. Generarlo dagli stessi JSON elimina il drift.
 | Milestone | Feature incluse | Risultato |
 | --- | --- | --- |
 | M1 — Scheletro | F0, F7 (base), F8 (deploy con un comando) | Shell dark-first, multilingua, già pubblicabile |
-| M2 — Engine & Explore | F1, F2 | Repository reali via GraphQL e griglia filtrabile |
+| M2 — Engine & Explore | F1, F2 | Repository reali via REST pubblico e griglia filtrabile |
 | M3 — Dettaglio | F3 | README come pagina |
 | M4 — Identità & Story | F5, F6 | Bento Grid, Git Graph a lane, quick actions |
 | M5 — CV & Export | F9 | `/cv` stampabile e `/resume.json` |
@@ -572,7 +572,7 @@ Queste feature non entrano nell'MVP ma l'architettura deve poterle accogliere.
 
 | Idea | Motivo |
 | --- | --- |
-| Featured carousel (ex F4) | Ridondante con Top Repo e pinned; JS e rumore in più |
+| Featured carousel (ex F4) | Ridondante con Top Repo e featured; JS e rumore in più |
 | Contribution heatmap | Calcolata solo in build: resterebbe ferma tra un deploy e l'altro |
 | OG image per progetto | Nessuna generazione di immagini in build |
 | Download e ottimizzazione delle immagini in build | Le preview restano remote (ADR-013) |

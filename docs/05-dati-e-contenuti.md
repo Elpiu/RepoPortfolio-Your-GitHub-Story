@@ -4,7 +4,7 @@
 
 | Dato | Fonte | Chi lo modifica |
 | --- | --- | --- |
-| Repository, stelle, topics, linguaggi, README, commit, release, pinned | GitHub API (GraphQL + REST README) | GitHub / build |
+| Repository, stelle, topics, licenza, linguaggio principale, README, date | GitHub REST pubblico + raw GitHub | GitHub / build |
 | Preview di un repository | Discovery automatica nel repository; override opzionale `.repo-story.json` | Owner, nel repository stesso |
 | Nome, ruolo, bio, avatar, disponibilità, competenze, esperienze, milestone | `data/profile/{locale}.json` | Owner |
 | Contatti, lingue, esclusioni, opzioni della story, dominio | `data/site.json` | Owner |
@@ -13,7 +13,7 @@
 
 Il racconto personale vive **solo nel JSON** (ADR-023): il profilo GitHub non
 sovrascrive nome, bio o disponibilità. Ciò che esiste già nei repository
-(descrizione, topics, date, linguaggi, release) non va copiato a mano.
+(descrizione, topics, date, linguaggio principale) non va copiato a mano.
 
 ## La cartella `data/`
 
@@ -48,6 +48,31 @@ Per aggiungere una lingua:
 Nessuna modifica al codice. La validazione controlla parità di chiavi e `id`
 tra le lingue.
 
+### Dataset alternativi (`datasets/`, ADR-029)
+
+`data/` resta il payload di default (il template per chi clona). Altri payload
+con la stessa forma possono vivere in `datasets/{nome}/` e si scelgono senza
+toccare il codice:
+
+| Contesto | Come |
+| --- | --- |
+| `pnpm dev` / `pnpm generate` | `PORTFOLIO_DATA_DIR=datasets/{nome}` in `.env` |
+| Deploy locale | `pnpm run deploy -- --data datasets/{nome}` |
+| Deploy in Actions | variabile di repository `PORTFOLIO_DATA_DIR` (Settings → Variables) |
+
+- I file puntano agli schemi di `data/schema/` (es.
+  `"$schema": "../../data/schema/site.schema.json"`): gli schemi restano unici.
+- I test unitari validano `data/` **e** ogni cartella in `datasets/`.
+- Lo snapshot `.cache/github/last-good.json` viene ignorato se appartiene a un
+  username diverso da quello del dataset attivo.
+- Chi clona può cancellare `datasets/` senza effetti sul motore.
+
+Le icone delle competenze (`skills.groups[].items[].icon`, formato
+`collezione:nome`, es. `simple-icons:typescript`) vengono risolte in build dalle
+collezioni `@iconify-json/*` installate e arrivano nel payload della home
+(`/api/data-icons`), non nel bundle JS. Un'icona sconosciuta produce un warning
+e viene omessa; i test la segnalano.
+
 ## `data/site.json`
 
 Esempio completo:
@@ -76,7 +101,6 @@ Esempio completo:
   },
   "story": {
     "autoEvents": true,
-    "includeReleases": true,
     "maxAutoEvents": 8
   },
   "locales": [
@@ -116,8 +140,7 @@ Esempio minimo valido (tutto il resto prende i default):
 | `links.linkedin`, `links.website` | `null` | |
 | `links.cvUrl` | `null` | Se `null`, il pulsante CV porta a `/cv` (F9) |
 | `career.start` | `null` | `YYYY-MM`; se assente gli anni di esperienza non vengono mostrati |
-| `story.autoEvents` | `true` | Pinned come nodi automatici della GitHub Story |
-| `story.includeReleases` | `true` | Ultima release dei pinned come nodo |
+| `story.autoEvents` | `true` | Featured come nodi automatici della GitHub Story |
 | `story.maxAutoEvents` | `8` | |
 | `locales` | — | Almeno una voce, esattamente una con `default: true` |
 | `deploy.customDomain` | `null` | Es. `portfolio.example.com`: base URL `/` e file `CNAME` |
@@ -322,9 +345,9 @@ repository un piccolo manifest:
 | --- | --- | --- |
 | `preview` | — | Path relativo alla root o URL `https://` su host GitHub; vince sulla discovery |
 | `hidden` | `false` | Esclude il repository dal portfolio (come il topic `portfolio-hidden`) |
-| `story` | `true` | Se `false`, il repository pinned non genera eventi automatici |
+| `story` | `true` | Se `false`, il repository featured non genera eventi automatici |
 
-- Letto nella stessa query GraphQL (nessuna chiamata in più).
+- Letto via `raw.githubusercontent.com` (nessuna chiamata API aggiuntiva).
 - Massimo 4 KB; campi sconosciuti ignorati.
 - Se non è JSON valido o non rispetta lo schema: warning con nome del
   repository e campo, file ignorato, build verde.
@@ -349,8 +372,8 @@ export type Repository = {
   url: string
   homepage: string | null
   topics: string[]
-  language: string | null // linguaggio principale (primo per byte)
-  languages: RepoLanguage[] // massimo 5, per il dettaglio
+  language: string | null // linguaggio principale (REST)
+  languages: RepoLanguage[] // in modalità pubblica un solo elemento al 100%
   stars: number
   forks: number
   sizeKb: number
@@ -359,10 +382,10 @@ export type Repository = {
   updatedAt: string // ISO 8601
   pushedAt: string | null // ISO 8601
   defaultBranch: string
-  lastCommit: { sha: string; shortSha: string; message: string; date: string } | null
-  latestRelease: { name: string; tag: string; date: string; url: string } | null
+  lastCommit: { sha: string; shortSha: string; message: string; date: string } | null // null in REST pubblico
+  latestRelease: { name: string; tag: string; date: string; url: string } | null // null in REST pubblico
   isPinned: boolean
-  pinnedOrder: number | null // 0..5 nell'ordine del profilo GitHub
+  pinnedOrder: number | null // sempre null in REST pubblico
   previewImage: string | null // URL assoluto; null = placeholder
   previewSource: PreviewSource
   placeholderIndex: number // id % 8 (PLACEHOLDER_COUNT, costante del motore)
@@ -371,7 +394,7 @@ export type Repository = {
 export type LanguageStat = {
   name: string
   color: string
-  bytes: number
+  repos: number
   percent: number // 0..100, somma 100
 }
 
@@ -384,7 +407,7 @@ export type Activity = {
 }
 
 export type StoryEvent = {
-  id: string // "auto-repo-{name}" | "auto-release-{name}"
+  id: string // "auto-repo-{name}" (release non disponibile in REST pubblico)
   type: 'repo' | 'release'
   date: string // YYYY-MM
   title: string
@@ -415,12 +438,12 @@ Note:
 
 - Le date restano stringhe ISO. Non usare `Date` nel payload.
 - `slug` è stabile e univoco.
-- `previewImage` è già un URL assoluto o `null`; il componente non costruisce
-  URL.
+- `previewImage` è già un URL assoluto o `null` (placeholder); il componente non
+  costruisce URL.
 - I README **non** fanno parte di `Repository` nella lista.
 - `license` è `null` se GitHub non rileva una licenza; è il criterio del tab
   `Open Source`.
-- `sizeKb` è `diskUsage` di GitHub, mostrato in forma compatta (es. 1.2 MB).
+- `sizeKb` è `size` di GitHub, mostrato in forma compatta (es. 1.2 MB).
 - `syncedAt` alimenta l'etichetta "Last synced" e il calcolo deterministico di
   "oggi" (anni di esperienza, esperienze in corso nel grafo).
 
@@ -428,90 +451,62 @@ Note:
 
 | Uso | Endpoint | Quando |
 | --- | --- | --- |
-| Repository, linguaggi, topics, commit, release, pinned, alberi, manifest | GraphQL `POST /graphql` | Build, una query paginata |
-| README | REST `GET /repos/{owner}/{repo}/readme` | Build, per repository incluso |
-| Preview | `raw.githubusercontent.com/{owner}/{repo}/{branch}/{path}` | Immagine remota nel browser |
+| Repository, topics, licenza, linguaggio principale, stelle, date | REST `GET /users/{username}/repos` | Build, paginata |
+| Manifest e README per la preview | `raw.githubusercontent.com/{owner}/{repo}/{branch}/{path}` | Build |
+| Preview | `raw.githubusercontent.com/...` | Immagine remota nel browser |
+| README del dettaglio (M3) | `raw.githubusercontent.com/.../README.md` e varianti | Build |
 
-### Query GraphQL
+### REST pubblico
 
-```graphql
-query Portfolio($login: String!, $cursor: String, $firstPage: Boolean!) {
-  rateLimit { cost remaining resetAt }
-  user(login: $login) {
-    login
-    pinnedItems(first: 6, types: REPOSITORY) @include(if: $firstPage) {
-      nodes { ... on Repository { name } }
-    }
-    repositories(
-      first: 50
-      after: $cursor
-      ownerAffiliations: OWNER
-      privacy: PUBLIC
-      orderBy: { field: PUSHED_AT, direction: DESC }
-    ) {
-      pageInfo { hasNextPage endCursor }
-      nodes {
-        databaseId name description url homepageUrl
-        isFork isArchived stargazerCount forkCount diskUsage
-        createdAt updatedAt pushedAt
-        licenseInfo { spdxId name }
-        languages(first: 10, orderBy: { field: SIZE, direction: DESC }) {
-          edges { size node { name color } }
-        }
-        repositoryTopics(first: 10) { nodes { topic { name } } }
-        openGraphImageUrl
-        usesCustomOpenGraphImage
-        latestRelease { name tagName publishedAt url }
-        defaultBranchRef {
-          name
-          target { ... on Commit { oid abbreviatedOid messageHeadline committedDate } }
-        }
-        rootTree: object(expression: "HEAD:") { ... on Tree { entries { name type path } } }
-        githubTree: object(expression: "HEAD:.github") { ... on Tree { entries { name type path } } }
-        docsTree: object(expression: "HEAD:docs") { ... on Tree { entries { name type path } } }
-        legacyPreview: object(expression: "HEAD:.github/RepoPortfolio-Your-GitHub-Story/index.png") { oid }
-        repoStory: object(expression: "HEAD:.repo-story.json") { ... on Blob { text } }
-      }
-    }
-  }
-}
+```text
+GET https://api.github.com/users/{username}/repos
+  ?per_page=100&page=N&sort=pushed&direction=desc&type=owner
+
+Headers:
+  Accept: application/vnd.github+json
+  X-GitHub-Api-Version: 2022-11-28
+  User-Agent: RepoPortfolio
+  Authorization: Bearer ${GITHUB_TOKEN}   # opzionale, solo rate limit
 ```
 
 Note:
 
-- GraphQL **richiede sempre un token**, anche per dati pubblici. In locale:
-  `GITHUB_TOKEN=$(gh auth token)`; in CI: il `GITHUB_TOKEN` del workflow.
-- `rateLimit` viene loggato a ogni pagina: il costo atteso è di pochi punti per
-  pagina, lontano dai limiti.
-- REST è usato solo per il README, perché `/readme` risolve le varianti del
-  nome file (`README.md`, `readme.markdown`, `README.rst`...). Con il
-  `GITHUB_TOKEN` di Actions il limite REST è **1.000 richieste/ora per
-  repository** (5.000 con un token personale): sufficiente per 300 README.
-- Header REST: `Accept: application/vnd.github.raw+json`,
-  `X-GitHub-Api-Version: 2022-11-28`.
+- **Nessun token obbligatorio.** GitHub REST pubblico espone i repository e i
+  metadati necessari; senza token il limite è **60 richieste/ora** per IP.
+  La pipeline usa 1–3 richieste API per la lista, quindi resta ampiamente sotto
+  il limite. Un token in sola lettura alza il limite a 5.000/ora.
+- La lista contiene già topics, licenza, linguaggio principale, stelle, fork,
+  size, branch di default e date: nessuna chiamata per repository.
+- Pinned, release e ultimo commit non sono disponibili via REST pubblico: il
+  modello li espone come `isPinned: false`, `latestRelease: null` e
+  `lastCommit: null`.
+- Le preview e i manifest sono letti da `raw.githubusercontent.com` (CDN, non
+  API): non consumano il rate limit REST.
+- Gli header `x-ratelimit-remaining` e `x-ratelimit-reset` vengono loggati a
+  ogni pagina.
 
 ## Normalizzazione GitHub
 
 | Campo API | Campo dominio | Trasformazione |
 | --- | --- | --- |
-| `databaseId` | `id` | invariato |
+| `id` | `id` | invariato |
 | `name` | `name` | invariato |
 | `name` | `slug` | `slugify(name)` + suffisso `-{id}` in caso di collisione |
 | `description` | `description` | trim; stringa vuota → `null` |
-| `url` | `url` | invariato |
-| `homepageUrl` | `homepage` | stringa vuota → `null` |
-| `repositoryTopics` | `topics` | dedup, lowercase, max 10 |
-| `languages.edges` | `language`, `languages` | primo per byte; top 5 con percentuale |
-| `stargazerCount` | `stars` | intero |
-| `forkCount` | `forks` | intero |
-| `diskUsage` | `sizeKb` | intero (KB), `null` → 0 |
-| `licenseInfo` | `license` | `{ spdxId, name }` o `null` (`NOASSERTION` → `null`) |
-| `createdAt` / `updatedAt` / `pushedAt` | idem | ISO invariato |
-| `defaultBranchRef.name` | `defaultBranch` | invariato (non assumere `main`) |
-| `defaultBranchRef.target` | `lastCommit` | `{ sha, shortSha, message, date }` o `null` |
-| `latestRelease` | `latestRelease` | `{ name ?? tagName, tag, date, url }` o `null` |
-| `pinnedItems` | `isPinned`, `pinnedOrder` | posizione nella lista pinned |
-| alberi + manifest + README + `openGraphImageUrl` | `previewImage`, `previewSource` | vedi [Preview image](#preview-image) |
+| `html_url` | `url` | invariato |
+| `homepage` | `homepage` | stringa vuota o URL non valido → `null` |
+| `topics` | `topics` | dedup, lowercase, max 10 |
+| `language` | `language`, `languages` | linguaggio principale; percentuale 100 nel repository |
+| `stargazers_count` | `stars` | intero |
+| `forks_count` | `forks` | intero |
+| `size` | `sizeKb` | intero (KB) |
+| `license` | `license` | `{ spdxId, name }` o `null` (`NOASSERTION` → `null`) |
+| `created_at` / `updated_at` / `pushed_at` | idem | ISO invariato |
+| `default_branch` | `defaultBranch` | invariato (non assumere `main`) |
+| — | `lastCommit` | sempre `null` in modalità pubblica |
+| — | `latestRelease` | sempre `null` in modalità pubblica |
+| — | `isPinned`, `pinnedOrder` | `false`, `null` |
+| manifest + convenzione + README | `previewImage`, `previewSource` | vedi [Preview image](#preview-image) |
 
 ### Regole di esclusione
 
@@ -549,37 +544,36 @@ export function slugify(value: string): string {
 
 ### Preview image
 
-Nessuna configurazione richiesta. Per ogni repository si prova, in ordine:
+Nessuna configurazione è obbligatoria. Per ogni repository si prova, in ordine:
 
 1. **Manifest:** `preview` in `.repo-story.json`.
 2. **Convenzione:** un file con nome `preview`, `screenshot`, `cover`, `hero`,
    `banner` o `social-preview` ed estensione `png`, `jpg`, `jpeg`, `webp`,
    `avif` o `gif`, cercato in quest'ordine di cartelle: `.github/`, root,
    `docs/`. Poi il path legacy `.github/RepoPortfolio-Your-GitHub-Story/index.png`.
-   Gli alberi arrivano già dalla query GraphQL: nessuna chiamata in più.
+   Per contenere le richieste, la scansione avviene solo per i repository
+   featured e su un sottoinsieme di nomi/estensioni comuni (preview, screenshot,
+   cover, banner, hero, social-preview; png/jpg); gli altri passano al README.
 3. **README:** la prima immagine del README che non sia un badge. Si scartano
    gli SVG e gli URL di servizi di badge (`img.shields.io`, `badgen.net`,
    `badge.fury.io`, `codecov.io`, `/actions/workflows/…/badge.svg`, path che
    contengono `badge`). Sono ammessi path relativi (risolti sul raw del default
    branch) e host GitHub (`raw.githubusercontent.com`,
    `user-images.githubusercontent.com`, `github.com/user-attachments`).
-4. **Social image custom:** `openGraphImageUrl`, solo se
-   `usesCustomOpenGraphImage` è `true` (quella generata da GitHub è una card
-   testuale, non una preview).
-5. **Placeholder** locale deterministico.
+4. **Placeholder** locale deterministico.
 
 Regole:
 
 - URL finale per i file nel repository:
   `https://raw.githubusercontent.com/{owner}/{repo}/{defaultBranch}/{path}`, con
   i segmenti del path encodati singolarmente.
-- I candidati 2 e 4 esistono per costruzione. I candidati 1 e 3 vengono
-  verificati con `HEAD` (timeout 5 s, concorrenza 5); se non rispondono 2xx si
-  passa al candidato successivo.
+- Manifest, convenzione e README vengono verificati con `HEAD` (timeout 5 s);
+  se non rispondono 2xx si passa al candidato successivo.
 - Le immagini restano remote: nessun download né ottimizzazione in build
   (ADR-013).
 - `previewSource` viene loggato per capire, a colpo d'occhio, quanti repository
   usano il placeholder.
+- Le richieste a `raw.githubusercontent.com` non consumano il rate limit REST.
 
 ### Placeholder
 
@@ -592,35 +586,37 @@ Regole:
 
 ### Language stats
 
-- Fonte: `languages.edges` della query (byte e colore per linguaggio).
-- Aggregazione: somma dei byte per linguaggio su tutti i repository inclusi.
-- Percentuale: `bytes / totalBytes * 100`, arrotondata a una cifra decimale;
+- Fonte: campo `language` (linguaggio principale) dei repository inclusi.
+- Aggregazione: conteggio dei repository per linguaggio.
+- Percentuale: `repos / totalRepos * 100`, arrotondata a una cifra decimale;
   correzione del residuo sull'elemento più grande, così la somma è 100.
 - Oltre 8 linguaggi, il resto confluisce in "Other".
-- Colore: quello di GitHub; se `null`, fallback deterministico (hash del nome →
-  palette neutra) in `shared/utils/language-colors.ts`.
+- Colore: mappa dei colori GitHub noti; per i linguaggi sconosciuti fallback
+  deterministico (hash del nome → palette neutra) in
+  `shared/utils/language-colors.ts`.
 - Se nessun dato: `languageStats: []` e la Bento mostra uno stato vuoto.
+- Il breakdown per byte non è disponibile nella lista REST pubblica: arriverà
+  solo se si aggiunge una fonte autenticata.
 
 ### Activity
 
 - Il repository con `pushedAt` più recente fornisce repo, branch e data.
-- L'ultimo commit (hash corto e messaggio) arriva da `defaultBranchRef.target`,
-  già nella query: nessuna chiamata extra.
+- Hash e messaggio dell'ultimo commit non sono disponibili nella lista REST
+  pubblica: `commit` resta `null`.
 - Nessun dato "in tempo reale": l'attività è quella dell'ultima build. La UI lo
   dice con l'etichetta "Last synced" e la data di `syncedAt`.
 
-### Featured (pinned)
+### Featured (stelle)
 
-1. I repository pinned sul profilo GitHub, nell'ordine del profilo, esclusi
-   quelli nascosti dalle regole di esclusione.
-2. Se non ci sono pinned, i repository con più stelle (a parità, il più
-   aggiornato), fino a 6.
-3. Il primo featured è il **Top Repo** della Bento.
-4. I featured hanno `isPinned`, ordinano per primi in Explore (sort
-   "rilevanza") e alimentano gli eventi automatici della story.
+1. I repository con più stelle (a parità, il più aggiornato), fino a 6.
+2. Il primo featured è il **Top Repo** della Bento.
+3. I featured ordinano per primi in Explore (sort "rilevanza") e alimentano gli
+   eventi automatici della story.
+4. `isPinned` è sempre `false` e `pinnedOrder` sempre `null`: i pinned del
+   profilo richiedono GraphQL.
 
-Nessuna lista manuale: per cambiare i progetti in evidenza si cambiano i pinned
-su GitHub.
+Nessuna lista manuale: per cambiare la gerarchia si cambiano le stelle dei
+repository.
 
 ## GitHub Story
 
@@ -631,17 +627,15 @@ La story è la fusione di tre sorgenti, ordinata per data decrescente:
 1. `experiences` del profilo (intervalli);
 2. `milestones` del profilo (punti);
 3. `storyEvents` automatici (punti), se `story.autoEvents` è attivo:
-   - un evento `repo` per ogni pinned, alla data di creazione, con
-     descrizione e linguaggi presi da GitHub;
-   - un evento `release` per l'ultima release di ogni pinned, se
-     `story.includeReleases` è attivo;
-   - massimo `story.maxAutoEvents`, priorità nell'ordine dei pinned;
+   - un evento `repo` per ogni repository featured, alla data di creazione, con
+     descrizione e topics presi da GitHub;
+   - niente eventi `release`: le release non sono disponibili via REST pubblico;
+   - massimo `story.maxAutoEvents`, priorità nell'ordine delle stelle;
    - esclusi i repository con `"story": false` nel manifest.
 
 Deduplicazione: un milestone curato con `repo: X` e `type: repo` sostituisce
-l'evento automatico `repo` di X; lo stesso vale per `type: release`. Il testo
-degli eventi automatici arriva da GitHub e non è tradotto; l'etichetta del tipo
-sì.
+l'evento automatico `repo` di X. Il testo degli eventi automatici arriva da
+GitHub e non è tradotto; l'etichetta del tipo sì.
 
 ### Lane del grafo
 
@@ -721,12 +715,11 @@ export default defineNuxtModule({
   "repositories": [ ...Repository ],
   "languageStats": [ ...LanguageStat ],
   "activity": { ...Activity },
-  "storyEvents": [ ...StoryEvent ],
-  "readmes": { "repo-name": "...markdown..." }
+  "storyEvents": [ ...StoryEvent ]
 }
 ```
 
-- Scritto al termine di una sync valida (dataset + README grezzi).
+- Scritto al termine di una sync valida (dataset con preview già risolte).
 - Riusato come fallback solo se:
   - l'API fallisce dopo i retry;
   - lo snapshot ha meno di 7 giorni;
@@ -739,7 +732,7 @@ export default defineNuxtModule({
   accettato, coerente con la scadenza dello snapshot.
 - `GITHUB_OFFLINE=1` salta la rete e usa lo snapshot (qualunque età) o, se
   manca, la fixture versionata `tests/fixtures/github.json`. È la modalità
-  delle PR in CI e dello sviluppo senza token.
+  delle PR in CI e dello sviluppo senza rete.
 
 ## Migrazione dal legacy `sharedData.json`
 
@@ -770,6 +763,12 @@ Vanno convertite a mano in `YYYY-MM`; non si automatizza un formato ambiguo.
 
 Il legacy era in italiano: i suoi contenuti vanno in `data/profile/it.json`,
 mentre `data/profile/en.json` è la lingua di default e va creato per primo.
+
+**Migrazione eseguita (01/11/2026):** i dati legacy dell'owner sono in
+`datasets/elpiu/` (IT dal legacy, EN tradotto), aggiornati al 2026: anni di
+esperienza calcolati da `career.start`, typo corretti, competenze tecniche
+derivate da esperienze e linguaggi dei repository, tesi come milestone `repo`.
+`data/` resta il template generico.
 
 ## Privacy e contenuti sensibili
 
