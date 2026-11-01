@@ -17,12 +17,7 @@ const skillGroups = computed(() => profile.value.skills.groups)
 <template>
   <div>
     <BentoSection v-if="dataset" :dataset="dataset" :profile="profile" />
-    <section
-      v-else
-      id="home"
-      aria-labelledby="home-title"
-      class="scroll-mt-24 border-b border-border"
-    >
+    <section v-else id="home" aria-labelledby="home-title" class="border-b border-border">
       <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
         <div class="max-w-3xl">
           <h1
@@ -49,47 +44,14 @@ const skillGroups = computed(() => profile.value.skills.groups)
       </div>
     </section>
 
-    <StorySection
-      v-if="dataset"
-      :profile="profile"
-      :story-events="dataset.storyEvents"
-      :synced-at="dataset.syncedAt"
-    />
-
-    <ExploreSection v-if="dataset" :repositories="dataset.repositories" />
-    <SectionShell
-      v-else
-      id="projects"
-      :eyebrow="t('home.projectsEyebrow')"
-      :title="t('home.projects')"
-    >
-      <ErrorState
-        :title="t('projects.error.title')"
-        :description="t('projects.error.description')"
-      />
-    </SectionShell>
-
+    <!-- Chi sono e cosa so fare subito dopo la Bento; poi storia e progetti. -->
     <SectionShell id="about" :eyebrow="t('home.aboutEyebrow')" :title="t('home.about')">
-      <div class="grid gap-8 md:grid-cols-[1.6fr_1fr]">
-        <div class="space-y-4 text-pretty text-base leading-relaxed text-foreground-muted">
-          <p v-for="paragraph in profile.about.paragraphs" :key="paragraph">
-            {{ paragraph }}
-          </p>
-        </div>
-        <div class="rounded-card border border-border bg-surface-raised p-6 shadow-card">
-          <p class="font-mono text-xs uppercase tracking-[0.18em] text-foreground-subtle">
-            {{ t('home.skillsEyebrow') }}
-          </p>
-          <ul class="mt-4 flex flex-wrap gap-2">
-            <li v-for="group in skillGroups" :key="group.id">
-              <span
-                class="inline-flex rounded-control border border-border bg-surface-muted px-2.5 py-1 text-xs text-foreground-muted"
-              >
-                {{ group.label }}
-              </span>
-            </li>
-          </ul>
-        </div>
+      <div
+        class="max-w-[65ch] space-y-4 text-pretty text-base leading-relaxed text-foreground-muted"
+      >
+        <p v-for="paragraph in profile.about.paragraphs" :key="paragraph">
+          {{ paragraph }}
+        </p>
       </div>
     </SectionShell>
 
@@ -119,6 +81,26 @@ const skillGroups = computed(() => profile.value.skills.groups)
           </ul>
         </li>
       </ul>
+    </SectionShell>
+
+    <StorySection
+      v-if="dataset"
+      :profile="profile"
+      :story-events="dataset.storyEvents"
+      :synced-at="dataset.syncedAt"
+    />
+
+    <ExploreSection v-if="dataset" :repositories="dataset.repositories" />
+    <SectionShell
+      v-else
+      id="projects"
+      :eyebrow="t('home.projectsEyebrow')"
+      :title="t('home.projects')"
+    >
+      <ErrorState
+        :title="t('projects.error.title')"
+        :description="t('projects.error.description')"
+      />
     </SectionShell>
   </div>
 </template>
