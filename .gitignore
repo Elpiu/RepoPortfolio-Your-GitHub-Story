@@ -137,3 +137,9 @@ dist
 
 # Nuxt test-utils local setup
 .nuxtrc
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/.lighthouseci/

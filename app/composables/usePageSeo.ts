@@ -1,11 +1,14 @@
+import { profileAvatarUrl } from '~~/shared/utils/profile'
+
 type PageSeo = {
   title?: string
   description?: string
   type?: 'website' | 'profile' | 'article'
+  jsonLd?: Record<string, unknown> | null
 }
 
 export function usePageSeo(options: PageSeo = {}) {
-  const { site, profile, locales, defaultLocale } = useSiteData()
+  const { site, profile, locales, defaultLocale, githubUrl } = useSiteData()
   const { locale } = useI18n()
   const route = useRoute()
   const switchLocalePath = useSwitchLocalePath()
@@ -21,6 +24,9 @@ export function usePageSeo(options: PageSeo = {}) {
   const description = options.description ?? profile.value.meta.tagline
   const currentLocale = locales.find((entry) => entry.code === locale.value) ?? locales[0]
   const canonical = new URL(route.path.replace(/^\//, ''), normalizedSiteUrl).toString()
+  const username = config.public.githubUsername || site.github.username
+  // Nessuna OG image generata in build (Q17): si usa l'avatar.
+  const image = profileAvatarUrl(profile.value.meta.avatarUrl, username)
 
   const languageLinks: Array<{ rel: 'alternate'; hreflang: string; href: string }> = locales.map(
     (entry) => {
@@ -48,10 +54,26 @@ export function usePageSeo(options: PageSeo = {}) {
     ogType: options.type ?? 'website',
     ogSiteName: siteName,
     ogUrl: canonical,
-    twitterCard: 'summary_large_image',
+    ogLocale: currentLocale?.language.replace('-', '_'),
+    ogImage: image ?? undefined,
+    twitterCard: 'summary',
     twitterTitle: title,
     twitterDescription: description,
+    twitterImage: image ?? undefined,
+    twitterSite: site.seo.twitterHandle ?? undefined,
   })
+
+  const personJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: profile.value.meta.fullName,
+    jobTitle: profile.value.meta.role,
+    description,
+    url: normalizedSiteUrl,
+    email: site.links.email,
+    ...(image ? { image } : {}),
+    sameAs: [githubUrl.value, site.links.linkedin, site.links.website].filter(Boolean),
+  }
 
   useHead({
     htmlAttrs: {
@@ -61,16 +83,7 @@ export function usePageSeo(options: PageSeo = {}) {
     script: [
       {
         type: 'application/ld+json',
-        innerHTML: JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'Person',
-          name: profile.value.meta.fullName,
-          jobTitle: profile.value.meta.role,
-          description,
-          url: normalizedSiteUrl,
-          email: site.links.email,
-          sameAs: [site.links.linkedin, site.links.website].filter(Boolean),
-        }),
+        innerHTML: JSON.stringify(options.jsonLd ?? personJsonLd),
       },
     ],
   })

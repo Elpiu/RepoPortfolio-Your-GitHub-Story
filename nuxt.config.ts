@@ -2,9 +2,12 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { Locale } from 'vue-i18n'
-import site from './data/site.json'
+import { resolveDataDir } from './scripts/data-dir.mjs'
+import { loadDataDir } from './shared/utils/validation'
 
 const rootDir = fileURLToPath(new URL('.', import.meta.url))
+// data/ per default; PORTFOLIO_DATA_DIR sceglie un altro dataset (es. datasets/me).
+const { site } = loadDataDir(resolveDataDir(rootDir))
 const pkg = JSON.parse(readFileSync(join(rootDir, 'package.json'), 'utf8')) as {
   version: string
 }
@@ -25,7 +28,7 @@ const uiLocales = site.locales.map(({ code, language, name }) => {
 
 const nonDefaultRoutes = site.locales
   .filter((locale) => locale.code !== defaultLocale)
-  .map((locale) => `/${locale.code}/`)
+  .flatMap((locale) => [`/${locale.code}/`, `/${locale.code}/cv`, `/${locale.code}/resume.json`])
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-10-01',
@@ -48,6 +51,8 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     '@nuxt/eslint',
     './modules/validate-data',
+    './modules/prerender-routes',
+    './modules/icon-bundle',
   ],
 
   css: ['~/assets/css/main.css'],
@@ -75,6 +80,10 @@ export default defineNuxtConfig({
     _priority: 0,
   },
 
+  sitemap: {
+    sources: ['/api/__sitemap__/urls'],
+  },
+
   robots: {
     robotsTxt: false,
   },
@@ -85,11 +94,14 @@ export default defineNuxtConfig({
     locales: uiLocales,
     langDir: 'locales',
     detectBrowserLanguage: false,
-    baseUrl: siteUrl,
+    baseUrl: siteOrigin,
   },
 
   icon: {
     mode: 'css',
+    // Nessuna richiesta a api.iconify.design a runtime (ADR-013). Le icone dei dati
+    // (competenze) non passano da qui: arrivano nel payload (/api/data-icons).
+    fallbackToApi: false,
     clientBundle: {
       scan: true,
       sizeLimitKb: 256,
@@ -118,7 +130,7 @@ export default defineNuxtConfig({
   nitro: {
     prerender: {
       crawlLinks,
-      routes: ['/', ...nonDefaultRoutes, '/robots.txt'],
+      routes: ['/', '/cv', '/resume.json', ...nonDefaultRoutes, '/robots.txt'],
     },
   },
 

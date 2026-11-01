@@ -38,7 +38,6 @@ export const careerSchema = z.object({
 
 export const storyConfigSchema = z.object({
   autoEvents: z.boolean().default(true),
-  includeReleases: z.boolean().default(true),
   maxAutoEvents: z.number().int().min(0).max(50).default(8),
 })
 

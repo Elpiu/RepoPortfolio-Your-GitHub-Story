@@ -51,6 +51,143 @@
     "viewProjects": "View projects",
     "readAbout": "Read about me"
   },
+  "bento": {
+    "eyebrow": "Profile",
+    "topRepo": "Top repo",
+    "activity": "Activity",
+    "language": "Tech stack",
+    "languages": "Languages",
+    "years": "{count} years of experience",
+    "copyEmail": "Copy email",
+    "copied": "Email copied",
+    "copyUnavailable": "Copy not available",
+    "email": "Email",
+    "call": "Call",
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "cv": "CV",
+    "viewProjects": "View projects",
+    "noTopRepo": "No public repository yet.",
+    "noLanguages": "Language data unavailable.",
+    "languageRepos": "{count} repositories",
+    "branch": "branch",
+    "lastPush": "last push",
+    "lastSynced": "Last synced",
+    "noActivity": "No recent activity."
+  },
+  "story": {
+    "eyebrow": "Career",
+    "title": "GitHub Story",
+    "description": "Work, education, milestones and featured repositories as a Git graph.",
+    "fromGithub": "from GitHub",
+    "present": "present",
+    "legend": "Legend",
+    "empty": "No story events yet.",
+    "openProject": "Open project",
+    "openLink": "Open link",
+    "types": {
+      "work": "Work",
+      "education": "Education",
+      "milestone": "Milestone",
+      "repo": "Repository",
+      "release": "Release"
+    }
+  },
+  "projects": {
+    "tabs": {
+      "label": "Filter projects",
+      "all": "All",
+      "openSource": "Open Source"
+    },
+    "filters": {
+      "searchLabel": "Search projects",
+      "searchPlaceholder": "Search by name, topic or technology",
+      "languageLabel": "Language",
+      "allLanguages": "All languages",
+      "sortLabel": "Sort by",
+      "reset": "Clear filters"
+    },
+    "sort": {
+      "relevance": "Relevance",
+      "stars": "Stars",
+      "updated": "Recently updated",
+      "name": "Name"
+    },
+    "resultOne": "1 project",
+    "results": "{count} projects",
+    "loadMore": "Load more",
+    "empty": {
+      "title": "No projects match these filters",
+      "description": "Try a different search or clear the filters."
+    },
+    "noProjects": {
+      "title": "No public projects yet",
+      "description": "Repositories will appear here after the next GitHub sync."
+    },
+    "project": {
+      "breadcrumb": "Breadcrumb",
+      "backToProjects": "Back to projects",
+      "openOnGitHub": "Open on GitHub",
+      "openDemo": "Open live demo",
+      "lastPush": "Last push",
+      "onThisPage": "On this page",
+      "readmeUnavailable": "README unavailable",
+      "readmeUnavailableDescription": "Open the repository on GitHub to read the README.",
+      "truncated": "README truncated at the configured size limit.",
+      "notFound": "Project not found"
+    },
+    "cv": {
+      "backHome": "Back to home",
+      "downloadPdf": "Download PDF",
+      "resumeJson": "JSON Resume",
+      "about": "About",
+      "experience": "Experience",
+      "education": "Education",
+      "skills": "Skills",
+      "projects": "Selected projects",
+      "website": "Website",
+      "printHint": "Use the browser print dialog to save a PDF."
+    },
+    "error": {
+      "title": "Projects unavailable",
+      "description": "The GitHub sync did not return data. Try again after the next deploy."
+    },
+    "noDescription": "No description",
+    "previewAlt": "Preview of {name}",
+    "placeholderAlt": "Preview unavailable for {name}",
+    "openRepository": "Open {name} on GitHub",
+    "openProject": "Open project {name}",
+    "openDemo": "Open the live demo of {name}",
+    "updated": "Updated",
+    "pinned": "Pinned",
+    "topicsMore": "+{count}",
+    "stars": "stars",
+    "forks": "forks"
+  },
+  "project": {
+    "breadcrumb": "Breadcrumb",
+    "backToProjects": "Back to projects",
+    "openOnGitHub": "Open on GitHub",
+    "openDemo": "Open live demo",
+    "lastPush": "Last push",
+    "onThisPage": "On this page",
+    "readmeUnavailable": "README unavailable",
+    "readmeUnavailableDescription": "Open the repository on GitHub to read the README.",
+    "truncated": "README truncated at the configured size limit.",
+    "notFound": "Project not found"
+  },
+  "cv": {
+    "backHome": "Back to home",
+    "downloadPdf": "Download PDF",
+    "resumeJson": "JSON Resume",
+    "about": "About",
+    "experience": "Experience",
+    "education": "Education",
+    "skills": "Skills",
+    "projects": "Selected projects",
+    "website": "Website",
+    "printHint": "Use the browser print dialog to save a PDF."
+  },
   "error": {
     "notFoundTitle": "Page not found",
     "notFoundDescription": "The page you are looking for does not exist or has moved.",

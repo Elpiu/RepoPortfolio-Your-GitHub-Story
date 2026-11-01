@@ -28,6 +28,7 @@ withDefaults(
     :icon="icon"
     size="sm"
     class="rounded-control"
+    :class="intent === 'primary' ? 'hover:bg-accent-hover' : undefined"
   >
     <slot />
   </UButton>

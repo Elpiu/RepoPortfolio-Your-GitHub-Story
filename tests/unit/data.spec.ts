@@ -1,25 +1,26 @@
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { existsSync, readdirSync } from 'node:fs'
+import { join, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import type { Profile } from '../../shared/schemas/profile'
+import { resolveDataIcon } from '../../server/utils/data-icons'
 import { profileSchema } from '../../shared/schemas/profile'
 import { siteSchema } from '../../shared/schemas/site'
-import {
-  assertAtMostOneCurrentJob,
-  assertSameShape,
-  assertUniqueIds,
-} from '../../shared/utils/validation'
+import { loadDataDir } from '../../shared/utils/validation'
 
-const site = siteSchema.parse(JSON.parse(readFileSync(resolve('data/site.json'), 'utf8')))
+// data/ è il template per chi clona; datasets/* sono payload alternativi
+// selezionabili con PORTFOLIO_DATA_DIR. Devono restare tutti validi.
+const datasetsRoot = resolve('datasets')
+const dataDirs = [
+  'data',
+  ...(existsSync(datasetsRoot)
+    ? readdirSync(datasetsRoot, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => join('datasets', entry.name))
+    : []),
+]
 
-const profiles: Record<string, Profile> = Object.fromEntries(
-  site.locales.map(({ code }) => [
-    code,
-    profileSchema.parse(JSON.parse(readFileSync(resolve(`data/profile/${code}.json`), 'utf8'))),
-  ]),
-)
+describe.each(dataDirs)('%s/', (dir) => {
+  const { site, profiles } = loadDataDir(resolve(dir))
 
-describe('data/', () => {
   it('site.json ha esattamente una lingua di default', () => {
     expect(site.locales.filter((locale) => locale.default)).toHaveLength(1)
   })
@@ -30,22 +31,16 @@ describe('data/', () => {
     }
   })
 
-  it('tutte le lingue hanno la stessa struttura', () => {
-    expect(() => assertSameShape(profiles)).not.toThrow()
-  })
-
-  it('gli id di esperienze e milestone sono univoci', () => {
+  it('le icone delle competenze esistono nelle collezioni installate', () => {
     for (const profile of Object.values(profiles)) {
-      expect(() => assertUniqueIds([...profile.experiences, ...profile.milestones])).not.toThrow()
+      for (const item of profile.skills.groups.flatMap((group) => group.items)) {
+        if (item.icon) expect(resolveDataIcon(item.icon), item.icon).not.toBeNull()
+      }
     }
   })
+})
 
-  it('c e al massimo un lavoro corrente per lingua', () => {
-    for (const [code, profile] of Object.entries(profiles)) {
-      expect(() => assertAtMostOneCurrentJob(profile, code)).not.toThrow()
-    }
-  })
-
+describe('schemi minimi', () => {
   it('un profilo minimo è valido', () => {
     const minimal = {
       locale: 'en',

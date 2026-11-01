@@ -18,10 +18,11 @@ const description = computed(() =>
   isNotFound.value ? t('error.notFoundDescription') : t('error.genericDescription'),
 )
 
+// Sostituisce il meta "index, follow" di default di @nuxtjs/robots sulla pagina di errore.
 useSeoMeta({
   title,
   description,
-  robots: 'noindex',
+  robots: 'noindex, nofollow',
 })
 
 useHead({

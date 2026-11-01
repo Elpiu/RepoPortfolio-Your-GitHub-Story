@@ -1,17 +1,8 @@
 import { join } from 'node:path'
 import { addTemplate, addTypeTemplate, defineNuxtModule } from '@nuxt/kit'
-import type { Profile } from '../shared/schemas/profile'
-import { profileSchema } from '../shared/schemas/profile'
-import { siteSchema } from '../shared/schemas/site'
-import {
-  assertAtMostOneCurrentJob,
-  assertLocaleMatches,
-  assertLocalesHaveProfiles,
-  assertSameShape,
-  assertUniqueIds,
-  parseJsonFile,
-  writeJsonSchemas,
-} from '../shared/utils/validation'
+import { consola } from 'consola'
+import { DEFAULT_DATA_DIR, resolveDataDir } from '../scripts/data-dir.mjs'
+import { loadDataDir, relativePath, writeJsonSchemas } from '../shared/utils/validation'
 
 export default defineNuxtModule({
   meta: {
@@ -19,25 +10,15 @@ export default defineNuxtModule({
     configKey: 'validateData',
   },
   setup(_options, nuxt) {
-    const dataDir = join(nuxt.options.rootDir, 'data')
-    const site = parseJsonFile(siteSchema, join(dataDir, 'site.json'))
+    const dataDir = resolveDataDir(nuxt.options.rootDir)
+    const { site, profiles } = loadDataDir(dataDir)
 
-    const profiles: Record<string, Profile> = {}
-    for (const locale of site.locales) {
-      const profile = parseJsonFile(profileSchema, join(dataDir, 'profile', `${locale.code}.json`))
-      assertLocaleMatches(locale.code, profile)
-      profiles[locale.code] = profile
+    if (relativePath(dataDir) !== DEFAULT_DATA_DIR) {
+      consola.info(`[validate-data] cartella dati: ${relativePath(dataDir)}`)
     }
 
-    assertLocalesHaveProfiles(site, profiles)
-    assertSameShape(profiles)
-
-    for (const [code, profile] of Object.entries(profiles)) {
-      assertUniqueIds([...profile.experiences, ...profile.milestones])
-      assertAtMostOneCurrentJob(profile, code)
-    }
-
-    writeJsonSchemas(join(dataDir, 'schema'))
+    // Gli schemi restano in data/schema: ogni dataset vi punta con "$schema".
+    writeJsonSchemas(join(nuxt.options.rootDir, DEFAULT_DATA_DIR, 'schema'))
 
     addTemplate({
       filename: 'site-data.mjs',

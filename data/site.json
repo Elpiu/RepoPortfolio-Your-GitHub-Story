@@ -21,7 +21,6 @@
   },
   "story": {
     "autoEvents": true,
-    "includeReleases": true,
     "maxAutoEvents": 8
   },
   "locales": [

@@ -29,7 +29,7 @@
     "version": "Versione"
   },
   "home": {
-    "available": "Disponibile per nuove opportunitÃ ",
+    "available": "Disponibile per nuove opportunità",
     "unavailable": "Non in cerca di lavoro",
     "present": "in corso",
     "years": "{count} anni di esperienza",
@@ -37,7 +37,7 @@
     "aboutEyebrow": "Profilo",
     "projects": "Esplora tutti i repository",
     "projectsEyebrow": "Lavoro",
-    "projectsEmpty": "Il motore dei progetti non Ã¨ ancora collegato. Arriva con la sincronizzazione GitHub.",
+    "projectsEmpty": "Il motore dei progetti non è ancora collegato. Arriva con la sincronizzazione GitHub.",
     "skills": "Competenze tecniche",
     "skillsEyebrow": "Strumenti",
     "experience": "GitHub Story",
@@ -45,17 +45,154 @@
     "experienceEmpty": "Nessuna esperienza. Aggiungile in data/profile.",
     "contact": "Parliamone",
     "contactEyebrow": "Contatti",
-    "contactDescription": "Il modo piÃ¹ rapido per contattarmi Ã¨ via email.",
+    "contactDescription": "Il modo più rapido per contattarmi è via email.",
     "email": "Scrivimi",
     "github": "Profilo GitHub",
     "viewProjects": "Guarda i progetti",
     "readAbout": "Leggi chi sono"
   },
+  "bento": {
+    "eyebrow": "Profilo",
+    "topRepo": "Top repo",
+    "activity": "Attività",
+    "language": "Competenze tecniche",
+    "languages": "Linguaggi",
+    "years": "{count} anni di esperienza",
+    "copyEmail": "Copia email",
+    "copied": "Email copiata",
+    "copyUnavailable": "Copia non disponibile",
+    "email": "Email",
+    "call": "Chiama",
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "cv": "CV",
+    "viewProjects": "Guarda i progetti",
+    "noTopRepo": "Nessun repository pubblico.",
+    "noLanguages": "Dati linguaggi non disponibili.",
+    "languageRepos": "{count} repository",
+    "branch": "branch",
+    "lastPush": "ultimo push",
+    "lastSynced": "Ultima sincronizzazione",
+    "noActivity": "Nessuna attività recente."
+  },
+  "story": {
+    "eyebrow": "Carriera",
+    "title": "GitHub Story",
+    "description": "Lavoro, studio, milestone e repository featured come un grafo Git.",
+    "fromGithub": "da GitHub",
+    "present": "in corso",
+    "legend": "Legenda",
+    "empty": "Nessun evento nella story.",
+    "openProject": "Apri il progetto",
+    "openLink": "Apri il link",
+    "types": {
+      "work": "Lavoro",
+      "education": "Studio",
+      "milestone": "Milestone",
+      "repo": "Repository",
+      "release": "Release"
+    }
+  },
+  "projects": {
+    "tabs": {
+      "label": "Filtra i progetti",
+      "all": "Tutti",
+      "openSource": "Open Source"
+    },
+    "filters": {
+      "searchLabel": "Cerca progetti",
+      "searchPlaceholder": "Cerca per nome, topic o tecnologia",
+      "languageLabel": "Linguaggio",
+      "allLanguages": "Tutti i linguaggi",
+      "sortLabel": "Ordina per",
+      "reset": "Azzera filtri"
+    },
+    "sort": {
+      "relevance": "Rilevanza",
+      "stars": "Stelle",
+      "updated": "Aggiornati di recente",
+      "name": "Nome"
+    },
+    "resultOne": "1 progetto",
+    "results": "{count} progetti",
+    "loadMore": "Carica altri",
+    "empty": {
+      "title": "Nessun progetto con questi filtri",
+      "description": "Prova una ricerca diversa o azzera i filtri."
+    },
+    "noProjects": {
+      "title": "Nessun progetto pubblico",
+      "description": "I repository compariranno qui dopo la prossima sincronizzazione GitHub."
+    },
+    "project": {
+      "breadcrumb": "Percorso",
+      "backToProjects": "Torna ai progetti",
+      "openOnGitHub": "Apri su GitHub",
+      "openDemo": "Apri la demo live",
+      "lastPush": "Ultimo push",
+      "onThisPage": "In questa pagina",
+      "readmeUnavailable": "README non disponibile",
+      "readmeUnavailableDescription": "Apri il repository su GitHub per leggere il README.",
+      "truncated": "README troncato al limite di dimensione configurato.",
+      "notFound": "Progetto non trovato"
+    },
+    "cv": {
+      "backHome": "Torna alla home",
+      "downloadPdf": "Scarica PDF",
+      "resumeJson": "JSON Resume",
+      "about": "Chi sono",
+      "experience": "Esperienza",
+      "education": "Formazione",
+      "skills": "Competenze",
+      "projects": "Progetti selezionati",
+      "website": "Sito",
+      "printHint": "Usa la finestra di stampa del browser per salvare un PDF."
+    },
+    "error": {
+      "title": "Progetti non disponibili",
+      "description": "La sincronizzazione GitHub non ha restituito dati. Riprova dopo il prossimo deploy."
+    },
+    "noDescription": "Nessuna descrizione",
+    "previewAlt": "Anteprima di {name}",
+    "placeholderAlt": "Anteprima non disponibile per {name}",
+    "openRepository": "Apri {name} su GitHub",
+    "openProject": "Apri il progetto {name}",
+    "openDemo": "Apri la demo live di {name}",
+    "updated": "Aggiornato",
+    "pinned": "Pinned",
+    "topicsMore": "+{count}",
+    "stars": "stelle",
+    "forks": "fork"
+  },
+  "project": {
+    "breadcrumb": "Percorso",
+    "backToProjects": "Torna ai progetti",
+    "openOnGitHub": "Apri su GitHub",
+    "openDemo": "Apri la demo live",
+    "lastPush": "Ultimo push",
+    "onThisPage": "In questa pagina",
+    "readmeUnavailable": "README non disponibile",
+    "readmeUnavailableDescription": "Apri il repository su GitHub per leggere il README.",
+    "truncated": "README troncato al limite di dimensione configurato.",
+    "notFound": "Progetto non trovato"
+  },
+  "cv": {
+    "backHome": "Torna alla home",
+    "downloadPdf": "Scarica PDF",
+    "resumeJson": "JSON Resume",
+    "about": "Chi sono",
+    "experience": "Esperienza",
+    "education": "Formazione",
+    "skills": "Competenze",
+    "projects": "Progetti selezionati",
+    "website": "Sito",
+    "printHint": "Usa la finestra di stampa del browser per salvare un PDF."
+  },
   "error": {
     "notFoundTitle": "Pagina non trovata",
-    "notFoundDescription": "La pagina che cerchi non esiste o Ã¨ stata spostata.",
-    "genericTitle": "Qualcosa Ã¨ andato storto",
-    "genericDescription": "Si Ã¨ verificato un errore imprevisto. Riprova o torna alla home.",
+    "notFoundDescription": "La pagina che cerchi non esiste o è stata spostata.",
+    "genericTitle": "Qualcosa è andato storto",
+    "genericDescription": "Si è verificato un errore imprevisto. Riprova o torna alla home.",
     "backHome": "Torna alla home"
   }
 }

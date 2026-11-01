@@ -2,9 +2,9 @@
 const { t } = useI18n()
 const localePath = useLocalePath()
 const { site } = useSiteData()
-const activeId = useActiveSection(['home', 'about', 'projects', 'skills', 'experience', 'contact'])
+const activeId = useActiveSection(['home', 'experience', 'projects', 'about', 'skills', 'contact'])
 
-const sections = ['home', 'about', 'projects', 'skills', 'experience', 'contact'] as const
+const sections = ['home', 'experience', 'projects', 'about', 'skills', 'contact'] as const
 </script>
 
 <template>
@@ -14,10 +14,10 @@ const sections = ['home', 'about', 'projects', 'skills', 'experience', 'contact'
     >
       <NuxtLink
         :to="localePath('/')"
-        class="flex items-center gap-2 font-mono text-sm font-medium tracking-tight text-foreground"
+        class="flex min-w-0 items-center gap-2 font-mono text-sm font-medium tracking-tight text-foreground"
       >
-        <span class="h-2 w-2 rounded-full bg-accent" aria-hidden="true" />
-        {{ site.seo.siteName ?? t('app.name') }}
+        <span class="h-2 w-2 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+        <span class="truncate">{{ site.seo.siteName ?? t('app.name') }}</span>
       </NuxtLink>
 
       <nav :aria-label="t('nav.label')" class="hidden md:block">
@@ -39,7 +39,7 @@ const sections = ['home', 'about', 'projects', 'skills', 'experience', 'contact'
         </ul>
       </nav>
 
-      <div class="flex items-center gap-1">
+      <div class="flex shrink-0 items-center gap-1">
         <ThemeToggle />
         <LocaleSwitcher />
         <MobileMenu />

@@ -50,7 +50,7 @@ function formatKb(bytes) {
 }
 
 try {
-  statSync(OUTPUT_DIR)
+  statSync(join(OUTPUT_DIR, 'index.html'))
 } catch {
   fail('Output non trovato. Esegui prima "pnpm generate".')
 }

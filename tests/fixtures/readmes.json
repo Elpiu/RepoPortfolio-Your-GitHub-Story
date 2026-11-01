@@ -1,0 +1,4 @@
+{
+  "alpha": "# Alpha\n\nA Nuxt portfolio engine with a **rigorous** design system.\n\n![Dashboard](docs/dashboard.png)\n\n## Features\n\n- Static generation\n- Accessible components\n- Repository sync\n\n```ts\nexport function hello(name: string) {\n  return `Hello ${name}`\n}\n```\n\n[Read the docs](docs/guide.md) or visit [Nuxt](https://nuxt.com).\n",
+  "beta": "# Beta\n\nSpring Boot API for enterprise CRM workflows.\n\n## Endpoints\n\n| Method | Path | Description |\n| --- | --- | --- |\n| GET | /customers | List customers |\n| POST | /customers | Create a customer |\n\n> Built for reliability.\n\n```java\npublic record Customer(String name) {}\n```\n"
+}

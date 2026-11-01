@@ -134,10 +134,6 @@
           "default": true,
           "type": "boolean"
         },
-        "includeReleases": {
-          "default": true,
-          "type": "boolean"
-        },
         "maxAutoEvents": {
           "default": 8,
           "type": "integer",

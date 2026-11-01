@@ -3,7 +3,7 @@ const { t } = useI18n()
 const localePath = useLocalePath()
 const details = ref<HTMLDetailsElement | null>(null)
 
-const sections = ['home', 'about', 'projects', 'skills', 'experience', 'contact'] as const
+const sections = ['home', 'experience', 'projects', 'about', 'skills', 'contact'] as const
 
 function close() {
   details.value?.removeAttribute('open')

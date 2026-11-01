@@ -1,5 +1,6 @@
 export function useActiveSection(ids: readonly string[]) {
-  const activeId = ref<string>(ids[0] ?? '')
+  // Vuoto finché non si osserva una sezione: fuori dalla home nessuna voce è "corrente".
+  const activeId = ref<string>('')
 
   onMounted(() => {
     if (!('IntersectionObserver' in window)) return

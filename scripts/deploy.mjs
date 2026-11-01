@@ -1,28 +1,36 @@
 import { execSync } from 'node:child_process'
 import { readFileSync, writeFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { relative, resolve } from 'node:path'
 import ghpages from 'gh-pages'
+import { DATA_DIR_ENV, parseDataDirArg, resolveDataDir } from './data-dir.mjs'
 import { resolveRepoContext, resolveSiteUrls } from './repo-context.mjs'
 
 const dryRun = process.argv.includes('--dry-run')
-const site = JSON.parse(readFileSync('data/site.json', 'utf8'))
+const dataDirArg = parseDataDirArg(process.argv.slice(2))
+const dataDir = resolveDataDir(
+  process.cwd(),
+  dataDirArg ? { ...process.env, [DATA_DIR_ENV]: dataDirArg } : process.env,
+)
+const site = JSON.parse(readFileSync(resolve(dataDir, 'site.json'), 'utf8'))
 const context = resolveRepoContext()
 const domain = site.deploy?.customDomain ?? null
 const { baseURL, siteUrl } = resolveSiteUrls(context, domain)
-const token = process.env.NUXT_GITHUB_TOKEN ?? process.env.GITHUB_TOKEN
+const token = process.env.NUXT_GITHUB_TOKEN || process.env.GITHUB_TOKEN
 
 if (!token && process.env.GITHUB_OFFLINE !== '1') {
-  console.warn(
-    '[deploy] Nessun token GitHub: la build procederà solo se GITHUB_OFFLINE=1 o se i dati sono in cache.',
+  console.info(
+    '[deploy] Nessun token GitHub: uso le API REST pubbliche (limite non autenticato: 60 richieste/ora).',
   )
 }
 
 console.log(`[deploy] ${context.owner}/${context.repo} → ${siteUrl} (base ${baseURL})`)
+console.log(`[deploy] dati: ${relative(process.cwd(), dataDir) || '.'}`)
 
 execSync('nuxt generate', {
   stdio: 'inherit',
   env: {
     ...process.env,
+    [DATA_DIR_ENV]: dataDir,
     NUXT_APP_BASE_URL: baseURL,
     NUXT_PUBLIC_SITE_URL: siteUrl,
     NUXT_PUBLIC_GITHUB_USERNAME: site.github?.username || context.owner,

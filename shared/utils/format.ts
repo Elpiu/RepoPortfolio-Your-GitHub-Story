@@ -8,3 +8,15 @@ export function formatTechDate(value: string | Date): string {
 export function formatMonth(value: string): string {
   return value.replace('-', '.')
 }
+
+export function formatCompactNumber(value: number, locale: string): string {
+  return new Intl.NumberFormat(locale, {
+    notation: 'compact',
+    maximumFractionDigits: 1,
+  }).format(value)
+}
+
+export function formatSizeKb(sizeKb: number): string {
+  if (sizeKb >= 1024) return `${(sizeKb / 1024).toFixed(1)} MB`
+  return `${sizeKb} KB`
+}
