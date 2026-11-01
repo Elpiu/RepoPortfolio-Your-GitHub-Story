@@ -33,6 +33,14 @@ describe('resolvePreview', () => {
     })
   })
 
+  it('con più file per convenzione vince il primo in ordine di priorità', async () => {
+    const result = await resolvePreview(fixtureNodes()[0]!, {
+      featured: true,
+      head: async (url) => url.endsWith('/docs/cover.png') || url.endsWith('/.github/hero.png'),
+    })
+    expect(result.previewImage).toMatch(/\/docs\/cover\.png$/)
+  })
+
   it('scarta i badge del README e usa la prima immagine utile', async () => {
     const readme = '![ci](https://img.shields.io/badge/x.svg)\n![shot](docs/shot.png)'
     const result = await resolvePreview(fixtureNodes()[0]!, {

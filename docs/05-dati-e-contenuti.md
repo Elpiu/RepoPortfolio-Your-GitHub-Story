@@ -733,6 +733,13 @@ export default defineNuxtModule({
 - `GITHUB_OFFLINE=1` salta la rete e usa lo snapshot (qualunque età) o, se
   manca, la fixture versionata `tests/fixtures/github.json`. È la modalità
   delle PR in CI e dello sviluppo senza rete.
+- In `pnpm dev` uno snapshot dello stesso username con meno di 24 ore viene
+  riusato senza sync: la sync completa fa 1–3 richieste API ma anche una
+  richiesta raw per manifest e README di ogni repository e i controlli per
+  convenzione dei featured (circa 7 s misurati con 26 repository).
+  `GITHUB_REFRESH=1` forza la sync; `pnpm generate` e il deploy sincronizzano
+  sempre. Le HEAD per convenzione partono in parallelo (l'ordine dei path resta
+  la priorità).
 
 ## Migrazione dal legacy `sharedData.json`
 

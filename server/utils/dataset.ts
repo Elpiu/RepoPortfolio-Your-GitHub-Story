@@ -24,6 +24,7 @@ import { buildStoryEvents } from './story-events'
 const CACHE_PATH = resolve('.cache/github/last-good.json')
 const FIXTURE_PATH = resolve('tests/fixtures/github.json')
 const CACHE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000
+const DEV_CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000
 const PREVIEW_SOURCES = ['manifest', 'convention', 'readme', 'social', 'placeholder'] as const
 
 const logger = consola.withTag('github')
@@ -204,6 +205,20 @@ async function loadDataset(): Promise<GitHubDataset> {
   }
 
   const username = resolveGithubUsername(site.github.username)
+
+  // In `pnpm dev` la sync completa (lista REST + centinaia di richieste raw per
+  // manifest, README e preview) costerebbe secondi a ogni riavvio: si riusa lo
+  // snapshot recente. `GITHUB_REFRESH=1` forza la sync. `generate` sincronizza sempre.
+  if (process.env.NODE_ENV !== 'production' && process.env.GITHUB_REFRESH !== '1') {
+    const cache = await loadCache(username)
+    if (cache && cacheAgeMs(cache) < DEV_CACHE_MAX_AGE_MS) {
+      logger.info(
+        `dev: uso lo snapshot del ${cache.syncedAt.slice(0, 16).replace('T', ' ')} (GITHUB_REFRESH=1 per aggiornarlo)`,
+      )
+      return cache
+    }
+  }
+
   try {
     const nodes = await fetchPublicRepositories(username, site.github.maxRepos)
     const dataset = await buildDataset(nodes, { username, offline: false })

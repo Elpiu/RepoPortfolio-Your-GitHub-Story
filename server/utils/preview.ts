@@ -127,11 +127,13 @@ export async function resolvePreview(
   if (options.featured) {
     const ref = repoRef(node)
     const conventionPaths = options.conventionPaths ?? RUNTIME_CONVENTION_PATHS
-    for (const path of conventionPaths) {
-      const url = rawUrl(ref, path)
-      if (await head(url)) {
-        return { previewImage: url, previewSource: 'convention' }
-      }
+    // In parallelo: una catena di HEAD in sequenza costava secondi per repository.
+    // L'ordine dei path resta la priorità.
+    const urls = conventionPaths.map((path) => rawUrl(ref, path))
+    const found = await Promise.all(urls.map((url) => head(url)))
+    const index = found.indexOf(true)
+    if (index !== -1) {
+      return { previewImage: urls[index]!, previewSource: 'convention' }
     }
   }
 
