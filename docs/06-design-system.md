@@ -286,7 +286,7 @@ Regole:
 | `ActivityCard` | Ultimo push, branch, "Last synced" |
 | `GitGraph` | SVG a lane (tronco, fork, merge) calcolato in build |
 | `StoryNode` | Card espandibile con data, badge, link |
-| `StoryLegend` | Legenda dei tipi di nodo |
+| `StoryFilters` | Filtri per tipo di nodo (default Lavoro); fanno anche da legenda |
 
 ### Progetti
 

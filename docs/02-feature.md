@@ -303,6 +303,12 @@ identità umana e identità GitHub in un'unica narrazione visiva.
   - Ogni nodo è una card espandibile con descrizione, badge tecnologie, link
     demo/repo.
   - Icone/nodi distinti per tipo (work, education, release, repo, milestone).
+  - **Filtri per tipo** (Lavoro, Formazione, Progetti, Traguardi, Tutto) al
+    posto della legenda: pulsanti `aria-pressed` con le stesse icone dei nodi e
+    il conteggio. **Default: Lavoro** (se non ci sono esperienze di lavoro,
+    tutto). Almeno un filtro resta attivo; le lane si ricalcolano sui soli tipi
+    visibili. Stato in query string (`?story=work,education`, il default non
+    viene scritto); senza JavaScript si vede la storia del lavoro.
   - Grafo SVG calcolato in build, nessun JS necessario per disegnarlo.
 - Anni di esperienza calcolati da `career.start`, mai hardcoded.
 

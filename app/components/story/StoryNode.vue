@@ -34,7 +34,7 @@ const endLabel = computed(() => {
 </script>
 
 <template>
-  <li class="grid grid-cols-[3.5rem_minmax(0,1fr)] gap-3">
+  <li class="grid grid-cols-[3.5rem_minmax(0,1fr)] gap-3" :data-kind="node.kind">
     <svg viewBox="0 0 56 72" class="h-full min-h-28 w-14" aria-hidden="true">
       <line x1="8" y1="0" x2="8" y2="72" stroke="var(--color-border-strong)" stroke-width="1.5" />
       <path

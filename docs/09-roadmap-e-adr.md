@@ -671,6 +671,11 @@ filtri da query string applicati dopo l'idratazione, overflow a 320 px,
 icone delle competenze spostate dal bundle JS al payload, nessun fallback
 all'API Iconify a runtime.
 
+Dopo la revisione dell'owner (01/11/2026): la legenda della story è diventata
+un filtro per tipo con default Lavoro (`StoryFilters` al posto di
+`StoryLegend`), `pnpm preview:deploy` per vedere in locale il sito come da
+deploy, snapshot riusato in `pnpm dev` (prima richiesta da ~7 s a istantanea).
+
 ## Prossimo passo
 
 Dopo la revisione dell'owner: commit per intenzione su `feat/m1-scaffold`, PR

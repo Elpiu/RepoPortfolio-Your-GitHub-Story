@@ -81,7 +81,6 @@
     "description": "Work, education, milestones and featured repositories as a Git graph.",
     "fromGithub": "from GitHub",
     "present": "present",
-    "legend": "Legend",
     "empty": "No story events yet.",
     "openProject": "Open project",
     "openLink": "Open link",
@@ -91,7 +90,16 @@
       "milestone": "Milestone",
       "repo": "Repository",
       "release": "Release"
-    }
+    },
+    "filters": {
+      "label": "Show in the story",
+      "work": "Work",
+      "education": "Education",
+      "projects": "Projects",
+      "milestones": "Milestones",
+      "all": "All"
+    },
+    "shown": "{count} entries shown | {count} entry shown | {count} entries shown"
   },
   "projects": {
     "tabs": {

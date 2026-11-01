@@ -15,6 +15,7 @@ import {
 } from '~~/shared/utils/project-filters'
 
 const SORT_VALUES: readonly ProjectSort[] = ['relevance', 'stars', 'updated', 'name']
+const OWN_QUERY_KEYS = ['q', 'lang', 'tab', 'sort', 'page'] as const
 
 export type ProjectTab = LanguageTab & {
   value: string
@@ -143,7 +144,12 @@ export function useProjectFilters(repositories: MaybeRefOrGetter<readonly Reposi
   }
 
   function syncQuery() {
-    const query: Record<string, string> = {}
+    // Conserva i parametri degli altri filtri della pagina (es. ?story= della GitHub Story).
+    const query: Record<string, string | null | (string | null)[]> = Object.fromEntries(
+      Object.entries(route.query).filter(
+        ([key]) => !(OWN_QUERY_KEYS as readonly string[]).includes(key),
+      ),
+    )
     if (q.value.trim()) query.q = q.value.trim()
     if (activeLanguage.value) query.lang = activeLanguage.value
     if (activeTab.value !== ALL_TAB) query.tab = activeTab.value

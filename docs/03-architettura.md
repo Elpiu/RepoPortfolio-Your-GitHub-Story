@@ -279,7 +279,7 @@ Regole:
 │  │  ├─ story/
 │  │  │  ├─ StorySection.vue
 │  │  │  ├─ StoryNode.vue        # nodo + segmento SVG del grafo a lane
-│  │  │  └─ StoryLegend.vue
+│  │  │  └─ StoryFilters.vue      # filtri per tipo (default Lavoro), anche legenda
 │  │  ├─ project/
 │  │  │  ├─ ProjectCard.vue
 │  │  │  ├─ ProjectGrid.vue
@@ -307,6 +307,7 @@ Regole:
 │  │  ├─ useProjects.ts
 │  │  ├─ useProjectFilters.ts
 │  │  ├─ useStory.ts
+│  │  ├─ useStoryFilters.ts       # ?story= nella query string
 │  │  ├─ useSpotlight.ts
 │  │  ├─ useActiveSection.ts
 │  │  ├─ useRelativeTime.ts
@@ -363,12 +364,14 @@ Regole:
 │     ├─ profile.ts              # avatar e URL GitHub del profilo
 │     ├─ svg-icon.ts             # body Iconify → nodi SVG con allowlist
 │     ├─ validation.ts           # loadDataDir: validazione di una cartella dati
+│     ├─ story-filters.ts        # filtri della story (puri)
 │     └─ story-graph.ts
 ├─ scripts/
 │  ├─ deploy.mjs
 │  ├─ data-dir.mjs               # PORTFOLIO_DATA_DIR / --data
 │  ├─ repo-context.mjs
 │  ├─ serve-static.mjs           # output statico come GitHub Pages (E2E, Lighthouse)
+│  ├─ preview-deploy.mjs         # pnpm preview:deploy: deploy --dry-run + serve sotto il base URL
 │  └─ check-budget.mjs
 ├─ i18n/locales/
 │  ├─ en.json

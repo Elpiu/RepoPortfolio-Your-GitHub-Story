@@ -375,8 +375,9 @@ test sono ermetici e verificano che a runtime partano solo immagini GitHub. I
 dati attesi si leggono dalla stessa cartella dati della build:
 `PORTFOLIO_DATA_DIR=datasets/me pnpm test:e2e` verifica un dataset alternativo.
 
-Implementati (`tests/e2e/*.spec.ts`, 44 test): home/Bento, nessuna richiesta
-esterna, id legacy e hash, date assolute nell'HTML, story espandibile, ricerca
+Implementati (`tests/e2e/*.spec.ts`, 45 test): home/Bento, nessuna richiesta
+esterna, id legacy e hash, date assolute nell'HTML, story espandibile e filtri
+per tipo (default Lavoro, `?story=`), ricerca
 con URL e reload, stato vuoto, tab ARIA da tastiera, filtro linguaggio,
 dettaglio e ritorno, README senza script, 404 (status, `noindex`), lingua senza
 redirect e switch sulla pagina equivalente senza cookie, tema persistito, copia

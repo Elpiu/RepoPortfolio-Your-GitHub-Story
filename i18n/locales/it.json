@@ -81,7 +81,6 @@
     "description": "Lavoro, studio, milestone e repository featured come un grafo Git.",
     "fromGithub": "da GitHub",
     "present": "in corso",
-    "legend": "Legenda",
     "empty": "Nessun evento nella story.",
     "openProject": "Apri il progetto",
     "openLink": "Apri il link",
@@ -91,7 +90,16 @@
       "milestone": "Milestone",
       "repo": "Repository",
       "release": "Release"
-    }
+    },
+    "filters": {
+      "label": "Mostra nella storia",
+      "work": "Lavoro",
+      "education": "Formazione",
+      "projects": "Progetti",
+      "milestones": "Traguardi",
+      "all": "Tutto"
+    },
+    "shown": "{count} voci mostrate | {count} voce mostrata | {count} voci mostrate"
   },
   "projects": {
     "tabs": {

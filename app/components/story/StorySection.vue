@@ -9,11 +9,15 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
-const { nodes } = useStory(
+const story = useStory(
   () => props.profile,
   () => props.storyEvents,
   () => props.syncedAt,
+  () => filters.selected.value,
 )
+const filters = useStoryFilters(story.available)
+const { nodes, counts, available } = story
+const { selected, isAll, toggle, selectAll } = filters
 </script>
 
 <template>
@@ -23,7 +27,17 @@ const { nodes } = useStory(
     :title="t('story.title')"
     :description="t('story.description')"
   >
-    <StoryLegend />
+    <StoryFilters
+      v-if="available.length > 0"
+      :available="available"
+      :selected="selected"
+      :counts="counts"
+      :is-all="isAll"
+      @toggle="toggle"
+      @all="selectAll"
+    />
+
+    <p class="sr-only" aria-live="polite">{{ t('story.shown', { count: nodes.length }) }}</p>
 
     <ol v-if="nodes.length > 0" class="mt-6 space-y-3">
       <StoryNode v-for="node in nodes" :key="`${node.source}-${node.id}`" :node="node" />

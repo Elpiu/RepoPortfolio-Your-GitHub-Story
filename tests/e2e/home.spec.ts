@@ -1,4 +1,4 @@
-import { IMAGE_HOSTS, defaultProfile, expect, test } from './fixtures'
+import { IMAGE_HOSTS, defaultProfile, expect, test, ui } from './fixtures'
 
 test('la griglia di default è già nell HTML statico', async ({ request }) => {
   const html = await (await request.get('/')).text()
@@ -41,6 +41,33 @@ test('l HTML statico contiene solo date assolute', async ({ request }) => {
   const html = await (await request.get('/')).text()
   const activity = html.slice(html.indexOf('data-testid="activity-card"'))
   expect(activity).toMatch(/<time[^>]*>\s*\d{4}\.\d{2}\.\d{2}\s*<\/time>/)
+})
+
+test('la GitHub Story parte dal lavoro e si filtra per tipo', async ({ page }) => {
+  test.skip(
+    !defaultProfile.experiences.some((entry) => entry.type === 'work') ||
+      !defaultProfile.experiences.some((entry) => entry.type === 'education'),
+    'Servono esperienze di lavoro e di formazione',
+  )
+  await page.goto('/')
+  const nodes = page.locator('#experience li[data-kind]')
+  const kinds = () => nodes.evaluateAll((items) => items.map((item) => item.dataset.kind))
+  expect(new Set(await kinds())).toEqual(new Set(['work']))
+
+  const filters = page.getByRole('group', { name: ui('story.filters.label') })
+  await expect(filters.getByRole('button', { name: ui('story.filters.work') })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  )
+  await filters.getByRole('button', { name: ui('story.filters.education') }).click()
+  await expect(page).toHaveURL(/[?&]story=work%2Ceducation|[?&]story=work,education/)
+  await expect(page.locator('#experience li[data-kind="education"]').first()).toBeVisible()
+
+  await page.reload()
+  await expect(page.locator('#experience li[data-kind="education"]').first()).toBeVisible()
+
+  await filters.getByRole('button', { name: ui('story.filters.all'), exact: true }).click()
+  expect((await kinds()).length).toBeGreaterThan(2)
 })
 
 test('la GitHub Story si espande e collassa', async ({ page }) => {
