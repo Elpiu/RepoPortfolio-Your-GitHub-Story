@@ -1,9 +1,13 @@
 import { execSync } from 'node:child_process'
-import { readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { relative, resolve } from 'node:path'
 import ghpages from 'gh-pages'
 import { DATA_DIR_ENV, parseDataDirArg, resolveDataDir } from './data-dir.mjs'
 import { resolveRepoContext, resolveSiteUrls } from './repo-context.mjs'
+
+// Stesse variabili di `nuxt dev/generate` (es. PORTFOLIO_DATA_DIR, GITHUB_OFFLINE);
+// quelle già presenti nell'ambiente vincono.
+if (existsSync('.env')) process.loadEnvFile('.env')
 
 const dryRun = process.argv.includes('--dry-run')
 const dataDirArg = parseDataDirArg(process.argv.slice(2))

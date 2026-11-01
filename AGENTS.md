@@ -112,6 +112,7 @@ pnpm check:budget
 pnpm exec playwright install chromium   # una volta
 pnpm test:e2e                       # sull'output di pnpm generate
 pnpm run deploy -- --dry-run        # genera senza pubblicare
+pnpm preview:deploy                 # come il deploy, servito in locale sotto il base URL
 ```
 
 - **`pnpm run deploy`, mai `pnpm deploy`**: quest'ultimo è un comando interno

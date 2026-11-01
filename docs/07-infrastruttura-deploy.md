@@ -134,7 +134,15 @@ Regole:
 
 ```bash
 pnpm run deploy -- --dry-run --data datasets/me   # genera con un altro dataset
+pnpm preview:deploy -- --data datasets/me         # genera come il deploy e serve in locale
 ```
+
+- `scripts/deploy.mjs` legge `.env` (le variabili già nell'ambiente vincono),
+  quindi `PORTFOLIO_DATA_DIR` e `GITHUB_OFFLINE` valgono anche per il deploy.
+- `pnpm preview:deploy` esegue `deploy --dry-run` (stesso base URL, stesso
+  dataset, `.nojekyll`, `build.json`) e serve `.output/public` sotto il base URL
+  su `http://localhost:4173/{repo}/`, con `404.html` e status 404 come su Pages.
+  Canonical, hreflang e OG puntano all'URL pubblico.
 
 ## Base URL e dominio
 
@@ -163,6 +171,7 @@ Regole:
 | --- | --- | --- | --- |
 | `GITHUB_TOKEN` o `NUXT_GITHUB_TOKEN` | build | Sì (opzionale) | Alza il rate limit REST; la build funziona anche senza |
 | `GITHUB_OFFLINE` | locale / CI PR | No | `1` = snapshot o fixture, nessuna rete |
+| `GITHUB_REFRESH` | locale | No | `1` = in `pnpm dev` ignora lo snapshot < 24 h e sincronizza |
 | `PORTFOLIO_DATA_DIR` | locale / deploy | No | Cartella dati alternativa (es. `datasets/me`); vuota = `data/` (ADR-029). In Actions: variabile di repository |
 | `NUXT_APP_BASE_URL`, `NUXT_PUBLIC_SITE_URL` | build | No | Impostate da `scripts/deploy.mjs`; servono a mano solo per `nuxt generate` diretto |
 | `NUXT_PUBLIC_PLAUSIBLE_DOMAIN` | build | No | Opzionale, vuoto di default |

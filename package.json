@@ -17,6 +17,7 @@
     "preview": "nuxt preview",
     "serve:static": "node scripts/serve-static.mjs",
     "deploy": "node scripts/deploy.mjs",
+    "preview:deploy": "node scripts/preview-deploy.mjs",
     "check:budget": "node scripts/check-budget.mjs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

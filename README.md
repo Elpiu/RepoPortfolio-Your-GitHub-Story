@@ -50,7 +50,15 @@ pnpm dev
 ```
 
 No network? `GITHUB_OFFLINE=1 pnpm dev` uses the last GitHub snapshot or the
-bundled fixture.
+bundled fixture. In dev a snapshot younger than 24 hours is reused, so the
+server starts fast; set `GITHUB_REFRESH=1` to sync again.
+
+To see the site exactly as it will be published (same base URL, same data,
+real 404), without publishing:
+
+```bash
+pnpm preview:deploy
+```
 
 ### More than one dataset
 
