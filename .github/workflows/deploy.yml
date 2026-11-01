@@ -41,6 +41,8 @@ jobs:
         run: pnpm run deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Vuota = data/. Per un altro dataset: Settings → Variables → PORTFOLIO_DATA_DIR.
+          PORTFOLIO_DATA_DIR: ${{ vars.PORTFOLIO_DATA_DIR }}
 
       - name: Smoke test
         run: |
@@ -51,5 +53,8 @@ jobs:
             sleep 10
           done
           curl -fsS "${base}build.json" | grep -q "$GITHUB_SHA"
+          curl -fsS "${base}" | grep -q 'data-testid="project-card"'
+          curl -fsS "${base}cv/" > /dev/null
+          curl -fsS "${base}resume.json" | grep -q '"basics"'
           curl -fsS "${base}sitemap.xml" > /dev/null
           test "$(curl -s -o /dev/null -w '%{http_code}' "${base}this-does-not-exist")" = "404"

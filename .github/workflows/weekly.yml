@@ -1,0 +1,65 @@
+name: Weekly checks
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Stessa cartella dati del deploy (variabile di repository, default data/).
+      - run: pnpm generate
+        env:
+          NUXT_APP_BASE_URL: /
+          NUXT_PUBLIC_SITE_URL: http://localhost:3000/
+          PORTFOLIO_DATA_DIR: ${{ vars.PORTFOLIO_DATA_DIR }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Link rotti nell'HTML generato: README, profilo, link esterni.
+      - uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        with:
+          args: >-
+            --no-progress
+            --root-dir ${{ github.workspace }}/.output/public
+            --exclude '^https?://localhost'
+            --exclude 'linkedin\.com'
+            --max-concurrency 8
+            '.output/public/**/*.html'
+          fail: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm audit --prod

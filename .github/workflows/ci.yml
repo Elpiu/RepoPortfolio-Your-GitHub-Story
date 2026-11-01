@@ -40,3 +40,18 @@ jobs:
 
       - run: git diff --exit-code data/schema
       - run: pnpm check:budget
+
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces
+          path: test-results/
+          retention-days: 7
+
+      # Report informativo, non bloccante (ADR-026).
+      - name: Lighthouse CI (report)
+        run: pnpm dlx @lhci/cli@0.15.1 autorun
+        continue-on-error: true
