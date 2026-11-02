@@ -557,10 +557,12 @@ Nessuna configurazione è obbligatoria. Per ogni repository si prova, in ordine:
 2. **Convenzione:** un file con nome `preview`, `screenshot`, `cover`, `hero`,
    `banner` o `social-preview` ed estensione `png`, `jpg`, `jpeg`, `webp`,
    `avif` o `gif`, cercato in quest'ordine di cartelle: `.github/`, root,
-   `docs/`. Poi il path legacy `.github/RepoPortfolio-Your-GitHub-Story/index.png`.
-   Per contenere le richieste, la scansione avviene solo per i repository
-   featured e su un sottoinsieme di nomi/estensioni comuni (preview, screenshot,
-   cover, banner, hero, social-preview; png/jpg); gli altri passano al README.
+   `docs/`; dentro ogni cartella i nomi e poi le estensioni nell'ordine
+   elencato. Poi il path legacy `.github/RepoPortfolio-Your-GitHub-Story/index.png`.
+   Sono 109 candidati, controllati solo per i repository featured (i 6 con più
+   stelle) a blocchi di 12 HEAD in parallelo, fermandosi al primo blocco che
+   trova un file; gli altri repository passano direttamente al README. (Fino al
+   02/11/2026 il codice controllava solo i `.png` e `preview.jpg`.)
 3. **README:** la prima immagine del README che non sia un badge. Si scartano
    gli SVG e gli URL di servizi di badge (`img.shields.io`, `badgen.net`,
    `badge.fury.io`, `codecov.io`, `/actions/workflows/…/badge.svg`, path che
@@ -745,8 +747,10 @@ export default defineNuxtModule({
   richiesta raw per manifest e README di ogni repository e i controlli per
   convenzione dei featured (circa 7 s misurati con 26 repository).
   `GITHUB_REFRESH=1` forza la sync; `pnpm generate` e il deploy sincronizzano
-  sempre. Le HEAD per convenzione partono in parallelo (l'ordine dei path resta
-  la priorità).
+  sempre, **una volta per build**: Nuxt carica la pipeline due volte nello
+  stesso processo (hook di prerender e server Nitro) e la seconda istanza riusa
+  lo snapshot scritto dalla prima (`PORTFOLIO_BUILD_SYNCED_AT`). Prima la
+  build ripeteva la sync.
 
 ## Migrazione dal legacy `sharedData.json`
 
