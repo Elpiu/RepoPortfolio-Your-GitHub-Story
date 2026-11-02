@@ -140,6 +140,8 @@ pnpm test:e2e                           # E2E + axe on the generated site
   graph with lanes for overlapping experiences.
 - Explore all repositories: tabs, search, language filter, sort, shareable URLs.
 - Static, SEO-friendly detail page per project with a sanitized README.
+- Optional reading list: add `books` to your profile and a Reading section
+  appears; leave it empty and it does not exist.
 - `/cv` print-ready page (save as PDF from the browser) and `/resume.json` in
   JSON Resume format.
 - English by default, extra languages by adding a JSON file.

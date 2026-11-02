@@ -71,7 +71,10 @@ Le icone delle competenze (`skills.groups[].items[].icon`, formato
 `collezione:nome`, es. `simple-icons:typescript`) vengono risolte in build dalle
 collezioni `@iconify-json/*` installate e arrivano nel payload della home
 (`/api/data-icons`), non nel bundle JS. Un'icona sconosciuta produce un warning
-e viene omessa; i test la segnalano.
+e viene omessa; i test la segnalano. Lo stesso payload porta le icone di marca
+dei linguaggi principali dei repository (mappa in
+`shared/utils/language-icons.ts`); un linguaggio senza icona usa un'icona
+generica.
 
 ## `data/site.json`
 
@@ -227,6 +230,8 @@ export const profileSchema = z.object({
   }).default({ groups: [] }),
   experiences: z.array(experienceSchema).default([]),
   milestones: z.array(milestoneSchema).default([]),
+  // F10, opzionale: { id, title, author, status: 'read' | 'reading', note?, url? }
+  books: z.array(bookSchema).default([]),
 })
 
 export type Profile = z.infer<typeof profileSchema>

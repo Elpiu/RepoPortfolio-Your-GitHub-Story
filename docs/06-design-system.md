@@ -288,6 +288,7 @@ Regole:
 | `StoryNode` | Card espandibile con data, badge, link |
 | `StoryFilters` | Tab a scelta singola per tipo di nodo (default Lavoro); fanno anche da legenda |
 | `SectionLink` | Link di sezione dell'header: scroll sul posto sulla home, navigazione altrove |
+| `ReadingSection` | Letture (F10): card libro con stato testuale, solo se `books` non è vuoto |
 
 ### Progetti
 

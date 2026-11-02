@@ -24,6 +24,7 @@ backlog e non entrano nell'MVP.
 | F5 GitHub Identity & Story | Must | Bento Grid + Git Graph a lane + eventi automatici |
 | F6 Contact | Must | Quick actions `mailto:` + `tel:` + link CV, nessun form |
 | F9 CV & Export | Should | `/cv` stampabile e `/resume.json` dagli stessi dati |
+| F10 Letture | Could | Sezione opzionale dai dati (`books`), nascosta se vuota |
 | F0/F7/F8 | Must | Fondamenta, preferenze, delivery con un comando |
 
 **Rimossa nella revisione:** F4 Featured Carousel (il Top Repo e i featured
@@ -72,7 +73,7 @@ questa, si costruiscono componenti duplicati e stringhe sparse.
   sezione già nell'URL. Filtri, tab e "carica altri" aggiornano la query string
   senza spostare la pagina.
 - Ordine della home: Home (Bento) → About → Skills → Experience (GitHub Story)
-  → Projects (Explore) → Contact (footer).
+  → Projects (Explore) → Reading (F10, solo se ci sono libri) → Contact (footer).
 - Container e ritmo verticale delle sezioni.
 - Token colore/tipografia (Geist Sans + Geist Mono)/spaziature in Tailwind 4,
   dark-first.
@@ -513,6 +514,36 @@ diverge dal sito. Generarlo dagli stessi JSON elimina il drift.
 - [ ] La pagina è accessibile e localizzata come le altre.
 
 **Decisioni collegate:** ADR-025.
+
+---
+
+## F10 — Letture (Could, opzionale)
+
+**Cosa:** una sezione `#reading` con i libri letti o in lettura, letta da
+`books` in `data/profile/{locale}.json`. Approvata dall'owner il 02/11/2026.
+
+**Perché è opzionale:** non viene da GitHub e va aggiornata a mano, quindi non
+rafforza "manutenzione zero". Racconta però la persona oltre ai repository e,
+vuota, non costa nulla: niente sezione, niente voce di menu.
+
+**Scope**
+
+- Card con titolo (link esterno se `url`), autore, nota breve (≤ 280
+  caratteri) e stato come testo (`Letto` / `In lettura`), non solo colore.
+- In lettura prima, poi l'ordine del JSON.
+- Posizione: dopo Explore, prima dei contatti; voce `Letture` nel menu solo se
+  la lista non è vuota.
+- Stessi `id` in tutte le lingue (validazione di parità); `id` univoci.
+
+**Criteri di accettazione**
+
+- [x] Con `books` vuoto o assente non esistono né la sezione né la voce di menu.
+- [x] Con dei libri, la sezione mostra una card per libro e il link del menu
+      porta alla sezione.
+- [x] Un libro presente in una sola lingua fa fallire la build.
+
+**Fuori scope:** copertine (immagini esterne), valutazioni, integrazioni con
+Goodreads o simili.
 
 ---
 
