@@ -12,7 +12,7 @@
   "about": {
     "paragraphs": [
       "Born in 1997 and based in Ravello (SA), Italy. I'm a full-stack developer who is always ready to take on new challenges and keep growing, with a particular focus on the web.",
-      "Since 2022 I have been building enterprise applications with Java, Spring, TypeScript and Angular; today I develop CRM, KPI and IoT solutions from backend to frontend.",
+      "Since 2022 I have been building enterprise applications with Java, Spring, TypeScript and Angular; today I develop a microservices platform for OSINT and security intelligence, bringing LLMs and automation into everyday workflows.",
       "My mission is to make people's lives simpler through software."
     ]
   },
@@ -38,7 +38,10 @@
           { "name": "Spring Boot", "icon": "simple-icons:springboot" },
           { "name": "PrimeNG", "icon": "simple-icons:primeng" },
           { "name": "Tailwind CSS", "icon": "simple-icons:tailwindcss" },
-          { "name": "Flask", "icon": "simple-icons:flask" }
+          { "name": "Flask", "icon": "simple-icons:flask" },
+          { "name": "FastAPI", "icon": "simple-icons:fastapi" },
+          { "name": "LangGraph", "icon": "simple-icons:langgraph" },
+          { "name": "NgRx", "icon": "simple-icons:ngrx" }
         ]
       },
       {
@@ -49,7 +52,11 @@
           { "name": "GitHub Actions", "icon": "simple-icons:githubactions" },
           { "name": "Maven", "icon": "simple-icons:apachemaven" },
           { "name": "npm", "icon": "simple-icons:npm" },
-          { "name": "AWS Amplify", "icon": "simple-icons:awsamplify" }
+          { "name": "AWS Amplify", "icon": "simple-icons:awsamplify" },
+          { "name": "Docker", "icon": "simple-icons:docker" },
+          { "name": "Kubernetes", "icon": "simple-icons:kubernetes" },
+          { "name": "OpenSearch", "icon": "simple-icons:opensearch" },
+          { "name": "Nx", "icon": "simple-icons:nx" }
         ]
       },
       {
@@ -71,32 +78,52 @@
   },
   "experiences": [
     {
+      "id": "neverhack",
+      "type": "work",
+      "title": "Software Development Engineer",
+      "organization": "NEVERHACK Italy",
+      "location": "Remote",
+      "start": "2025-09",
+      "end": null,
+      "description": "Full-stack developer on CyberZoom, an enterprise-grade microservices platform for OSINT and security intelligence. Stack: Python (FastAPI, SQLAlchemy, LangGraph), Java (Spring Boot, Quartz), Angular (standalone components, signals, PrimeNG, Tailwind CSS 4) and containerized infrastructure (Docker, Kubernetes, KasmVNC).",
+      "highlights": [
+        "AI in decision-making and automation workflows: LLMs, OCR and turning unstructured data into structured data",
+        "Microservices architectures and service-to-service communication",
+        "Application reverse engineering, API analysis and process-flow analysis",
+        "Data extraction and analysis; cybersecurity and physical security threat analysis",
+        "Tor infrastructure (torapi) and local CPU models for text analysis and data extraction (textmetadata library)"
+      ]
+    },
+    {
       "id": "system-management",
       "type": "work",
-      "title": "Full-stack Developer",
+      "title": "Software Development Engineer",
       "organization": "System Management S.p.A.",
       "location": "Naples — Hybrid",
-      "start": "2024-07",
-      "end": null,
-      "description": "I build custom CRM and KPI applications for clients across backend and frontend, with a strong focus on smart IoT solutions that let heterogeneous devices communicate.",
+      "start": "2024-05",
+      "end": "2025-09",
+      "description": "Angular frontend developer on IoT and real-time data visualization projects, building interfaces that turn complex data into clear, accessible information.",
       "highlights": [
-        "Custom CRM and KPI applications for clients",
-        "IoT solutions connecting heterogeneous devices",
-        "End-to-end development, from backend to frontend"
+        "Interactive real-time monitoring dashboards, with OpenSearch for complex data, and live maps for geolocation and asset tracking",
+        "PrimeNG application template configurable through JSON, to start or tailor applications for different customers quickly",
+        "Internal UI kit on PrimeNG with configurable meta-components, standardizing UI and UX across all company products",
+        "CI/CD and semantic versioning for the libraries; Dockerfiles for reproducible frontend image builds",
+        "Drag-and-drop page builder (GridStack, NgRx SignalStore) for dynamic, customer-defined views"
       ]
     },
     {
       "id": "nexsoft",
       "type": "work",
-      "title": "Software Developer",
+      "title": "Software Development Engineer",
       "organization": "Nexsoft S.p.A.",
-      "location": "Salerno — Full remote",
+      "location": "Salerno",
       "start": "2022-07",
       "end": "2024-06",
-      "description": "Outsourced professional at CCH Tagetik: design, development, porting and testing of an enterprise application within my functional area.",
+      "description": "Outsourced professional at CCH Tagetik: design, development, porting and testing of an enterprise application.",
       "highlights": [
-        "Design, development, porting and testing of an enterprise application",
-        "Java and Spring on the backend, TypeScript and Angular on the frontend"
+        "Design and development of an enterprise application: Java and Spring on the backend, TypeScript and Angular on the frontend",
+        "Porting and testing to ensure software quality and functionality",
+        "Collaboration with internal and external teams to meet project requirements"
       ]
     },
     {
