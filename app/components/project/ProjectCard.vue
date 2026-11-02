@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Repository } from '~~/shared/types'
+import { languageIconName } from '~~/shared/utils/language-icons'
 
 const props = defineProps<{
   repository: Repository
@@ -9,28 +10,14 @@ const { t } = useI18n()
 const localePath = useLocalePath()
 const detailPath = computed(() => localePath(`/projects/${props.repository.slug}`))
 
-const LANGUAGE_ICONS: Record<string, string> = {
-  TypeScript: 'simple-icons:typescript',
-  JavaScript: 'simple-icons:javascript',
-  Vue: 'simple-icons:vuedotjs',
-  Java: 'simple-icons:openjdk',
-  Python: 'simple-icons:python',
-  Go: 'simple-icons:go',
-  Rust: 'simple-icons:rust',
-  HTML: 'simple-icons:html5',
-  CSS: 'simple-icons:css3',
-  PHP: 'simple-icons:php',
-  C: 'simple-icons:c',
-  'C++': 'simple-icons:cplusplus',
-  'C#': 'simple-icons:dotnet',
-  Shell: 'simple-icons:gnubash',
-  Dockerfile: 'simple-icons:docker',
-}
-
-const languageIcon = computed(() =>
-  props.repository.language
-    ? (LANGUAGE_ICONS[props.repository.language] ?? 'i-lucide-code')
-    : 'i-lucide-folder-git-2',
+// L'icona di marca arriva dal payload (/api/data-icons), non dal bundle JS.
+const dataIcons = useLoadedDataIcons()
+const brandIcon = computed(() => {
+  const name = languageIconName(props.repository.language)
+  return name ? (dataIcons.value?.[name] ?? null) : null
+})
+const fallbackIcon = computed(() =>
+  props.repository.language ? 'i-lucide-code' : 'i-lucide-folder-git-2',
 )
 const topics = computed(() => props.repository.topics.slice(0, 5))
 const extraTopics = computed(() =>
@@ -55,8 +42,14 @@ const extraTopics = computed(() =>
     <div class="flex flex-1 flex-col p-5">
       <div class="flex items-start justify-between gap-3">
         <div class="flex min-w-0 items-center gap-2">
+          <DataIcon
+            v-if="brandIcon"
+            :icon="brandIcon"
+            class="h-4 w-4 shrink-0 text-foreground-muted"
+          />
           <UIcon
-            :name="languageIcon"
+            v-else
+            :name="fallbackIcon"
             class="h-4 w-4 shrink-0 text-foreground-muted"
             aria-hidden="true"
           />

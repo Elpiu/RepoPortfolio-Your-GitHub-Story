@@ -47,8 +47,12 @@ test('il filtro linguaggio si combina con il contatore', async ({ page }) => {
   const option = await select.locator('option').nth(1).getAttribute('value')
   test.skip(!option, 'Dataset senza linguaggi')
 
-  await select.selectOption(option!)
-  await expect(page).toHaveURL(/[?&]lang=/)
+  // Una selezione prima dell'idratazione non ha effetto: si ritenta.
+  await expect(async () => {
+    await select.selectOption('')
+    await select.selectOption(option!)
+    await expect(page).toHaveURL(/[?&]lang=/, { timeout: 1000 })
+  }).toPass()
   const languages = await page
     .getByTestId('project-card')
     .locator('[data-testid="project-language"]')

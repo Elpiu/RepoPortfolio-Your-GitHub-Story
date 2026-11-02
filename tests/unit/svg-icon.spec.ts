@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { resolveDataIcon } from '../../server/utils/data-icons'
+import { resolveDataIcon, resolveDataIcons } from '../../server/utils/data-icons'
+import type { Repository } from '../../shared/types'
 import { parseIconBody, splitIconName } from '../../shared/utils/svg-icon'
 
 describe('parseIconBody', () => {
@@ -40,6 +41,18 @@ describe('resolveDataIcon', () => {
   it('risolve icone dalle collezioni installate', () => {
     expect(resolveDataIcon('simple-icons:typescript')?.viewBox).toBe('0 0 24 24')
     expect(resolveDataIcon('lucide:database')?.nodes[0]?.tag).toBe('g')
+  })
+
+  it('aggiunge le icone dei linguaggi dei repository, ignorando quelli senza icona', () => {
+    const languages = ['TypeScript', 'Java', 'CSS', 'Kotlin', 'AMPL', null]
+    const repositories = languages.map((language) => ({ language })) as Repository[]
+    const icons = resolveDataIcons({}, repositories)
+    expect(Object.keys(icons).sort()).toEqual([
+      'simple-icons:css',
+      'simple-icons:kotlin',
+      'simple-icons:openjdk',
+      'simple-icons:typescript',
+    ])
   })
 
   it('restituisce null per icone o collezioni sconosciute', () => {

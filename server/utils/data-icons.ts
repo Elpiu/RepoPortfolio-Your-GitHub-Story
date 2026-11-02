@@ -3,6 +3,8 @@ import { createRequire } from 'node:module'
 import { join } from 'node:path'
 import { consola } from 'consola'
 import type { Profile } from '~~/shared/schemas/profile'
+import type { Repository } from '~~/shared/types'
+import { languageIconName } from '~~/shared/utils/language-icons'
 import { parseIconBody, splitIconName, type SvgIcon } from '~~/shared/utils/svg-icon'
 
 type IconifyCollection = {
@@ -46,8 +48,14 @@ export function resolveDataIcon(icon: string): SvgIcon | null {
   return { viewBox: `0 0 ${width} ${height}`, nodes }
 }
 
-/** Tutte le icone citate dalle competenze dei profili, risolte dalle collezioni locali. */
-export function resolveProfileIcons(profiles: Record<string, Profile>): Record<string, SvgIcon> {
+/**
+ * Icone dei dati, risolte dalle collezioni locali: quelle citate dalle
+ * competenze dei profili e quelle dei linguaggi dei repository.
+ */
+export function resolveDataIcons(
+  profiles: Record<string, Profile>,
+  repositories: readonly Repository[] = [],
+): Record<string, SvgIcon> {
   const icons: Record<string, SvgIcon> = {}
   for (const profile of Object.values(profiles)) {
     for (const item of profile.skills.groups.flatMap((group) => group.items)) {
@@ -56,6 +64,12 @@ export function resolveProfileIcons(profiles: Record<string, Profile>): Record<s
       if (resolved) icons[item.icon] = resolved
       else logger.warn(`icona "${item.icon}" (${item.name}) non trovata: verrà omessa`)
     }
+  }
+  for (const repository of repositories) {
+    const name = languageIconName(repository.language)
+    if (!name || name in icons) continue
+    const resolved = resolveDataIcon(name)
+    if (resolved) icons[name] = resolved
   }
   return icons
 }
