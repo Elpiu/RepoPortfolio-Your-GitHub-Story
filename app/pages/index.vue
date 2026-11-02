@@ -1,9 +1,15 @@
 <script setup lang="ts">
-const { t } = useI18n()
+import type { Book } from '~~/shared/schemas/profile'
+
+const { t, locale } = useI18n()
 const localePath = useLocalePath()
 const { profile } = useSiteData()
 const { data: dataset } = await useProjects()
 const { data: dataIcons } = await useDataIcons()
+const { data: booksByLocale } = await useAsyncData('books', () =>
+  $fetch<Record<string, Book[]>>('/api/books'),
+)
+const books = computed(() => booksByLocale.value?.[locale.value] ?? [])
 
 usePageSeo()
 
@@ -100,6 +106,6 @@ const skillGroups = computed(() => profile.value.skills.groups)
     </SectionShell>
 
     <!-- Opzionale: compare solo se il profilo elenca dei libri. -->
-    <ReadingSection v-if="profile.books.length > 0" :books="profile.books" />
+    <ReadingSection v-if="books.length > 0" :books="books" />
   </div>
 </template>
