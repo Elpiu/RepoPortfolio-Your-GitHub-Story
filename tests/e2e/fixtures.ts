@@ -34,6 +34,10 @@ export const IMAGE_HOSTS = new Set([
   'private-user-images.githubusercontent.com',
   'repository-images.githubusercontent.com',
   'github.com',
+  // Eccezione opt-in a ADR-013: solo gli host delle copertine dichiarate nei dati.
+  ...Object.values(profiles).flatMap((profile) =>
+    profile.books.flatMap((book) => (book.cover ? [new URL(book.cover).hostname] : [])),
+  ),
 ])
 
 /** Slug del primo progetto della griglia di default. */

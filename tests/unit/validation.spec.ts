@@ -106,6 +106,16 @@ describe('validazione dei dati owner', () => {
       /"books" non allineate/,
     )
     expect(() => assertUniqueIds([book, book], 'books')).toThrow(/id duplicato: "b" \(books\)/)
+    // Copertina e link facoltativi, solo https.
+    expect(() =>
+      profileSchema.parse({ ...baseProfile, books: [{ ...book, cover: 'http://x.test/c.jpg' }] }),
+    ).toThrow()
+    expect(
+      profileSchema.parse({
+        ...baseProfile,
+        books: [{ ...book, cover: 'https://x.test/c.jpg', url: 'https://x.test/b' }],
+      }).books[0],
+    ).toMatchObject({ cover: 'https://x.test/c.jpg', url: 'https://x.test/b' })
   })
 
   it('riporta un errore leggibile per JSON malformato', () => {

@@ -279,6 +279,11 @@
             "type": "string",
             "format": "starts_with",
             "pattern": "^https:\\/\\/.*"
+          },
+          "cover": {
+            "type": "string",
+            "format": "starts_with",
+            "pattern": "^https:\\/\\/.*"
           }
         },
         "required": [

@@ -209,6 +209,7 @@
     "status": {
       "read": "Read",
       "reading": "Reading now"
-    }
+    },
+    "open": "Open book"
   }
 }

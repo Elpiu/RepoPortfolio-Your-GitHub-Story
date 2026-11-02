@@ -123,64 +123,89 @@
     }
   ],
   "books": [
-    { "id": "reactive-angular", "title": "Reactive Application with Angular", "status": "read" },
+    {
+      "id": "reactive-angular",
+      "title": "Reactive Application with Angular",
+      "cover": "https://m.media-amazon.com/images/I/8164bREMLML.jpg",
+      "status": "read"
+    },
     {
       "id": "reactive-rxjs",
       "title": "Reactive Programming with RxJS",
       "author": "Sergi Mansilla",
+      "cover": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTKzbr4_qjDBgS9-vbiqUg6fxG5zTA0BsA0YIZn9hhwh_XCwCRA",
       "status": "read"
     },
     {
       "id": "aws-cloud-practitioner",
       "title": "AWS Certified Cloud Practitioner",
+      "cover": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTl16b3U5QV9Qm9YZACpdG8n2jC6EcFkQxQaEH3SMNIhtcg61Qdo3jSkljTEbmeLYaLduMXB1oxS4YxxJM5t8aonoU6JMCXf3gpo25SZ-yDjcJyxBaDKNME1g",
       "status": "read"
     },
     {
       "id": "pro-typescript",
       "title": "Pro TypeScript: Application-Scale JavaScript Development",
       "author": "Steve Fenton",
+      "cover": "https://m.media-amazon.com/images/I/61golxOgA4L._SY466_.jpg",
       "status": "read"
     },
-    { "id": "journey-angular", "title": "A Journey to Angular Development", "status": "read" },
+    {
+      "id": "journey-angular",
+      "title": "A Journey to Angular Development",
+      "cover": "https://m.media-amazon.com/images/I/81HJC2uXmCS._SY466_.jpg",
+      "status": "read"
+    },
     {
       "id": "serverless-amplify",
       "title": "Serverless Web Applications with AWS Amplify",
+      "cover": "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcR0c3axW0Q-RinY1rWxQG9782tDBGpGHW5eIKaeStE0ERR3r4vn",
       "status": "read"
     },
     {
       "id": "saas-playbook",
       "title": "The SaaS Playbook",
       "author": "Rob Walling",
+      "cover": "https://m.media-amazon.com/images/I/61037y8MQ8L._SY466_.jpg",
       "status": "read"
     },
-    { "id": "nestjs", "title": "Nest.js: A Progressive Node.js Framework", "status": "read" },
+    {
+      "id": "nestjs",
+      "title": "Nest.js: A Progressive Node.js Framework",
+      "cover": "https://m.media-amazon.com/images/I/512bhoDmCeL._SY466_.jpg",
+      "status": "read"
+    },
     {
       "id": "blockchain-ethereum",
       "title": "Blockchain and Ethereum Smart Contract Solution Development",
+      "cover": "https://media.springernature.com/full/springer-static/cover-hires/book/978-1-4842-8164-2?as=webp",
       "status": "read"
     },
     {
       "id": "postgresql-up-and-running",
       "title": "PostgreSQL: Up and Running",
       "author": "Regina Obe, Leo Hsu",
+      "cover": "https://m.media-amazon.com/images/I/91V4KvmUzdL._SY342_.jpg",
       "status": "read"
     },
     {
       "id": "scrum",
       "title": "Scrum: The Art of Doing Twice the Work in Half the Time",
       "author": "Jeff Sutherland",
+      "cover": "https://m.media-amazon.com/images/I/71OUBnMjOwL._SY466_.jpg",
       "status": "read"
     },
     {
       "id": "enterprise-angular",
       "title": "Enterprise Angular: Micro Frontends and Moduliths",
       "author": "Manfred Steyer",
+      "cover": "https://d2sofvawe08yqg.cloudfront.net/enterprise-angular/s_hero?1706702348",
       "status": "read"
     },
     {
       "id": "weaving-the-web",
       "title": "Weaving the Web",
       "author": "Tim Berners-Lee",
+      "cover": "https://m.media-amazon.com/images/I/71pjNjSe49L._SY466_.jpg",
       "status": "read"
     }
   ]

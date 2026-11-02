@@ -51,6 +51,8 @@ export const bookSchema = z.object({
   status: z.enum(['read', 'reading']).default('read'),
   note: z.string().min(1).max(280).optional(),
   url: httpsUrl.optional(),
+  // Immagine remota non GitHub: eccezione opt-in a ADR-013, voluta dall'owner.
+  cover: httpsUrl.optional(),
 })
 
 export const profileSchema = z.object({
