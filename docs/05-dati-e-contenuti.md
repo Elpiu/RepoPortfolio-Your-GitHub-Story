@@ -651,15 +651,24 @@ GitHub e non è tradotto; l'etichetta del tipo sì.
 Calcolate da una funzione pura (`shared/utils/story-graph.ts`), testata a parte:
 
 1. Ogni esperienza è un intervallo `[start, end ?? mese di syncedAt]`.
-2. Gli intervalli si ordinano per `start` crescente, poi `work` prima di
-   `education`, poi `id`.
-3. Ogni intervallo prende la lane libera più bassa. La lane 0 è il tronco,
-   sempre disegnato.
+2. Prima i `work`, poi gli `education`; dentro ogni tipo per `start`
+   crescente, poi `id`. Così il tronco racconta il lavoro e lo studio in
+   parallelo diventa un ramo.
+3. Ogni intervallo prende la lane più bassa in cui **nessun** intervallo già
+   piazzato si sovrappone. Finire e iniziare nello stesso mese (cambio di
+   lavoro) non è una sovrapposizione. La lane 0 è il tronco, sempre disegnato.
 4. Massimo 3 lane: oltre, gli intervalli condividono la lane 2.
 5. I punti (milestone, repo, release) stanno sul tronco alla loro data.
-6. Output: nodi con lane e posizione, più gli archi di fork (inizio
-   intervallo) e merge (fine intervallo) verso il tronco. L'SVG è disegnato in
-   build; l'ordine nel DOM è cronologico.
+6. Binari per riga (`rails`), con le righe dalla più recente: un'esperienza su
+   lane > 0 si stacca dal tronco nella sua riga (fork), attraversa le righe più
+   recenti fino alla prima con data ≤ della sua fine e lì rientra nel nodo
+   (merge); se è in corso resta aperta fino in cima. Se nessuna riga più
+   recente cade entro la fine, rientra in cima alla propria riga.
+7. Il disegno (`StoryRail`) usa linee CSS a tutta altezza della riga, quindi i
+   binari restano continui anche espandendo una card, e curve SVG a dimensione
+   fissa per fork e merge. Le righe non hanno margini tra loro (solo padding).
+   (Fino al 02/11/2026 ogni nodo aveva un SVG fisso centrato nella card: i
+   binari risultavano spezzati.)
 
 ## Validazione a build time
 

@@ -284,7 +284,7 @@ Regole:
 | `TopRepoCard` | Repository più stellato con preview e stats |
 | `LanguageBar` | Percentuali multi-colore + legenda accessibile |
 | `ActivityCard` | Ultimo push, branch, "Last synced" |
-| `GitGraph` | SVG a lane (tronco, fork, merge) calcolato in build |
+| `StoryRail` | Binari della riga: tronco continuo, rami, fork e merge (CSS + SVG) |
 | `StoryNode` | Card espandibile con data, badge, link |
 | `StoryFilters` | Tab a scelta singola per tipo di nodo (default Lavoro); fanno anche da legenda |
 | `SectionLink` | Link di sezione dell'header: scroll sul posto sulla home, navigazione altrove |
@@ -397,7 +397,8 @@ progetto sostituisce. Il differenziatore sono le **lane**:
   staccano dal tronco (fork) all'inizio e vi rientrano (merge) alla fine.
 - Massimo 3 lane; passo 16 px su desktop, 8 px sotto `md`.
 - Le lane sono calcolate in build da `shared/utils/story-graph.ts` e disegnate
-  come SVG inline: zero JS per il grafo. Algoritmo in
+  da `StoryRail` (linee CSS continue + curve SVG di fork/merge) già nell'HTML
+  statico. Il tronco porta il lavoro. Algoritmo in
   [05](05-dati-e-contenuti.md#lane-del-grafo).
 - Colori: tronco e archi in `border-strong`; il nodo corrente (esperienza in
   corso) in emerald. Nessun colore per lane: la distinzione è geometrica.
