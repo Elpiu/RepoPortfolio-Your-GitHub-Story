@@ -52,7 +52,7 @@ const ordered = computed(() => [
           </a>
           <template v-else>{{ book.title }}</template>
         </h3>
-        <p class="mt-1 text-sm text-foreground-muted">{{ book.author }}</p>
+        <p v-if="book.author" class="mt-1 text-sm text-foreground-muted">{{ book.author }}</p>
         <p v-if="book.note" class="mt-3 text-pretty text-sm leading-relaxed text-foreground-muted">
           {{ book.note }}
         </p>

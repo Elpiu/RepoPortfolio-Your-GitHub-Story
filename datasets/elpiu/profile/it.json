@@ -121,5 +121,67 @@
       "repo": "cnn-evaluate-parkinson-bd",
       "tags": ["Python", "CNN", "Flask"]
     }
+  ],
+  "books": [
+    { "id": "reactive-angular", "title": "Reactive Application with Angular", "status": "read" },
+    {
+      "id": "reactive-rxjs",
+      "title": "Reactive Programming with RxJS",
+      "author": "Sergi Mansilla",
+      "status": "read"
+    },
+    {
+      "id": "aws-cloud-practitioner",
+      "title": "AWS Certified Cloud Practitioner",
+      "status": "read"
+    },
+    {
+      "id": "pro-typescript",
+      "title": "Pro TypeScript: Application-Scale JavaScript Development",
+      "author": "Steve Fenton",
+      "status": "read"
+    },
+    { "id": "journey-angular", "title": "A Journey to Angular Development", "status": "read" },
+    {
+      "id": "serverless-amplify",
+      "title": "Serverless Web Applications with AWS Amplify",
+      "status": "read"
+    },
+    {
+      "id": "saas-playbook",
+      "title": "The SaaS Playbook",
+      "author": "Rob Walling",
+      "status": "read"
+    },
+    { "id": "nestjs", "title": "Nest.js: A Progressive Node.js Framework", "status": "read" },
+    {
+      "id": "blockchain-ethereum",
+      "title": "Blockchain and Ethereum Smart Contract Solution Development",
+      "status": "read"
+    },
+    {
+      "id": "postgresql-up-and-running",
+      "title": "PostgreSQL: Up and Running",
+      "author": "Regina Obe, Leo Hsu",
+      "status": "read"
+    },
+    {
+      "id": "scrum",
+      "title": "Scrum: The Art of Doing Twice the Work in Half the Time",
+      "author": "Jeff Sutherland",
+      "status": "read"
+    },
+    {
+      "id": "enterprise-angular",
+      "title": "Enterprise Angular: Micro Frontends and Moduliths",
+      "author": "Manfred Steyer",
+      "status": "read"
+    },
+    {
+      "id": "weaving-the-web",
+      "title": "Weaving the Web",
+      "author": "Tim Berners-Lee",
+      "status": "read"
+    }
   ]
 }

@@ -47,7 +47,7 @@ export const milestoneSchema = z.object({
 export const bookSchema = z.object({
   id: z.string().min(1),
   title: z.string().min(1),
-  author: z.string().min(1),
+  author: z.string().min(1).optional(),
   status: z.enum(['read', 'reading']).default('read'),
   note: z.string().min(1).max(280).optional(),
   url: httpsUrl.optional(),
