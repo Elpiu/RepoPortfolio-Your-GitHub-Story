@@ -4,6 +4,8 @@ import { formatMonth } from '~~/shared/utils/format'
 
 const props = defineProps<{
   node: StoryNode
+  first: boolean
+  last: boolean
 }>()
 
 const { t } = useI18n()
@@ -26,7 +28,6 @@ const typeIcon = computed(() => {
       return 'i-lucide-git-branch'
   }
 })
-const laneX = computed(() => 8 + props.node.lane * 16)
 const endLabel = computed(() => {
   if (!props.node.end) return props.node.current ? t('story.present') : null
   return formatMonth(props.node.end)
@@ -34,46 +35,8 @@ const endLabel = computed(() => {
 </script>
 
 <template>
-  <li class="grid grid-cols-[3.5rem_minmax(0,1fr)] gap-3" :data-kind="node.kind">
-    <svg viewBox="0 0 56 72" class="h-full min-h-28 w-14" aria-hidden="true">
-      <line x1="8" y1="0" x2="8" y2="72" stroke="var(--color-border-strong)" stroke-width="1.5" />
-      <path
-        v-if="node.lane > 0"
-        :d="`M8 0 V36 H${laneX}`"
-        fill="none"
-        stroke="var(--color-border-strong)"
-        stroke-width="1.5"
-      />
-      <path
-        v-if="node.lane > 0 && node.end"
-        :d="`M${laneX} 36 V72 H8`"
-        fill="none"
-        stroke="var(--color-border-strong)"
-        stroke-width="1.5"
-      />
-      <polygon
-        v-if="node.kind === 'milestone'"
-        :points="`${laneX},29 ${laneX + 7},36 ${laneX},43 ${laneX - 7},36`"
-        fill="var(--color-accent)"
-        stroke="var(--color-accent)"
-        stroke-width="1.5"
-      />
-      <circle
-        v-else
-        :cx="laneX"
-        cy="36"
-        r="4.5"
-        :fill="
-          node.current
-            ? 'var(--color-accent)'
-            : node.kind === 'repo' || node.kind === 'release'
-              ? 'var(--color-surface)'
-              : 'var(--color-foreground)'
-        "
-        :stroke="node.current ? 'var(--color-accent)' : 'var(--color-border-strong)'"
-        stroke-width="1.5"
-      />
-    </svg>
+  <li class="relative pb-3 pl-14 last:pb-0" :data-kind="node.kind">
+    <StoryRail :node="node" :first="first" :last="last" />
 
     <details class="group rounded-card border border-border bg-surface-raised shadow-card">
       <summary

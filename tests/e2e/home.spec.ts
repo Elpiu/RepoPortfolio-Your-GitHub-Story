@@ -140,6 +140,32 @@ test('le letture compaiono solo se il profilo elenca dei libri', async ({ page }
   await expect(page.locator('#reading')).toBeInViewport()
 })
 
+test('il binario principale della story è continuo, anche espandendo una card', async ({
+  page,
+}) => {
+  await page.goto('/?story=all')
+  const rows = page.locator('#story-panel > ol > li')
+  await expect.poll(() => rows.count()).toBeGreaterThan(1)
+
+  const gaps = async () =>
+    page.evaluate(() => {
+      const items = [...document.querySelectorAll('#story-panel > ol > li')]
+      const mainLine = (li: Element) =>
+        [...li.querySelectorAll('[aria-hidden="true"] > span')]
+          .map((span) => span.getBoundingClientRect())
+          .sort((left, right) => left.left - right.left)[0]!
+      const result: number[] = []
+      for (let index = 1; index < items.length; index += 1) {
+        result.push(Math.round(mainLine(items[index]!).top - mainLine(items[index - 1]!).bottom))
+      }
+      return result
+    })
+
+  for (const gap of await gaps()) expect(gap).toBeLessThanOrEqual(0)
+  await rows.first().locator('summary').click()
+  for (const gap of await gaps()) expect(gap).toBeLessThanOrEqual(0)
+})
+
 test('la GitHub Story si espande e collassa', async ({ page }) => {
   await page.goto('/')
   const node = page.locator('#experience details').first()

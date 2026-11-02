@@ -41,8 +41,15 @@ const { view, views, select } = filters
       :aria-labelledby="views.length > 1 ? `story-tab-${view}` : undefined"
       class="mt-6"
     >
-      <ol v-if="nodes.length > 0" class="space-y-3">
-        <StoryNode v-for="node in nodes" :key="`${node.source}-${node.id}`" :node="node" />
+      <!-- Niente gap tra le righe: lo spazio è padding, così i binari restano continui. -->
+      <ol v-if="nodes.length > 0">
+        <StoryNode
+          v-for="(node, index) in nodes"
+          :key="`${node.source}-${node.id}`"
+          :node="node"
+          :first="index === 0"
+          :last="index === nodes.length - 1"
+        />
       </ol>
       <EmptyState v-else :title="t('story.empty')" />
     </div>
