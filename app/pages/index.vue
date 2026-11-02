@@ -1,13 +1,9 @@
 <script setup lang="ts">
-import type { SvgIcon } from '~~/shared/utils/svg-icon'
-
 const { t } = useI18n()
 const localePath = useLocalePath()
 const { profile } = useSiteData()
 const { data: dataset } = await useProjects()
-const { data: dataIcons } = await useAsyncData('data-icons', () =>
-  $fetch<Record<string, SvgIcon>>('/api/data-icons'),
-)
+const { data: dataIcons } = await useDataIcons()
 
 usePageSeo()
 
@@ -102,5 +98,8 @@ const skillGroups = computed(() => profile.value.skills.groups)
         :description="t('projects.error.description')"
       />
     </SectionShell>
+
+    <!-- Opzionale: compare solo se il profilo elenca dei libri. -->
+    <ReadingSection v-if="profile.books.length > 0" :books="profile.books" />
   </div>
 </template>

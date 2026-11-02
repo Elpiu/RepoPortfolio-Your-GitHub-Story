@@ -83,5 +83,20 @@
       "description": "Shipped an enterprise application used by real customers.",
       "tags": ["Java", "Angular"]
     }
+  ],
+  "books": [
+    {
+      "id": "pragmatic-programmer",
+      "title": "The Pragmatic Programmer",
+      "author": "David Thomas, Andrew Hunt",
+      "status": "read",
+      "note": "Small, daily habits that keep a codebase easy to change."
+    },
+    {
+      "id": "clean-code",
+      "title": "Clean Code",
+      "author": "Robert C. Martin",
+      "status": "reading"
+    }
   ]
 }

@@ -12,7 +12,8 @@
     "experience": "Experience",
     "contact": "Contact",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "reading": "Reading"
   },
   "theme": {
     "label": "Theme",
@@ -49,7 +50,9 @@
     "email": "Email me",
     "github": "GitHub profile",
     "viewProjects": "View projects",
-    "readAbout": "Read about me"
+    "readAbout": "Read about me",
+    "readingEyebrow": "Library",
+    "reading": "Books I read"
   },
   "bento": {
     "eyebrow": "Profile",
@@ -201,5 +204,11 @@
     "genericTitle": "Something went wrong",
     "genericDescription": "An unexpected error occurred. Try again or go back home.",
     "backHome": "Back to home"
+  },
+  "reading": {
+    "status": {
+      "read": "Read",
+      "reading": "Reading now"
+    }
   }
 }

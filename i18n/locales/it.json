@@ -12,7 +12,8 @@
     "experience": "Esperienza",
     "contact": "Contatti",
     "openMenu": "Apri menu",
-    "closeMenu": "Chiudi menu"
+    "closeMenu": "Chiudi menu",
+    "reading": "Letture"
   },
   "theme": {
     "label": "Tema",
@@ -49,7 +50,9 @@
     "email": "Scrivimi",
     "github": "Profilo GitHub",
     "viewProjects": "Guarda i progetti",
-    "readAbout": "Leggi chi sono"
+    "readAbout": "Leggi chi sono",
+    "readingEyebrow": "Libreria",
+    "reading": "Libri che ho letto"
   },
   "bento": {
     "eyebrow": "Profilo",
@@ -201,5 +204,11 @@
     "genericTitle": "Qualcosa è andato storto",
     "genericDescription": "Si è verificato un errore imprevisto. Riprova o torna alla home.",
     "backHome": "Torna alla home"
+  },
+  "reading": {
+    "status": {
+      "read": "Letto",
+      "reading": "In lettura"
+    }
   }
 }

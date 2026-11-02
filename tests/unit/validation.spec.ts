@@ -38,6 +38,7 @@ const baseProfile: Profile = {
     },
   ],
   milestones: [],
+  books: [],
 }
 
 describe('validazione dei dati owner', () => {
@@ -94,6 +95,17 @@ describe('validazione dei dati owner', () => {
     } finally {
       rmSync(directory, { recursive: true, force: true })
     }
+  })
+
+  it('i libri sono opzionali, "read" di default e allineati tra lingue', () => {
+    expect(profileSchema.parse({ ...baseProfile, books: undefined }).books).toEqual([])
+    const book = { id: 'b', title: 'T', author: 'A' }
+    const english = profileSchema.parse({ ...baseProfile, books: [book] })
+    expect(english.books[0]?.status).toBe('read')
+    expect(() => assertSameShape({ en: english, it: { ...english, books: [] } })).toThrow(
+      /"books" non allineate/,
+    )
+    expect(() => assertUniqueIds([book, book], 'books')).toThrow(/id duplicato: "b" \(books\)/)
   })
 
   it('riporta un errore leggibile per JSON malformato', () => {

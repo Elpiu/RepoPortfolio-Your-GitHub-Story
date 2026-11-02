@@ -2,7 +2,7 @@
 const { t } = useI18n()
 const details = ref<HTMLDetailsElement | null>(null)
 
-const sections = ['home', 'about', 'skills', 'experience', 'projects', 'contact'] as const
+const sections = useHomeSections()
 
 function close() {
   details.value?.removeAttribute('open')

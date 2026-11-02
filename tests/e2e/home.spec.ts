@@ -126,6 +126,20 @@ test('un link di sezione porta il titolo appena sotto l header', async ({ page }
   await expect(page.locator('#about')).toBeInViewport()
 })
 
+test('le letture compaiono solo se il profilo elenca dei libri', async ({ page }) => {
+  await page.goto('/')
+  const navLink = page.locator('header nav').getByRole('link', { name: ui('nav.reading') })
+  if (defaultProfile.books.length === 0) {
+    await expect(page.locator('#reading')).toHaveCount(0)
+    await expect(navLink).toHaveCount(0)
+    return
+  }
+  await expect(page.getByTestId('book-card')).toHaveCount(defaultProfile.books.length)
+  await navLink.click()
+  await expect(page).toHaveURL(/#reading$/)
+  await expect(page.locator('#reading')).toBeInViewport()
+})
+
 test('la GitHub Story si espande e collassa', async ({ page }) => {
   await page.goto('/')
   const node = page.locator('#experience details').first()

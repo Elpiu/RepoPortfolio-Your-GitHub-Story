@@ -2,8 +2,8 @@
 const { t } = useI18n()
 const localePath = useLocalePath()
 const { site } = useSiteData()
-const sections = ['home', 'about', 'skills', 'experience', 'projects', 'contact'] as const
-const activeId = useActiveSection(sections)
+const sections = useHomeSections()
+const activeId = useActiveSection(sections.value)
 </script>
 
 <template>

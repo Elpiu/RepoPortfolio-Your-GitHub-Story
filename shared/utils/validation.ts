@@ -59,12 +59,13 @@ export function assertSameShape(profiles: Record<string, Profile>, dir = 'data')
     experiences: profile.experiences.map((experience) => experience.id).sort(),
     milestones: profile.milestones.map((milestone) => milestone.id).sort(),
     skillGroups: profile.skills.groups.map((group) => group.id).sort(),
+    books: profile.books.map((book) => book.id).sort(),
   })
   const expected = shape(reference)
 
   for (const [code, profile] of entries.slice(1)) {
     const actual = shape(profile)
-    for (const key of ['experiences', 'milestones', 'skillGroups'] as const) {
+    for (const key of ['experiences', 'milestones', 'skillGroups', 'books'] as const) {
       if (actual[key].join('\u0000') !== expected[key].join('\u0000')) {
         throw new Error(
           `[validate-data] ${dir}/profile/${code}.json: "${key}" non allineate a ${referenceCode}.json (${actual[key].join(', ') || 'vuoto'} ≠ ${expected[key].join(', ') || 'vuoto'})`,
@@ -74,13 +75,14 @@ export function assertSameShape(profiles: Record<string, Profile>, dir = 'data')
   }
 }
 
-export function assertUniqueIds(items: Array<{ id: string }>): void {
+export function assertUniqueIds(
+  items: Array<{ id: string }>,
+  context = 'esperienze e milestone condividono lo stesso grafo',
+): void {
   const seen = new Set<string>()
   for (const item of items) {
     if (seen.has(item.id)) {
-      throw new Error(
-        `[validate-data] id duplicato: "${item.id}" (esperienze e milestone condividono lo stesso grafo)`,
-      )
+      throw new Error(`[validate-data] id duplicato: "${item.id}" (${context})`)
     }
     seen.add(item.id)
   }
@@ -143,6 +145,7 @@ export function loadDataDir(dataDir: string): SiteData {
 
   for (const [code, profile] of Object.entries(profiles)) {
     assertUniqueIds([...profile.experiences, ...profile.milestones])
+    assertUniqueIds(profile.books, 'books')
     assertAtMostOneCurrentJob(profile, code, dir)
   }
 
