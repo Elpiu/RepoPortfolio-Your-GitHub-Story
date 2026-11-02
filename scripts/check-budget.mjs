@@ -35,14 +35,19 @@ function assetPathFromUrl(url) {
   return marker === -1 ? null : normalized.slice(marker)
 }
 
-function initialAssets(html) {
-  const assets = new Set()
+// rel="prefetch" sono chunk di altre pagine scaricati a riposo: non sono
+// iniziali e si riportano a parte, senza contarli nel budget.
+function referencedAssets(html) {
+  const initial = new Set()
+  const prefetch = new Set()
   const pattern = /<(?:script|link)\b[^>]*?(?:src|href)="([^"]+)"[^>]*>/gi
   for (const match of html.matchAll(pattern)) {
     const path = assetPathFromUrl(match[1])
-    if (path && (path.endsWith('.js') || path.endsWith('.css'))) assets.add(path)
+    if (!path || !(path.endsWith('.js') || path.endsWith('.css'))) continue
+    ;(/\brel="prefetch"/i.test(match[0]) ? prefetch : initial).add(path)
   }
-  return [...assets]
+  for (const path of initial) prefetch.delete(path)
+  return { initial: [...initial], prefetch: [...prefetch] }
 }
 
 function formatKb(bytes) {
@@ -56,7 +61,8 @@ try {
 }
 
 const indexHtml = readFileSync(join(OUTPUT_DIR, 'index.html'), 'utf8')
-const initial = initialAssets(indexHtml)
+const { initial, prefetch } = referencedAssets(indexHtml)
+const prefetchBytes = prefetch.reduce((total, path) => total + gzipSize(join(OUTPUT_DIR, path)), 0)
 const jsBytes = initial
   .filter((path) => path.endsWith('.js'))
   .reduce((total, path) => total + gzipSize(join(OUTPUT_DIR, path)), 0)
@@ -89,6 +95,10 @@ for (const [key, budget] of Object.entries(BUDGETS)) {
     `  ${key.padEnd(8)} ${formatKb(value).padStart(9)} / ${formatKb(budget).padStart(9)}  ${status}`,
   )
 }
+
+console.log(
+  `  prefetch ${formatKb(prefetchBytes).padStart(9)}  (altre pagine, a riposo: fuori budget)`,
+)
 
 if (initial.length === 0) {
   fail('Nessun asset iniziale trovato in index.html.')
