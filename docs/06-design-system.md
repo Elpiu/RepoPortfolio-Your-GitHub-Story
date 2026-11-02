@@ -258,7 +258,7 @@ Regole:
 | `AppFooter` | Copyright, crediti stack, link | `<footer>` |
 | `SkipLink` | Salta al contenuto | Primo elemento focusabile |
 | `ThemeToggle` | system/light/dark | `UButton` + disclosure nativo |
-| `LocaleSwitcher` | Lingue supportate, mantenendo la pagina | `<select>` nativo |
+| `LocaleSwitcher` | Lingue supportate, mantenendo la pagina | Disclosure nativo con link (`lang`, `hreflang`, `aria-current`); il `<select>` nativo è stato scartato il 02/11/2026: su Windows le opzioni restano bianche e non seguono i token |
 | `MobileMenu` | Navigazione mobile | Disclosure nativo (`<details>`) |
 
 ### UI

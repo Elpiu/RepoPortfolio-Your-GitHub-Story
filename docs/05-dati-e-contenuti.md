@@ -230,7 +230,8 @@ export const profileSchema = z.object({
   }).default({ groups: [] }),
   experiences: z.array(experienceSchema).default([]),
   milestones: z.array(milestoneSchema).default([]),
-  // F10, opzionale: { id, title, author, status: 'read' | 'reading', note?, url? }
+  // F10, opzionale: { id, title, author?, status: 'read' | 'reading', note?, url? }
+  // Niente copertine: sarebbero immagini esterne non GitHub (ADR-013).
   books: z.array(bookSchema).default([]),
 })
 

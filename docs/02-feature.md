@@ -528,8 +528,9 @@ vuota, non costa nulla: niente sezione, niente voce di menu.
 
 **Scope**
 
-- Card con titolo (link esterno se `url`), autore, nota breve (≤ 280
-  caratteri) e stato come testo (`Letto` / `In lettura`), non solo colore.
+- Card con titolo (link esterno se `url`), autore (facoltativo), nota breve
+  (≤ 280 caratteri) e stato come testo (`Letto` / `In lettura`), non solo
+  colore.
 - In lettura prima, poi l'ordine del JSON.
 - Posizione: dopo Explore, prima dei contatti; voce `Letture` nel menu solo se
   la lista non è vuota.
