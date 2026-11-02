@@ -75,5 +75,7 @@ usePageSeo({
         </EmptyState>
       </div>
     </section>
+
+    <FloatingBackLink />
   </div>
 </template>

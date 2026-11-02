@@ -19,6 +19,30 @@ test('dalla card al dettaglio e ritorno', async ({ page }) => {
   await expect(page).toHaveURL(/\/(#projects)?$/)
 })
 
+test('il ritorno ai progetti segue lo scroll oltre metà pagina', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 500 })
+  const path = await firstProjectPath(page)
+  await page.goto(path)
+  const floating = page.getByTestId('floating-back')
+  await expect(floating).toHaveCount(0)
+
+  const scrollable = await page.evaluate(
+    () => document.documentElement.scrollHeight - window.innerHeight,
+  )
+  test.skip(scrollable < 200, 'Pagina troppo corta per scorrere')
+
+  await page.evaluate((top) => window.scrollTo({ top, behavior: 'instant' }), scrollable)
+  await expect(floating).toBeVisible()
+  await expect(floating).toBeInViewport()
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
+  await expect(floating).toHaveCount(0)
+
+  await page.evaluate((top) => window.scrollTo({ top, behavior: 'instant' }), scrollable)
+  await floating.click()
+  await expect(page).toHaveURL(/\/#projects$/)
+  await expect(page.locator('#projects')).toBeInViewport()
+})
+
 test('il dettaglio è una pagina statica raggiungibile direttamente', async ({ page, request }) => {
   const path = await firstProjectPath(page)
   const response = await request.get(path)
