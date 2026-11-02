@@ -245,7 +245,10 @@ il "perché". È anche la pagina che dà valore SEO e link condivisibili.
 - Sanitizzazione dell'HTML: niente script, iframe o attributi pericolosi.
 - Link esterni con `target="_blank"` e `rel="noopener noreferrer"`.
 - Fallback se il README manca o supera il limite di dimensione.
-- Breadcrumb/back link alla sezione Explore.
+- Breadcrumb/back link alla sezione Explore, in alto; un secondo link "Torna ai
+  progetti" fisso in basso a destra compare oltre metà della parte scorrevole
+  della pagina (assente nell'HTML statico, nascosto in stampa, senza animazione
+  di comparsa).
 - `404` localizzata per slug inesistente.
 
 **Criteri di accettazione**
@@ -528,9 +531,12 @@ vuota, non costa nulla: niente sezione, niente voce di menu.
 
 **Scope**
 
-- Card con titolo (link esterno se `url`), autore (facoltativo), nota breve
-  (≤ 280 caratteri) e stato come testo (`Letto` / `In lettura`), non solo
-  colore.
+- Card con copertina piccola se `cover` (altrimenti icona; ritorno all'icona se
+  l'immagine non carica), titolo, autore (facoltativo), nota breve (≤ 280
+  caratteri), stato come testo (`Letto` / `In lettura`), non solo colore, e
+  link "Apri il libro" se `url`.
+- Le copertine sono l'unica eccezione opt-in ad ADR-013 (immagini non GitHub).
+- I libri arrivano nel payload della home (`/api/books`), non nel bundle JS.
 - In lettura prima, poi l'ordine del JSON.
 - Posizione: dopo Explore, prima dei contatti; voce `Letture` nel menu solo se
   la lista non è vuota.
@@ -543,7 +549,7 @@ vuota, non costa nulla: niente sezione, niente voce di menu.
       porta alla sezione.
 - [x] Un libro presente in una sola lingua fa fallire la build.
 
-**Fuori scope:** copertine (immagini esterne), valutazioni, integrazioni con
+**Fuori scope:** download o ottimizzazione delle copertine in build, valutazioni, integrazioni con
 Goodreads o simili.
 
 ---

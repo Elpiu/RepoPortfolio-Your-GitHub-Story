@@ -230,8 +230,9 @@ export const profileSchema = z.object({
   }).default({ groups: [] }),
   experiences: z.array(experienceSchema).default([]),
   milestones: z.array(milestoneSchema).default([]),
-  // F10, opzionale: { id, title, author?, status: 'read' | 'reading', note?, url? }
-  // Niente copertine: sarebbero immagini esterne non GitHub (ADR-013).
+  // F10, opzionale: { id, title, author?, status: 'read' | 'reading', note?, url?, cover? }
+  // cover: URL https di un'immagine anche non GitHub, eccezione opt-in ad ADR-013.
+  // I libri non entrano nel bundle JS: arrivano nel payload da /api/books.
   books: z.array(bookSchema).default([]),
 })
 

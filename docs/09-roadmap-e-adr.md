@@ -360,13 +360,20 @@ social e CV.
 
 ### ADR-013 — Nessuna richiesta esterna a runtime, tranne le immagini GitHub
 
-**Stato:** Accettata (rivista il 30/10/2026)
+**Stato:** Accettata (rivista il 30/10/2026 e il 02/11/2026: copertine dei libri opt-in)
 **Contesto:** privacy, performance, affidabilità.
 **Decisione:** font self-hosted, icone bundled, dati nel payload. Le immagini
 GitHub (avatar, preview, immagini dei README, social image) restano **remote**:
 nessun download né ottimizzazione in build.
 **Conseguenze:** build più semplice; le preview non sono ottimizzate, quindi non
 devono essere l'elemento LCP; CSP `img-src` include gli host GitHub.
+**Revisione del 02/11/2026 (richiesta dell'owner):** eccezione **opt-in** per le
+copertine dei libri (`books[].cover`, F10): un URL https per libro, deciso da
+chi compila i dati. Il template non ne usa, quindi di default nessuna richiesta
+esterna. Le copertine sono `loading="lazy"`, `referrerpolicy="no-referrer"`,
+con dimensioni riservate e ritorno all'icona se non caricano; gli E2E ammettono
+solo gli host delle copertine dichiarate. Costo accettato: gli host terzi vedono
+l'IP del visitatore e gli URL possono scadere.
 **Alternative:** download e conversione AVIF/WebP in build (scartato).
 
 ### ADR-014 — Featured manuale con fallback automatico

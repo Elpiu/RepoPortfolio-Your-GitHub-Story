@@ -468,7 +468,7 @@ deterministici, quindi bloccanti.
 
 | Voce | Target |
 | --- | --- |
-| JS iniziale route `/` | < 180 KB gzip |
+| JS iniziale route `/` (script e `modulepreload`; i `prefetch` di altre pagine sono riportati a parte) | < 180 KB gzip |
 | CSS iniziale | < 40 KB gzip |
 | Font totali | < 100 KB |
 | Payload home (`_payload.json`) | < 80 KB gzip |
