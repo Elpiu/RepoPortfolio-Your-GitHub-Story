@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { RepoStory } from '../../shared/schemas/repo-story'
-import { resolvePreview } from '../../server/utils/preview'
-import { resolveReadmeLink } from '../../shared/utils/preview'
+import { RUNTIME_CONVENTION_PATHS, firstExisting, resolvePreview } from '../../server/utils/preview'
+import { LEGACY_PREVIEW_PATH, resolveReadmeLink } from '../../shared/utils/preview'
 import { fixtureNodes } from '../helpers/repositories'
 
 const manifest: RepoStory = {
@@ -33,12 +33,36 @@ describe('resolvePreview', () => {
     })
   })
 
-  it('con più file per convenzione vince il primo in ordine di priorità', async () => {
+  it('con più file per convenzione vince la cartella, poi il nome, poi l estensione', async () => {
     const result = await resolvePreview(fixtureNodes()[0]!, {
       featured: true,
-      head: async (url) => url.endsWith('/docs/cover.png') || url.endsWith('/.github/hero.png'),
+      head: async (url) =>
+        url.endsWith('/docs/cover.png') ||
+        url.endsWith('/.github/hero.png') ||
+        url.endsWith('/.github/hero.jpg'),
     })
-    expect(result.previewImage).toMatch(/\/docs\/cover\.png$/)
+    expect(result.previewImage).toMatch(/\/\.github\/hero\.png$/)
+  })
+
+  it('trova tutte le estensioni documentate, non solo png', async () => {
+    for (const file of ['screenshot.webp', 'docs/banner.avif', '.github/cover.jpeg', 'hero.gif']) {
+      const result = await resolvePreview(fixtureNodes()[0]!, {
+        featured: true,
+        head: async (url) => url.endsWith(`/${file}`),
+      })
+      expect(result).toMatchObject({ previewSource: 'convention' })
+      expect(result.previewImage).toMatch(new RegExp(`/${file.replace('.', '\\.')}$`))
+    }
+  })
+
+  it('il path legacy è l ultimo candidato e i non featured saltano la convenzione', async () => {
+    expect(RUNTIME_CONVENTION_PATHS.at(-1)).toBe(LEGACY_PREVIEW_PATH)
+    expect(RUNTIME_CONVENTION_PATHS).toHaveLength(3 * 6 * 6 + 1)
+    const result = await resolvePreview(fixtureNodes()[0]!, {
+      featured: false,
+      head: async (url) => url.endsWith('/.github/preview.png'),
+    })
+    expect(result.previewSource).toBe('placeholder')
   })
 
   it('scarta i badge del README e usa la prima immagine utile', async () => {
@@ -59,6 +83,39 @@ describe('resolvePreview', () => {
       head: async () => false,
     })
     expect(result).toEqual({ previewSource: 'placeholder', previewImage: null })
+  })
+})
+
+describe('firstExisting', () => {
+  const urls = Array.from({ length: 30 }, (_, index) => `u${index}`)
+
+  it('si ferma al primo blocco con un risultato e rispetta l ordine', async () => {
+    const asked: string[] = []
+    const found = await firstExisting(
+      urls,
+      async (url) => {
+        asked.push(url)
+        return url === 'u13' || url === 'u15' || url === 'u2'
+      },
+      12,
+    )
+    expect(found).toBe('u2')
+    expect(asked).toHaveLength(12)
+  })
+
+  it('controlla i blocchi successivi solo se serve', async () => {
+    const asked: string[] = []
+    const found = await firstExisting(
+      urls,
+      async (url) => {
+        asked.push(url)
+        return url === 'u15' || url === 'u13'
+      },
+      12,
+    )
+    expect(found).toBe('u13')
+    expect(asked).toHaveLength(24)
+    expect(await firstExisting(urls, async () => false, 12)).toBeNull()
   })
 })
 

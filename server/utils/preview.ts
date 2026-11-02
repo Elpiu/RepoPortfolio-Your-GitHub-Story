@@ -4,7 +4,7 @@ import type { RepoStory } from '~~/shared/schemas/repo-story'
 import { repoStorySchema } from '~~/shared/schemas/repo-story'
 import type { PreviewSource } from '~~/shared/types'
 import {
-  LEGACY_PREVIEW_PATH,
+  conventionCandidates,
   extractReadmeImage,
   isAllowedImageHost,
   rawUrl,
@@ -16,30 +16,34 @@ const MAX_MANIFEST_BYTES = 4_096
 const MAX_README_BYTES = 200_000
 const README_FILES = ['README.md', 'readme.md', 'README.markdown', 'README.rst'] as const
 
-export const RUNTIME_CONVENTION_PATHS = [
-  '.github/preview.png',
-  'preview.png',
-  'docs/preview.png',
-  '.github/screenshot.png',
-  'screenshot.png',
-  'docs/screenshot.png',
-  '.github/cover.png',
-  'cover.png',
-  'docs/cover.png',
-  '.github/banner.png',
-  'banner.png',
-  'docs/banner.png',
-  '.github/hero.png',
-  'hero.png',
-  'docs/hero.png',
-  '.github/social-preview.png',
-  'social-preview.png',
-  'docs/social-preview.png',
-  '.github/preview.jpg',
-  'preview.jpg',
-  'docs/preview.jpg',
-  LEGACY_PREVIEW_PATH,
-] as const
+/**
+ * Tutti i path per convenzione documentati in 05: cartelle `.github/`, root,
+ * `docs/`; per cartella i nomi nell'ordine, per nome le estensioni; infine il
+ * path legacy. L'ordine è la priorità.
+ */
+export const RUNTIME_CONVENTION_PATHS: readonly string[] = conventionCandidates()
+
+// Quante HEAD per convenzione partono insieme per repository: abbastanza per non
+// fare catene lente, poche per non lanciare ~100 richieste in un colpo.
+const CONVENTION_BATCH_SIZE = 12
+
+/**
+ * Primo URL esistente nell'ordine dato, controllando a blocchi in parallelo e
+ * fermandosi al primo blocco che contiene un risultato.
+ */
+export async function firstExisting(
+  urls: readonly string[],
+  head: (url: string) => Promise<boolean>,
+  batchSize = CONVENTION_BATCH_SIZE,
+): Promise<string | null> {
+  for (let start = 0; start < urls.length; start += batchSize) {
+    const batch = urls.slice(start, start + batchSize)
+    const found = await Promise.all(batch.map((url) => head(url)))
+    const index = found.indexOf(true)
+    if (index !== -1) return batch[index]!
+  }
+  return null
+}
 
 export type PreviewResult = {
   previewImage: string | null
@@ -127,14 +131,11 @@ export async function resolvePreview(
   if (options.featured) {
     const ref = repoRef(node)
     const conventionPaths = options.conventionPaths ?? RUNTIME_CONVENTION_PATHS
-    // In parallelo: una catena di HEAD in sequenza costava secondi per repository.
-    // L'ordine dei path resta la priorità.
-    const urls = conventionPaths.map((path) => rawUrl(ref, path))
-    const found = await Promise.all(urls.map((url) => head(url)))
-    const index = found.indexOf(true)
-    if (index !== -1) {
-      return { previewImage: urls[index]!, previewSource: 'convention' }
-    }
+    const url = await firstExisting(
+      conventionPaths.map((path) => rawUrl(ref, path)),
+      head,
+    )
+    if (url) return { previewImage: url, previewSource: 'convention' }
   }
 
   if (options.readme) {
