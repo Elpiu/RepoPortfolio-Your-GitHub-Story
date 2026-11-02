@@ -18,10 +18,11 @@ test.describe('lingua', () => {
     const path = await firstProjectPath(page)
     await page.goto(path)
 
+    await page.locator('header summary', { hasText: ui('language.label') }).click()
     await page
       .locator('header')
-      .getByLabel(ui('language.label'))
-      .selectOption(secondaryLocale!.code)
+      .getByRole('link', { name: secondaryLocale!.name, exact: true })
+      .click()
     await expect(page).toHaveURL(new RegExp(`/${secondaryLocale!.code}${path}/?$`))
     await expect(page.locator('html')).toHaveAttribute('lang', secondaryLocale!.language)
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
@@ -37,15 +38,28 @@ test('con una sola lingua lo switcher non esiste, altrimenti elenca il registry'
   page,
 }) => {
   await page.goto('/')
-  const switcher = page.locator('header').getByLabel(ui('language.label'))
+  const summary = page.locator('header summary', { hasText: ui('language.label') })
   if (site.locales.length < 2) {
-    await expect(switcher).toHaveCount(0)
+    await expect(summary).toHaveCount(0)
     return
   }
-  const options = await switcher
-    .locator('option')
-    .evaluateAll((nodes) => nodes.map((node) => (node as HTMLOptionElement).value))
-  expect(options).toEqual(site.locales.map((locale) => locale.code))
+  await summary.click()
+  const menu = page.locator('header').getByRole('list', { name: ui('language.label') })
+  const languages = await menu
+    .getByRole('link')
+    .evaluateAll((nodes) => nodes.map((node) => node.getAttribute('lang')))
+  expect(languages).toEqual(site.locales.map((locale) => locale.language))
+  await expect(menu.locator('[aria-current="true"]')).toHaveAttribute(
+    'lang',
+    site.locales.find((locale) => locale.default)!.language,
+  )
+
+  // Si chiude con Esc e cliccando fuori.
+  await page.keyboard.press('Escape')
+  await expect(menu).toBeHidden()
+  await summary.click()
+  await page.locator('main').click({ position: { x: 5, y: 300 } })
+  await expect(menu).toBeHidden()
 })
 
 test('tema scuro di default, scelta persistita al reload', async ({ page }) => {

@@ -7,6 +7,8 @@ const sections = useHomeSections()
 function close() {
   details.value?.removeAttribute('open')
 }
+
+onClickOutside(details, close)
 </script>
 
 <template>

@@ -21,6 +21,8 @@ function selectMode(value: string) {
 function close() {
   details.value?.removeAttribute('open')
 }
+
+onClickOutside(details, close)
 </script>
 
 <template>
