@@ -25,6 +25,7 @@ const CACHE_PATH = resolve('.cache/github/last-good.json')
 const FIXTURE_PATH = resolve('tests/fixtures/github.json')
 const CACHE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000
 const DEV_CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000
+const BUILD_SYNC_MARKER = 'PORTFOLIO_BUILD_SYNCED_AT'
 const PREVIEW_SOURCES = ['manifest', 'convention', 'readme', 'social', 'placeholder'] as const
 
 const logger = consola.withTag('github')
@@ -206,10 +207,21 @@ async function loadDataset(): Promise<GitHubDataset> {
 
   const username = resolveGithubUsername(site.github.username)
 
+  // `generate` carica questo modulo due volte nello stesso processo (hook di
+  // prerender e server Nitro): la seconda istanza riusa la sync della prima.
+  const syncedInThisBuild = process.env[BUILD_SYNC_MARKER]
+  if (syncedInThisBuild) {
+    const cache = await loadCache(username)
+    if (cache?.syncedAt === syncedInThisBuild) {
+      logger.info('uso lo snapshot sincronizzato in questa build')
+      return cache
+    }
+  }
+
   // In `pnpm dev` la sync completa (lista REST + centinaia di richieste raw per
   // manifest, README e preview) costerebbe secondi a ogni riavvio: si riusa lo
   // snapshot recente. `GITHUB_REFRESH=1` forza la sync. `generate` sincronizza sempre.
-  if (process.env.NODE_ENV !== 'production' && process.env.GITHUB_REFRESH !== '1') {
+  if (import.meta.dev && process.env.GITHUB_REFRESH !== '1') {
     const cache = await loadCache(username)
     if (cache && cacheAgeMs(cache) < DEV_CACHE_MAX_AGE_MS) {
       logger.info(
@@ -223,6 +235,7 @@ async function loadDataset(): Promise<GitHubDataset> {
     const nodes = await fetchPublicRepositories(username, site.github.maxRepos)
     const dataset = await buildDataset(nodes, { username, offline: false })
     await writeCache(dataset)
+    process.env[BUILD_SYNC_MARKER] = dataset.syncedAt
     return dataset
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
