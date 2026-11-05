@@ -4,7 +4,7 @@ import { resolve } from 'node:path'
 
 /**
  * Anteprima locale identica al deploy: stesso base URL, stesso dataset, stesso
- * output di `pnpm run deploy`, ma senza pubblicare. Poi serve `.output/public`
+ * output di `deploy.yml`, ma senza pubblicare. Poi serve `.output/public`
  * sotto il base URL, come GitHub Pages.
  * Uso: pnpm preview:deploy [-- --data datasets/me] [-- --port 4173]
  */
@@ -15,7 +15,7 @@ const port = portIndex === -1 ? '4173' : (args[portIndex + 1] ?? '4173')
 const deployArgs =
   portIndex === -1 ? args : args.filter((_, i) => i !== portIndex && i !== portIndex + 1)
 
-execFileSync(process.execPath, ['scripts/deploy.mjs', '--dry-run', ...deployArgs], {
+execFileSync(process.execPath, ['scripts/build-site.mjs', ...deployArgs], {
   stdio: 'inherit',
 })
 

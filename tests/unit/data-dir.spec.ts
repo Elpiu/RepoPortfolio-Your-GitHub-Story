@@ -36,12 +36,12 @@ describe('resolveDataDir', () => {
 
 describe('parseDataDirArg', () => {
   it('legge --data <dir> e --data=<dir>', () => {
-    expect(parseDataDirArg(['--dry-run', '--data', 'datasets/me'])).toBe('datasets/me')
+    expect(parseDataDirArg(['--other', '--data', 'datasets/me'])).toBe('datasets/me')
     expect(parseDataDirArg(['--data=datasets/me'])).toBe('datasets/me')
   })
 
   it('restituisce null senza flag e fallisce senza valore', () => {
-    expect(parseDataDirArg(['--dry-run'])).toBeNull()
-    expect(() => parseDataDirArg(['--data', '--dry-run'])).toThrow(/richiede una cartella/)
+    expect(parseDataDirArg(['--other'])).toBeNull()
+    expect(() => parseDataDirArg(['--data', '--other'])).toThrow(/richiede una cartella/)
   })
 })

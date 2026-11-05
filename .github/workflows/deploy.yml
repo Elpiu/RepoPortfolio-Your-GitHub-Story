@@ -1,32 +1,35 @@
+# Ogni push sul branch di default pubblica il sito su GitHub Pages (ADR-030).
+# Una tantum: Settings → Pages → Source: GitHub Actions.
 name: Deploy
 
 on:
   push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: deploy
+  group: pages
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  build:
+    # Vale per qualunque nome del branch di default, senza configurazione.
+    if: github.ref_name == github.event.repository.default_branch
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: pnpm
 
       - name: Restore GitHub snapshot
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: .cache/github
           key: github-${{ github.repository }}-${{ github.run_id }}
@@ -35,24 +38,42 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Generate and publish
-        run: pnpm run deploy
+      - name: Build site
+        run: pnpm build:site
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Vuota = data/. Per un altro dataset: Settings → Variables → PORTFOLIO_DATA_DIR.
           PORTFOLIO_DATA_DIR: ${{ vars.PORTFOLIO_DATA_DIR }}
 
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: .output/public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
+
       - name: Smoke test
+        env:
+          BASE: ${{ steps.deployment.outputs.page_url }}
         run: |
           set -e
-          base="$(node -p "require('./.output/public/build.json').siteUrl")"
           for i in $(seq 1 30); do
-            if curl -fsS "${base}build.json" | grep -q "$GITHUB_SHA"; then break; fi
+            if curl -fsS "${BASE}build.json" | grep -q "$GITHUB_SHA"; then break; fi
             sleep 10
           done
-          curl -fsS "${base}build.json" | grep -q "$GITHUB_SHA"
-          curl -fsS "${base}" | grep -q 'data-testid="project-card"'
-          curl -fsS "${base}cv/" > /dev/null
-          curl -fsS "${base}resume.json" | grep -q '"basics"'
-          curl -fsS "${base}sitemap.xml" > /dev/null
-          test "$(curl -s -o /dev/null -w '%{http_code}' "${base}this-does-not-exist")" = "404"
+          curl -fsS "${BASE}build.json" | grep -q "$GITHUB_SHA"
+          curl -fsS "${BASE}" | grep -q 'data-testid="project-card"'
+          curl -fsSL "${BASE}cv/" > /dev/null
+          curl -fsS "${BASE}resume.json" | grep -q '"basics"'
+          curl -fsS "${BASE}sitemap.xml" > /dev/null
+          test "$(curl -s -o /dev/null -w '%{http_code}' "${BASE}this-does-not-exist")" = "404"
