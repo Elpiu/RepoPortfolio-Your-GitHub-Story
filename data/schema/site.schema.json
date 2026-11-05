@@ -218,6 +218,18 @@
               "type": "null"
             }
           ]
+        },
+        "faviconUrl": {
+          "default": null,
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uri"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       }
     }

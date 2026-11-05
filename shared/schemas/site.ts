@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { isAllowedImageHost } from '../utils/preview'
 
 const localeCode = z
   .string()
@@ -48,6 +49,13 @@ export const deploySchema = z.object({
 export const seoSchema = z.object({
   siteName: z.string().min(1).nullable().default(null),
   twitterHandle: z.string().min(1).nullable().default(null),
+  // Icona del tab: un'immagine GitHub (ADR-013). null = favicon.ico del motore.
+  faviconUrl: z
+    .string()
+    .url()
+    .refine(isAllowedImageHost, 'Serve un URL https di un host GitHub, es. il tuo avatar')
+    .nullable()
+    .default(null),
 })
 
 export const siteSchema = z

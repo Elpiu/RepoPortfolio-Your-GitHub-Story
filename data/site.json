@@ -32,6 +32,7 @@
   },
   "seo": {
     "siteName": null,
-    "twitterHandle": null
+    "twitterHandle": null,
+    "faviconUrl": null
   }
 }

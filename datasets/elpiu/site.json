@@ -11,7 +11,7 @@
   },
   "links": {
     "email": "elpidio.mazza97@gmail.com",
-    "phone": "+39 366 399 7645",
+    "phone": null,
     "linkedin": "https://www.linkedin.com/in/elpidio-mazza-72b641155/",
     "website": null,
     "cvUrl": null
@@ -32,6 +32,7 @@
   },
   "seo": {
     "siteName": null,
-    "twitterHandle": null
+    "twitterHandle": null,
+    "faviconUrl": "https://avatars.githubusercontent.com/u/49283847?v=4&s=64"
   }
 }

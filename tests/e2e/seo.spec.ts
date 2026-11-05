@@ -22,6 +22,20 @@ test('home: meta, canonical, hreflang, Open Graph e JSON-LD', async ({ page }) =
   expect((await jsonLd(page))['@type']).toBe('Person')
 })
 
+test('l icona del tab segue i dati, su tutte le pagine', async ({ page, request }) => {
+  for (const path of ['/', '/cv', '/questa-pagina-non-esiste']) {
+    await page.goto(path)
+    const icon = page.locator('link[rel="icon"]')
+    await expect(icon).toHaveCount(1)
+    const href = await icon.getAttribute('href')
+    if (site.seo.faviconUrl) {
+      expect(href).toBe(site.seo.faviconUrl)
+    } else {
+      expect((await request.get(href!)).status()).toBe(200)
+    }
+  }
+})
+
 test('titoli diversi per home, CV e dettaglio', async ({ page }) => {
   const detail = await firstProjectPath(page)
   const titles = new Set<string>()

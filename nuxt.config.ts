@@ -63,6 +63,14 @@ export default defineNuxtConfig({
     baseURL: appBaseURL,
     head: {
       meta: [{ name: 'color-scheme', content: 'dark light' }],
+      // Senza link esplicito, su un project site il browser cerca /favicon.ico
+      // nella root del dominio, fuori dal base URL.
+      link: [
+        {
+          rel: 'icon',
+          href: site.seo.faviconUrl ?? `${appBaseURL.replace(/\/?$/, '/')}favicon.ico`,
+        },
+      ],
     },
   },
 

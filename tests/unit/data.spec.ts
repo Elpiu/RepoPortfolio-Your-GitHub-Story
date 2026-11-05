@@ -58,6 +58,19 @@ describe('schemi minimi', () => {
     expect(() => siteSchema.parse(minimal)).not.toThrow()
   })
 
+  it('la favicon è facoltativa e accetta solo immagini GitHub', () => {
+    const base = {
+      links: { email: 'you@example.com' },
+      locales: [{ code: 'en', language: 'en-US', name: 'English', default: true }],
+    }
+    expect(siteSchema.parse(base).seo.faviconUrl).toBeNull()
+    const avatar = 'https://avatars.githubusercontent.com/u/1?v=4'
+    expect(siteSchema.parse({ ...base, seo: { faviconUrl: avatar } }).seo.faviconUrl).toBe(avatar)
+    expect(() =>
+      siteSchema.parse({ ...base, seo: { faviconUrl: 'https://example.com/icon.png' } }),
+    ).toThrow(/host GitHub/)
+  })
+
   it('rifiuta due lingue di default', () => {
     const invalid = {
       links: { email: 'you@example.com' },

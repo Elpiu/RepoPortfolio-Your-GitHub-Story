@@ -149,6 +149,7 @@ Esempio minimo valido (tutto il resto prende i default):
 | `deploy.customDomain` | `null` | Es. `portfolio.example.com`: base URL `/` e file `CNAME` |
 | `seo.siteName` | `null` | Default `"{fullName} — Portfolio"` |
 | `seo.twitterHandle` | `null` | |
+| `seo.faviconUrl` | `null` | Icona del tab: URL https di un host GitHub (es. `https://avatars.githubusercontent.com/u/{id}?s=64`, ADR-013). `null` = `favicon.ico` del motore, sotto il base URL |
 
 Il link a GitHub non si configura: deriva dallo username.
 
