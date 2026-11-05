@@ -37,6 +37,50 @@ describe('renderReadme', () => {
     expect(headings).toEqual([{ id: 'section', text: 'Section', level: 3 }])
   })
 
+  it('ogni colore della sintassi passa AA sul proprio sfondo, in entrambi i temi', async () => {
+    const code = [
+      '```ts',
+      '// commento',
+      "import { x } from './y'",
+      'export const answer: number = 42 // altro commento',
+      'function f(value: string) { return `${value}!` }',
+      'class A<T> extends B { private y = /re/g; z = null }',
+      '```',
+      '```python',
+      '# commento',
+      'def f(a, b=1): return "x" + str(a)',
+      '```',
+      '```bash',
+      '# commento',
+      'export X="y"; echo "$X" | grep -v z',
+      '```',
+    ].join('\n')
+    const { html } = await renderReadme(code, repository, 'Elpiu')
+
+    const luminance = (hex: string) => {
+      const channels = [1, 3, 5]
+        .map((start) => Number.parseInt(hex.slice(start, start + 2), 16) / 255)
+        .map((value) => (value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4))
+      return 0.2126 * channels[0]! + 0.7152 * channels[1]! + 0.0722 * channels[2]!
+    }
+    const contrast = (left: string, right: string) => {
+      const [high, low] = [luminance(left), luminance(right)].sort((a, b) => b - a)
+      return (high! + 0.05) / (low! + 0.05)
+    }
+
+    for (const theme of ['light', 'dark']) {
+      const background = html.match(new RegExp(`--shiki-${theme}-bg:\\s*(#[0-9a-fA-F]{6})`))?.[1]
+      expect(background, theme).toBeTruthy()
+      const colors = [
+        ...html.matchAll(new RegExp(`--shiki-${theme}:\\s*(#[0-9a-fA-F]{6})`, 'g')),
+      ].map((match) => match[1]!)
+      expect(colors.length).toBeGreaterThan(5)
+      for (const color of new Set(colors)) {
+        expect(contrast(color, background!), `${theme} ${color}`).toBeGreaterThanOrEqual(4.5)
+      }
+    }
+  })
+
   it('evidenzia il codice con Shiki a build time', async () => {
     const { html } = await renderReadme('```js\nconst x = 1\n```', repository, 'Elpiu')
     expect(html).toContain('class="shiki')

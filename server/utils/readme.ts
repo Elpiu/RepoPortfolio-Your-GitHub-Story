@@ -53,7 +53,7 @@ async function getMarkdown(): Promise<MarkdownItInstance> {
       })
       markdown.use(
         await markdownItShiki({
-          themes: { light: 'github-light', dark: 'github-dark' },
+          themes: { light: 'github-light-high-contrast', dark: 'github-dark-high-contrast' },
           defaultColor: false,
         }),
       )
@@ -176,7 +176,7 @@ function sanitizeReadme(html: string, ref: RepoRef): string {
       source: ['srcset', 'type', 'media'],
     },
     allowedClasses: {
-      pre: ['shiki', 'shiki-themes', 'github-light', 'github-dark'],
+      pre: ['shiki', 'shiki-themes', 'github-light-high-contrast', 'github-dark-high-contrast'],
       code: [/^language-/],
       span: ['line'],
     },
