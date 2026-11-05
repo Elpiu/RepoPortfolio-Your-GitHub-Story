@@ -200,6 +200,17 @@ Note:
 Da quel momento ogni push su `main` ripubblica il sito tramite `deploy.yml`;
 il deploy locale resta disponibile per un refresh immediato.
 
+Passando da un sito pubblicato con `actions/deploy-pages` (come il legacy) la
+sorgente di Pages va cambiata da "GitHub Actions" a "Deploy from a branch": il
+branch `gh-pages` esiste solo dopo il primo deploy, quindi prima si pubblica e
+poi si cambia l'impostazione. Con un dataset diverso da `data/`, la variabile di
+repository `PORTFOLIO_DATA_DIR` va impostata **prima** del merge su `main`,
+altrimenti il primo deploy automatico pubblica il template.
+
+`pnpm/action-setup` non riceve una versione: la legge da `packageManager` in
+`package.json`, e dichiararne una diversa (anche solo `11` contro `11.9.0`) fa
+fallire il workflow.
+
 ## Pipeline CI (`ci.yml`)
 
 Obiettivi: feedback rapido sulle PR, nessun segreto, build riproducibile.
@@ -226,8 +237,6 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
-        with:
-          version: 11
 
       - uses: actions/setup-node@v4
         with:
@@ -304,8 +313,6 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
-        with:
-          version: 11
 
       - uses: actions/setup-node@v4
         with:
