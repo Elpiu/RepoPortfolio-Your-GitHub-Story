@@ -2,29 +2,29 @@
 
 ## Obiettivo
 
-> Chi clona modifica i JSON in `data/` e lancia **un comando**. Il sito è
-> online su GitHub Pages.
+> Chi clona modifica i JSON in `data/` e fa **commit sul branch di default**. Il
+> sito è online su GitHub Pages.
 
-Lo stesso comando (`pnpm run deploy`) gira in locale e nella GitHub Action a
-ogni push su `main`: non esistono due modi diversi di pubblicare.
+Non ci sono comandi di pubblicazione né credenziali da configurare: l'unico
+modo di pubblicare è la GitHub Action `deploy.yml` (ADR-030).
 
 ## Ambienti
 
 | Ambiente | Dove | Scopo | Dati GitHub |
 | --- | --- | --- | --- |
 | Locale | `pnpm dev` | Sviluppo | REST pubblico (nessun token) o `GITHUB_OFFLINE=1` |
-| Deploy locale | `pnpm run deploy` | Pubblicazione manuale | REST pubblico (token opzionale) |
-| CI pull request | GitHub Actions `ci.yml` | Lint, typecheck, test, build, budget | Fixture, niente segreti |
-| Produzione | GitHub Pages, branch `gh-pages` | Sito pubblico | Generato da `deploy.yml` o da un deploy locale |
+| Anteprima locale | `pnpm preview:deploy` | Il sito come verrà pubblicato, sotto il base URL | REST pubblico o `GITHUB_OFFLINE=1` |
+| CI pull request | GitHub Actions `ci.yml` | Lint, typecheck, test, build, budget | Fixture, niente rete GitHub |
+| Produzione | GitHub Pages, sorgente "GitHub Actions" | Sito pubblico | Generato da `deploy.yml` |
 
 Non esiste uno staging permanente: il costo non è giustificato per un sito
-statico. `pnpm run deploy -- --dry-run` genera il sito senza pubblicarlo.
+statico.
 
 ## Modello di hosting
 
-**Scelta:** GitHub Pages con sorgente **"Deploy from a branch" → `gh-pages` /
-`(root)`**. Il branch viene scritto dalla libreria
-[`gh-pages`](https://www.npmjs.com/package/gh-pages) (ADR-019).
+**Scelta:** GitHub Pages con sorgente **"GitHub Actions"**. `deploy.yml` genera
+`.output/public`, lo carica con `actions/upload-pages-artifact` e lo pubblica con
+`actions/deploy-pages` (ADR-030). Nessun branch di output.
 
 | Aspetto | GitHub Pages |
 | --- | --- |
@@ -33,12 +33,11 @@ statico. `pnpm run deploy -- --dry-run` genera il sito senza pubblicarlo.
 | HTTPS | Automatico |
 | Header HTTP custom | No (limite) |
 | Redirect server-side | No (solo `404.html`) |
-| Pubblicazione | Commit sul branch `gh-pages`; Pages lo serve in ~1 minuto |
+| Pubblicazione | Deployment dell'artefatto, online in ~1 minuto |
 | Limite sito | 1 GB (soft), 100 GB/mese (soft) |
 
-Perché un branch e non `actions/deploy-pages`: con un branch il deploy è un
-comando che funziona identico da un portatile e da una Action, e la storia del
-branch `gh-pages` è anche lo storico dei deploy (utile per il rollback).
+Senza Jekyll le cartelle `_nuxt/` e `__sitemap__/` sono servite senza
+`.nojekyll`, e la storia dei deployment sta nell'environment `github-pages`.
 
 Alternative documentate:
 
@@ -48,101 +47,34 @@ Alternative documentate:
 | Netlify | Preview, redirect | Limiti free tier |
 | Vercel | Ottimo supporto Nuxt | SSR non necessario |
 
-L'output è `.output/public`: cambiare hosting significa cambiare solo lo step
-di pubblicazione di `scripts/deploy.mjs`.
+L'output è `.output/public`: cambiare hosting significa cambiare solo il job di
+pubblicazione di `deploy.yml`.
 
-## Il comando `pnpm run deploy`
+## La build del sito (`pnpm build:site`)
 
-> Va lanciato come `pnpm run deploy`: `pnpm deploy` (senza `run`) è un comando
-> interno di pnpm per i workspace e fa un'altra cosa.
+`scripts/build-site.mjs` è l'unico modo di generare il sito come verrà
+pubblicato, in CI e in locale:
 
 ```text
-pnpm run deploy
-  1. scripts/repo-context.mjs
-       owner e repository da GITHUB_REPOSITORY (CI) o da `git remote get-url origin`
-  2. legge data/site.json
-       username (vuoto = owner), deploy.customDomain
-  3. risolve base URL e site URL (tabella sotto)
-  4. nuxt generate
-       con NUXT_APP_BASE_URL, NUXT_PUBLIC_SITE_URL, NUXT_GITHUB_TOKEN
-  5. scrive .output/public/build.json  { sha, syncedAt, siteUrl }
-  6. gh-pages.publish('.output/public')
-       branch gh-pages, .nojekyll, CNAME se c'è un dominio custom
+pnpm build:site [-- --data datasets/me]
+  ├─ legge .env se esiste (le variabili già nell'ambiente vincono)
+  ├─ risolve la cartella dati (--data, PORTFOLIO_DATA_DIR, default data/)
+  ├─ risolve owner e repository (GITHUB_REPOSITORY in CI, git remote in locale)
+  ├─ calcola base URL e URL del sito (project site, user site, dominio custom)
+  ├─ nuxt generate
+  └─ scrive build.json (commit, data, URL) per lo smoke test
 ```
 
-```js
-// scripts/deploy.mjs (estratto)
-import { execSync } from 'node:child_process'
-import { readFileSync, writeFileSync } from 'node:fs'
-import ghpages from 'gh-pages'
-import { resolveRepoContext, resolveSiteUrls } from './repo-context.mjs'
-
-const dryRun = process.argv.includes('--dry-run')
-const site = JSON.parse(readFileSync('data/site.json', 'utf8'))
-const ctx = resolveRepoContext() // { owner, repo }
-const domain = site.deploy?.customDomain ?? null
-const { baseURL, siteUrl } = resolveSiteUrls(ctx, domain)
-const token = process.env.NUXT_GITHUB_TOKEN ?? process.env.GITHUB_TOKEN
-
-execSync('nuxt generate', {
-  stdio: 'inherit',
-  env: {
-    ...process.env,
-    NUXT_APP_BASE_URL: baseURL,
-    NUXT_PUBLIC_SITE_URL: siteUrl,
-    NUXT_PUBLIC_GITHUB_USERNAME: site.github?.username || ctx.owner,
-    NUXT_GITHUB_TOKEN: token,
-  },
-})
-
-writeFileSync('.output/public/build.json', JSON.stringify({
-  sha: process.env.GITHUB_SHA ?? execSync('git rev-parse HEAD').toString().trim(),
-  siteUrl,
-}))
-
-if (!dryRun) {
-  await ghpages.publish('.output/public', {
-    branch: 'gh-pages',
-    dotfiles: true,
-    nojekyll: true, // senza, Pages ignora le cartelle _nuxt/ e i _payload.json
-    cname: domain ?? undefined,
-    message: `deploy: ${ctx.owner}/${ctx.repo}`,
-    ...(process.env.CI && {
-      repo: `https://x-access-token:${token}@github.com/${ctx.owner}/${ctx.repo}.git`,
-      user: {
-        name: 'github-actions[bot]',
-        email: '41898282+github-actions[bot]@users.noreply.github.com',
-      },
-    }),
-  })
-}
-```
+`pnpm preview:deploy` esegue la stessa build e serve `.output/public` sotto il base
+URL su `http://localhost:4173/{repo}/`, con `404.html` e status 404 come su Pages.
+Canonical, hreflang e OG puntano all'URL pubblico.
 
 Regole:
 
-- In locale la pubblicazione usa le credenziali git dell'utente; il token è
-  opzionale e serve solo ad alzare il rate limit REST.
-- In CI la pubblicazione usa il `GITHUB_TOKEN` del workflow
-  (`contents: write`).
-- Il token non viene mai stampato; gli errori di `gh-pages` vengono ripuliti
-  dall'URL con credenziali prima di essere loggati.
-- La storia del branch `gh-pages` viene mantenuta (default della libreria):
-  serve al rollback.
-- Il dataset si sceglie con `--data <dir>` o `PORTFOLIO_DATA_DIR` (default
-  `data/`, ADR-029); `site.json` di quella cartella decide anche il dominio
-  custom. In Actions vale la variabile di repository `PORTFOLIO_DATA_DIR`.
-
-```bash
-pnpm run deploy -- --dry-run --data datasets/me   # genera con un altro dataset
-pnpm preview:deploy -- --data datasets/me         # genera come il deploy e serve in locale
-```
-
-- `scripts/deploy.mjs` legge `.env` (le variabili già nell'ambiente vincono),
-  quindi `PORTFOLIO_DATA_DIR` e `GITHUB_OFFLINE` valgono anche per il deploy.
-- `pnpm preview:deploy` esegue `deploy --dry-run` (stesso base URL, stesso
-  dataset, `.nojekyll`, `build.json`) e serve `.output/public` sotto il base URL
-  su `http://localhost:4173/{repo}/`, con `404.html` e status 404 come su Pages.
-  Canonical, hreflang e OG puntano all'URL pubblico.
+- Il token è opzionale e alza solo il rate limit REST; in CI si usa il
+  `GITHUB_TOKEN` del workflow. Non viene mai stampato.
+- Il dataset si sceglie con `PORTFOLIO_DATA_DIR` (ADR-029): variabile di
+  repository in Actions, `.env` o `--data` in locale.
 
 ## Base URL e dominio
 
@@ -160,8 +92,9 @@ Regole:
   `joinURL(useRuntimeConfig().app.baseURL, 'path')`, non con `/path` assoluto.
   Un path assoluto ignora il base URL e produce 404 su project site.
 - `NUXT_PUBLIC_SITE_URL` alimenta canonical, hreflang, sitemap e OG.
-- Con dominio custom, lo script scrive `CNAME` nell'output: non configurarlo
-  anche a mano in modo diverso nelle impostazioni Pages.
+- Con dominio custom, oltre a `deploy.customDomain` il dominio va inserito una
+  volta in Settings → Pages → Custom domain: con la sorgente "GitHub Actions" un
+  file `CNAME` nell'output verrebbe ignorato.
 - Forzare HTTPS nelle impostazioni Pages.
 - In `pnpm dev` il base URL è `/`.
 
@@ -189,27 +122,23 @@ Note:
 ## Primo deploy (per chi clona)
 
 ```text
-1. Fork o clone del repository (o "Use this template").
-2. Modificare data/site.json e data/profile/en.json.
-3. pnpm install
-4. pnpm run deploy
-5. Una sola volta: Settings → Pages → Source "Deploy from a branch",
-   branch gh-pages, cartella / (root).
+1. "Use this template" o fork del repository.
+2. Una sola volta: Settings → Pages → Source "GitHub Actions".
+3. Modificare data/site.json e data/profile/en.json.
+4. Commit e push sul branch di default (va bene anche l'editor web di GitHub).
 ```
 
-Da quel momento ogni push su `main` ripubblica il sito tramite `deploy.yml`;
-il deploy locale resta disponibile per un refresh immediato.
+Da quel momento ogni push sul branch di default ripubblica il sito tramite
+`deploy.yml`, qualunque sia il suo nome. Per un refresh senza modifiche: Actions →
+Deploy → Run workflow.
 
-Passando da un sito pubblicato con `actions/deploy-pages` (come il legacy) la
-sorgente di Pages va cambiata da "GitHub Actions" a "Deploy from a branch": il
-branch `gh-pages` esiste solo dopo il primo deploy, quindi prima si pubblica e
-poi si cambia l'impostazione. Con un dataset diverso da `data/`, la variabile di
-repository `PORTFOLIO_DATA_DIR` va impostata **prima** del merge su `main`,
-altrimenti il primo deploy automatico pubblica il template.
+Con un dataset diverso da `data/`, la variabile di repository
+`PORTFOLIO_DATA_DIR` va impostata **prima** del push, altrimenti il deploy
+pubblica il template.
 
 `pnpm/action-setup` non riceve una versione: la legge da `packageManager` in
 `package.json`, e dichiararne una diversa (anche solo `11` contro `11.9.0`) fa
-fallire il workflow.
+fallire il workflow. Il supporto a pnpm 11 parte dalla v6 dell'action.
 
 ## Pipeline CI (`ci.yml`)
 
@@ -221,7 +150,6 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
 
 permissions:
   contents: read
@@ -232,13 +160,14 @@ concurrency:
 
 jobs:
   quality:
+    if: github.event_name == 'pull_request' || github.ref_name == github.event.repository.default_branch
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: pnpm
@@ -291,76 +220,32 @@ Scelte:
 
 ## Pipeline di deploy (`deploy.yml`)
 
-```yaml
-name: Deploy
+Il file è la fonte: [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml).
 
-on:
-  push:
-    branches: [main]
-  workflow_dispatch:
-
-permissions:
-  contents: write
-
-concurrency:
-  group: deploy
-  cancel-in-progress: false
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-
-      - name: Restore GitHub snapshot
-        uses: actions/cache@v4
-        with:
-          path: .cache/github
-          key: github-${{ github.repository }}-${{ github.run_id }}
-          restore-keys: |
-            github-${{ github.repository }}-
-
-      - run: pnpm install --frozen-lockfile
-
-      - name: Generate and publish
-        run: pnpm run deploy
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Smoke test
-        run: |
-          set -e
-          base="$(node -p "require('./.output/public/build.json').siteUrl")"
-          for i in $(seq 1 30); do
-            if curl -fsS "${base}build.json" | grep -q "$GITHUB_SHA"; then break; fi
-            sleep 10
-          done
-          curl -fsS "${base}build.json" | grep -q "$GITHUB_SHA"
-          curl -fsS "${base}" | grep -q 'data-testid="project-card"'
-          curl -fsS "${base}cv/" > /dev/null
-          curl -fsS "${base}resume.json" | grep -q '"basics"'
-          curl -fsS "${base}sitemap.xml" > /dev/null
-          test "$(curl -s -o /dev/null -w '%{http_code}' "${base}this-does-not-exist")" = "404"
+```text
+push su qualunque branch / workflow_dispatch
+  job build (solo se github.ref_name == branch di default)
+    checkout → pnpm → node 22 → snapshot GitHub → pnpm install --frozen-lockfile
+    pnpm build:site (GITHUB_TOKEN, vars.PORTFOLIO_DATA_DIR)
+    upload-pages-artifact (.output/public)
+  job deploy (pages: write, id-token: write; environment github-pages)
+    deploy-pages → smoke test
 ```
 
 Note:
 
-- Ogni push su `main` rigenera il sito e aggiorna stelle, date, README e
-  anteprime. Per un refresh senza modifiche: `workflow_dispatch` dalla tab
-  Actions oppure `pnpm run deploy` in locale.
+- Il confronto con `github.event.repository.default_branch` evita di scrivere il
+  nome del branch nel workflow: `main`, `master` o altro funzionano senza
+  configurazione. I push sugli altri branch compaiono come run saltati.
+- Ogni push sul branch di default rigenera il sito e aggiorna stelle, date, README
+  e anteprime. Per un refresh senza modifiche: `workflow_dispatch` dalla tab
+  Actions.
 - Lo smoke test aspetta (fino a 5 minuti) che Pages serva il `build.json` del
-  commit appena pubblicato, poi controlla sitemap e 404.
-- `concurrency: deploy` con `cancel-in-progress: false` evita deploy intermedi
-  che si sovrascrivono.
-- Il job summary riporta i conteggi della sync (repository, esclusi, preview per
-  sorgente, fallback).
+  commit appena pubblicato, poi controlla home, CV, export, sitemap e 404.
+- `concurrency: pages` con `cancel-in-progress: false` evita deploy intermedi che
+  si sovrascrivono.
+- `deploy.yml` non dipende da `ci.yml`: il gate di qualità è sulla PR. Un push
+  diretto sul branch di default pubblica anche se la CI poi fallisce.
 - Le action di terze parti vanno pinnate a SHA; le action GitHub ufficiali
   possono restare a major.
 
@@ -371,7 +256,6 @@ Note:
 | pnpm store | gestita da `setup-node` (`cache: pnpm`) | Velocizza install |
 | Build Nuxt | `.nuxt/cache` (opzionale) | Utile se il tempo cresce |
 | Snapshot GitHub | `.cache/github` con `restore-keys` | Fallback se l'API è giù |
-| Clone di `gh-pages` | `node_modules/.cache/gh-pages` | Gestita dalla libreria |
 
 Lo snapshot ha una scadenza logica di 7 giorni. `actions/cache` elimina le voci
 non usate da 7 giorni: con deploy rari il fallback in CI può non esserci, e in
@@ -384,8 +268,8 @@ quel caso un'API irraggiungibile fa fallire la build (si riprova con
 - Dependabot/Renovate settimanale; major revisionate manualmente.
 - `pnpm audit --prod` in CI.
 - Secret scanning e push protection attivi su GitHub.
-- Permessi workflow minimi: `contents: read` in CI, `contents: write` solo nel
-  deploy.
+- Permessi workflow minimi: `contents: read` ovunque; `pages: write` e
+  `id-token: write` solo nel job che pubblica.
 - Nessun `pull_request_target` con checkout di codice non fidato.
 - Nessun segreto in `NUXT_PUBLIC_*`, log o messaggi di errore.
 - Action di terze parti pinnate a commit SHA.
@@ -442,32 +326,27 @@ deve essere cookieless e documentato.
 
 ## Backup e rollback
 
-- **Codice e dati owner:** git. Ogni deploy corrisponde a un commit di `main` e
-  a un commit di `gh-pages`.
-- **Rollback rapido del sito:** riportare il branch `gh-pages` al commit del
-  deploy precedente.
-- **Rollback del codice:** `git revert` del commit problematico su `main` e
-  push, oppure `workflow_dispatch` su un ref precedente.
+- **Codice e dati owner:** git. Ogni deploy corrisponde a un commit del branch di
+  default e a un deployment dell'environment `github-pages`.
+- **Rollback del sito:** `git revert` del commit problematico e push: il deploy
+  riparte da solo.
 - **Rollback dati GitHub:** i dati sono pubblici e ricostruibili con un nuovo
   deploy.
 
 Procedura di rollback:
 
 ```text
-1. Identifica l'ultimo deploy buono nella storia del branch gh-pages.
-2. Ripubblica quello stato: workflow_dispatch sul commit buono di main
-   (oppure git revert su main e push).
-3. Se serve subito, riporta gh-pages al commit buono (operazione distruttiva
-   sul branch di deploy: da fare consapevolmente).
-4. Verifica home, un dettaglio e la 404.
-5. Apri una issue per la causa e correggi su un branch.
+1. Identifica il commit problematico (tab Actions o Deployments).
+2. git revert <commit> e push sul branch di default.
+3. Attendi deploy e smoke test, poi verifica home, un dettaglio e la 404.
+4. Apri una issue per la causa e correggi su un branch.
 ```
 
 ## Runbook
 
 ### La build non aggiorna i dati (rate limit o API giù)
 
-1. In locale: `pnpm run deploy` funziona senza token; se il limite è stato
+1. In locale: `pnpm build:site` funziona senza token; se il limite è stato
    esaurito, attendi il reset o imposta un token in sola lettura.
 2. Per lavorare senza rete: `GITHUB_OFFLINE=1 pnpm dev`.
 3. In CI: `GITHUB_OFFLINE=1` usa fixture/snapshot e non richiede segreti.
@@ -482,14 +361,15 @@ Procedura di rollback:
 
 ### Il sito mostra il README del repository invece del portfolio
 
-1. Pages sta servendo `main`: imposta Settings → Pages → branch `gh-pages`,
-   cartella `/ (root)`.
-2. Verifica che il branch `gh-pages` esista e contenga `index.html`.
+1. Pages sta servendo un branch: imposta Settings → Pages → Source "GitHub
+   Actions".
+2. Rilancia Actions → Deploy → Run workflow.
 
 ### Asset 404 dopo il deploy
 
-1. Verifica che l'output contenga `.nojekyll`: senza, Pages ignora `_nuxt/`.
-2. Controlla il base URL calcolato (è nei log di `pnpm run deploy`).
+1. Verifica che la sorgente di Pages sia "GitHub Actions": un branch servito con
+   Jekyll ignorerebbe `_nuxt/`.
+2. Controlla il base URL calcolato (è nei log di `pnpm build:site`).
 3. Verifica che gli asset in `public/` usino `joinURL(baseURL, path)`.
 
 ### Schema GitHub non valido
@@ -540,8 +420,8 @@ Ordine di lavoro:
 1. Scaffold Nuxt 4 in una cartella temporanea e unione con i file rimasti.
 2. Installare i moduli del tech stack.
 3. Creare `data/` con i contenuti migrati dal legacy.
-4. Aggiungere `scripts/deploy.mjs`, `ci.yml` e `deploy.yml`.
-5. Primo `pnpm run deploy`, poi impostare Pages sul branch `gh-pages`.
+4. Aggiungere `scripts/build-site.mjs`, `ci.yml` e `deploy.yml`.
+5. Merge sul branch di default: la sorgente di Pages è già "GitHub Actions".
 6. Verificare base URL, smoke test e URL legacy.
 
 ### Compatibilità URL
@@ -566,8 +446,9 @@ giusta, nella lingua di default. Non c'è redirect automatico verso `/it/`
 
 - [x] Legacy rimosso dal working tree (storia in git).
 - [x] `docs/` non è più output di build.
-- [ ] `pnpm run deploy -- --dry-run` produce `.output/public` con `.nojekyll`.
-- [ ] Pages impostato su "Deploy from a branch" → `gh-pages`.
+- [x] `pnpm build:site` produce `.output/public` con `build.json`.
+- [ ] Pages impostato su "GitHub Actions" (già così per il legacy, da verificare).
+- [ ] Variabile `PORTFOLIO_DATA_DIR` impostata, se serve un altro dataset.
 - [ ] Base URL corretto (project site, user site o dominio custom).
 - [ ] Smoke test su home, CV, export, sitemap, 404 (in `deploy.yml`; il dettaglio è coperto dagli E2E).
 - [x] Gli `id` di sezione legacy esistono nella nuova landing (E2E).

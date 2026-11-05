@@ -446,22 +446,20 @@ flash, stringhe duplicate e hydration mismatch.
 
 ---
 
-## F8 — Delivery statica: SEO, performance, deploy con un comando (abilitante)
+## F8 — Delivery statica: SEO, performance, deploy con un commit (abilitante)
 
-**Cosa:** il sito è generato staticamente e pubblicato sul branch `gh-pages` con
-**un solo comando** (`pnpm run deploy`, libreria `gh-pages`), identico in locale
-e nella GitHub Action che gira a ogni push su `main`.
+**Cosa:** il sito è generato staticamente e pubblicato su GitHub Pages dalla
+GitHub Action che gira a **ogni push sul branch di default** (ADR-030).
 
 **Perché è pilastro:** è il modello di distribuzione e la promessa "facile da
-rideployare": chi clona modifica i JSON in `data/` e lancia un comando.
+rideployare": chi clona modifica i JSON in `data/` e fa commit.
 
 **Scope MVP**
 
-- `pnpm run deploy`: risolve owner, repository e base URL (project site, user
-  site `{owner}.github.io` o dominio custom), esegue `nuxt generate` e pubblica
-  `.output/public` su `gh-pages` con `.nojekyll` e `CNAME` se serve.
-- Workflow `deploy.yml` su push su `main` e dispatch manuale che esegue lo
-  stesso comando.
+- `pnpm build:site`: risolve owner, repository e base URL (project site, user
+  site `{owner}.github.io` o dominio custom) ed esegue `nuxt generate`.
+- Workflow `deploy.yml` su push sul branch di default e dispatch manuale: esegue
+  la build e pubblica `.output/public` con `actions/deploy-pages`.
 - Sitemap, `robots.txt`, pagina 404, canonical, hreflang, Open Graph e JSON-LD.
 - Nessuna richiesta runtime a font, icone o API esterne.
 - Budget deterministici (byte di JS, CSS, payload) come gate; Lighthouse CI
@@ -470,19 +468,20 @@ rideployare": chi clona modifica i JSON in `data/` e lancia un comando.
 
 **Criteri di accettazione**
 
-- [ ] Da un clone pulito: modificare `data/`, `pnpm install`,
-      `pnpm run deploy` pubblica il sito; l'unico passaggio manuale è
-      impostare una volta Pages sul branch `gh-pages`.
+- [ ] Da un template pulito: modificare `data/` e fare commit pubblica il sito;
+      l'unico passaggio manuale è impostare una volta la sorgente di Pages su
+      "GitHub Actions".
 - [ ] Il base URL è corretto per project site, user site e dominio custom senza
       variabili d'ambiente manuali.
-- [ ] L'output contiene `.nojekyll` (le cartelle `_nuxt/` vengono servite).
+- [ ] Le cartelle `_nuxt/` e `__sitemap__/` vengono servite da Pages.
 - [ ] Tutte le rotte generate restituiscono 200 e la 404 restituisce 404.
 - [ ] `sitemap.xml` elenca home, dettagli e `/cv` in tutte le lingue.
 - [ ] Il browser non carica font da Google Fonts né icone da API esterne.
 - [ ] Una PR che supera i budget in byte viene bloccata.
-- [ ] Un push su `main` aggiorna stelle, date e README con una nuova build.
+- [ ] Un push sul branch di default aggiorna stelle, date e README con una nuova
+      build, qualunque sia il nome del branch.
 
-**Decisioni collegate:** ADR-002, ADR-019, ADR-026.
+**Decisioni collegate:** ADR-002, ADR-026, ADR-030.
 
 ---
 

@@ -57,7 +57,7 @@ toccare il codice:
 | Contesto | Come |
 | --- | --- |
 | `pnpm dev` / `pnpm generate` | `PORTFOLIO_DATA_DIR=datasets/{nome}` in `.env` |
-| Deploy locale | `pnpm run deploy -- --data datasets/{nome}` |
+| Anteprima come da deploy | `pnpm preview:deploy -- --data datasets/{nome}` |
 | Deploy in Actions | variabile di repository `PORTFOLIO_DATA_DIR` (Settings → Variables) |
 
 - I file puntano agli schemi di `data/schema/` (es.
@@ -146,7 +146,7 @@ Esempio minimo valido (tutto il resto prende i default):
 | `story.autoEvents` | `true` | Featured come nodi automatici della GitHub Story |
 | `story.maxAutoEvents` | `8` | |
 | `locales` | — | Almeno una voce, esattamente una con `default: true` |
-| `deploy.customDomain` | `null` | Es. `portfolio.example.com`: base URL `/` e file `CNAME` |
+| `deploy.customDomain` | `null` | Es. `portfolio.example.com`: base URL `/`; il dominio va inserito anche in Settings → Pages |
 | `seo.siteName` | `null` | Default `"{fullName} — Portfolio"` |
 | `seo.twitterHandle` | `null` | |
 | `seo.faviconUrl` | `null` | Icona del tab: URL https di un host GitHub (es. `https://avatars.githubusercontent.com/u/{id}?s=64`, ADR-013). `null` = `favicon.ico` del motore, sotto il base URL |

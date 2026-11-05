@@ -19,10 +19,10 @@ Il sito è una **Single Page Application generata staticamente**, con pagine
 multiple (landing, dettaglio progetto, CV) prerenderizzate.
 
 ```text
-Build time (locale o GitHub Actions: `pnpm run deploy`)
+Build time (GitHub Actions, o in locale: `pnpm build:site`)
 ┌──────────────────────────────────────────────────────────────┐
-│ scripts/deploy.mjs                                           │
-│   risolve owner/repo/baseURL ──► nuxt generate ──► gh-pages  │
+│ scripts/build-site.mjs                                       │
+│   risolve owner/repo/baseURL ──► nuxt generate               │
 │                                                              │
 │ nuxt generate                                                │
 │  modules/validate-data ──► data/*.json (zod)                 │
@@ -43,7 +43,7 @@ Build time (locale o GitHub Actions: `pnpm run deploy`)
 └──────────────────────────────────────────────────────────────┘
                               │
                               ▼
-            branch gh-pages ──► GitHub Pages (CDN statica)
+       actions/deploy-pages ──► GitHub Pages (CDN statica)
 
 Runtime (browser)
 HTML + payload già presenti
@@ -370,11 +370,11 @@ Regole:
 │     ├─ story-filters.ts        # filtri della story (puri)
 │     └─ story-graph.ts
 ├─ scripts/
-│  ├─ deploy.mjs
+│  ├─ build-site.mjs             # base URL, dati, nuxt generate, build.json
 │  ├─ data-dir.mjs               # PORTFOLIO_DATA_DIR / --data
 │  ├─ repo-context.mjs
 │  ├─ serve-static.mjs           # output statico come GitHub Pages (E2E, Lighthouse)
-│  ├─ preview-deploy.mjs         # pnpm preview:deploy: deploy --dry-run + serve sotto il base URL
+│  ├─ preview-deploy.mjs         # pnpm preview:deploy: build-site + serve sotto il base URL
 │  └─ check-budget.mjs
 ├─ i18n/locales/
 │  ├─ en.json

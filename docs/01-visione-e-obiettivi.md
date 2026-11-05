@@ -33,7 +33,7 @@ un solo comando.
 
 ## Value proposition
 
-> Cloni il progetto, modifichi i JSON in `data/`, lanci `pnpm run deploy`:
+> Usi il template, modifichi i JSON in `data/`, fai commit:
 > ottieni una landing page statica, multilingua (inglese default), accessibile
 > e veloce, che sincronizza la tua identità GitHub: Bento profile, GitHub Story
 > a forma di git graph, repository esplorabili e un CV esportabile.
@@ -75,9 +75,9 @@ un solo comando.
 | Core Web Vitals | LCP < 2,5 s; CLS < 0,1; INP < 200 ms | Lighthouse CI / CrUX dopo il deploy |
 | Accessibilità | WCAG 2.2 AA; Lighthouse A11y = 100 | axe (gate) + test manuale da tastiera |
 | SEO | Ogni progetto e ogni locale ha title, description, canonical, OG | Test E2E + controllo HTML generato |
-| Freschezza dati | Repository aggiornati a ogni deploy | Deploy su push, dispatch manuale, `pnpm run deploy` |
+| Freschezza dati | Repository aggiornati a ogni deploy | Deploy su push, dispatch manuale |
 | Semplicità di personalizzazione | Solo file JSON in `data/`; nessun file di codice da toccare | Validazione + JSON Schema nell'editor |
-| Rideploy | Un comando, base URL dedotto | `pnpm run deploy` da un clone pulito |
+| Rideploy | Un commit, base URL dedotto | Push sul branch di default da un template pulito |
 | Build | `generate` < 3 minuti con 100 repository | Timing della CI |
 | Zero runtime esterni | Nessuna richiesta a GitHub API/Google Fonts/icon API dal browser (le immagini GitHub sono l'eccezione) | Network tab + test E2E |
 | Bundle iniziale | JS < 180 KB gzip (route `/`) | Budget in byte in CI (bloccante) |
@@ -128,8 +128,8 @@ l'architettura statica.
 1. Clona il progetto (o usa il template).
 2. Modifica `data/site.json` e `data/profile/en.json`; l'editor suggerisce i
    campi grazie al JSON Schema.
-3. Lancia `pnpm run deploy` (nessun token richiesto).
-4. Imposta una volta GitHub Pages sul branch `gh-pages`.
+3. Imposta una volta GitHub Pages su sorgente "GitHub Actions".
+4. Fa commit e push sul branch di default (nessun token da configurare).
 
 ### Owner — aggiornare il portfolio
 
@@ -137,7 +137,7 @@ l'architettura statica.
 2. Se vuole metterlo in evidenza, lo pinna sul profilo GitHub: diventa featured
    e compare nella GitHub Story.
 3. Se deve cambiare il racconto personale, modifica il JSON della lingua.
-4. Fa commit e push, oppure lancia `pnpm run deploy`.
+4. Fa commit e push sul branch di default.
 5. La build valida i dati, genera il sito e lo pubblica.
 6. Ogni deploy aggiorna stelle, date, README e anteprime; tra un deploy e
    l'altro il sito mostra la data dell'ultima sincronizzazione.
@@ -145,7 +145,7 @@ l'architettura statica.
 ## Metriche di prodotto
 
 - **Time to first value:** un nuovo owner pubblica il sito in < 15 minuti
-  (clone, `data/`, `pnpm run deploy`).
+  (template, `data/`, commit).
 - **Time to understanding:** un visitatore identifica ruolo e stack in < 30 s.
 - **Content drift:** 0 informazioni duplicate tra GitHub e `data/`; il CV è
   generato dagli stessi dati.
@@ -160,7 +160,7 @@ l'architettura statica.
 | GitHub API rate limit o down durante la build | Deploy bloccato | REST pubblico (1–3 richieste), snapshot dell'ultimo dato valido, retry con dispatch o deploy locale |
 | README troppo grandi o con HTML malevolo | Build lenta / XSS | Limite dimensione, sanitizzazione, allowlist di tag |
 | Progetti senza descrizione o immagine | Card povere | Discovery automatica delle preview, copy di default, placeholder locali |
-| Primo deploy che non va online | Abbandono di chi clona | Base URL dedotto, guida nel README, runbook "Pages su `gh-pages`" |
+| Primo deploy che non va online | Abbandono di chi clona | Base URL dedotto, guida nel README, runbook "sorgente GitHub Actions" |
 | Contenuti delle lingue supportate divergenti | Esperienza incoerente | Schema condiviso + test di parità delle chiavi |
 | Over-engineering del portfolio | Tempo speso, valore basso | Backlog MoSCoW, MVP prima delle feature "cool" |
 | Dipendenza da un solo hosting | Indisponibilità | Build statica portabile; adapter alternativo documentato |

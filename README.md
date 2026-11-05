@@ -26,9 +26,41 @@ remaining step. Product and technical decisions live in
 
 ## How it works
 
-1. Clone the repository (or use it as a template).
+1. Use this repository as a template (or fork it).
 2. Edit the JSON files in `data/`. Nothing else.
-3. Run one command to publish to GitHub Pages.
+3. Commit to your default branch. GitHub Actions publishes the site.
+
+### Publish on GitHub Pages
+
+1. **Once:** in your repository open **Settings → Pages** and set **Source** to
+   **GitHub Actions**.
+2. Edit `data/site.json` and `data/profile/en.json`, then commit and push to your
+   default branch. You can do it from the GitHub web editor too:
+
+   ```bash
+   git add data
+   git commit -m "docs: update my profile"
+   git push
+   ```
+
+That's it. Every push to the default branch rebuilds and publishes the site
+(follow it in the **Actions** tab; it takes a few minutes), and the workflow then
+checks that the new version is online. Your site is at
+`https://{owner}.github.io/{repo}/`.
+
+- **No token and no secrets to configure.** The build reads public repositories
+  through the REST API with the token GitHub Actions already provides.
+- **Refresh without committing** (new stars, READMEs, repositories): **Actions →
+  Deploy → Run workflow**.
+- **Base URL:** detected automatically for project sites and user sites
+  (`{owner}.github.io`).
+- **Custom domain:** set `deploy.customDomain` in `data/site.json` and enter the
+  same domain once in **Settings → Pages → Custom domain**.
+
+If the first run fails with a permissions error on the `github-pages`
+environment, check that **Source** is set to **GitHub Actions** and re-run it.
+
+### Your data
 
 ```text
 data/
@@ -42,7 +74,9 @@ Every JSON file points to a generated JSON Schema, so your editor autocompletes
 fields and flags mistakes as you type. An invalid file stops `pnpm dev` and
 `pnpm generate` with the file, the field path and a readable message.
 
-### Quick start
+### Work locally (optional)
+
+Publishing needs nothing on your machine. To preview changes first:
 
 ```bash
 pnpm install
@@ -66,39 +100,14 @@ pnpm preview:deploy
 in `datasets/{name}/` (this repository ships the owner's own in
 `datasets/elpiu/`) and pick one without touching any code:
 
-```bash
-# .env (dev and generate)
-PORTFOLIO_DATA_DIR=datasets/elpiu
-```
+- **On GitHub Pages:** add the repository variable `PORTFOLIO_DATA_DIR` =
+  `datasets/elpiu` in **Settings → Secrets and variables → Actions → Variables**,
+  before the push that should publish it.
+- **Locally:** put `PORTFOLIO_DATA_DIR=datasets/elpiu` in `.env`, or run
+  `pnpm preview:deploy -- --data datasets/elpiu`.
 
-```bash
-pnpm run deploy -- --data datasets/elpiu
-```
-
-In GitHub Actions, set the repository variable `PORTFOLIO_DATA_DIR`
-(Settings → Secrets and variables → Actions → Variables). Unit tests validate
-`data/` and every folder in `datasets/`. If you cloned this repository for
-yourself, delete `datasets/`.
-
-To generate and publish:
-
-```bash
-pnpm run deploy
-```
-
-No GitHub token is required: the build reads public repositories through the
-unauthenticated REST API. A read-only `GITHUB_TOKEN` is optional and only raises
-the hourly rate limit.
-
-Then, once: **Settings → Pages → Deploy from a branch → `gh-pages` / `(root)`**.
-
-After that, every push to `main` republishes the site through the included
-GitHub Action. Use `pnpm run deploy` (with `run`: `pnpm deploy` is a different,
-built-in pnpm command) whenever you want an immediate refresh.
-
-The base URL is detected automatically for project sites
-(`{owner}.github.io/{repo}`), user sites (`{owner}.github.io`) and custom
-domains (`deploy.customDomain` in `data/site.json`).
+Unit tests validate `data/` and every folder in `datasets/`. If you cloned this
+repository for yourself, delete `datasets/`.
 
 ### What syncs from GitHub
 
@@ -151,7 +160,7 @@ pnpm test:e2e                           # E2E + axe on the generated site
 
 Nuxt 4 (SSG) · Vue 3 · TypeScript strict · Tailwind CSS 4 · Nuxt UI · Nuxt Icon ·
 Nuxt Fonts · Nuxt i18n · VueUse · Zod · GitHub REST API ·
-`gh-pages`
+GitHub Actions + Pages
 
 Build-time only: `markdown-it` + Shiki + `sanitize-html`. Quality: Vitest,
 Playwright + axe, byte budgets, Lighthouse CI (report).
@@ -167,7 +176,7 @@ Playwright + axe, byte budgets, Lighthouse CI (report).
 | [04 — Tech stack](docs/04-tech-stack.md) | Libraries and configuration |
 | [05 — Data](docs/05-dati-e-contenuti.md) | `data/`, schemas, preview discovery, story |
 | [06 — Design](docs/06-design-system.md) | Engineered Minimalism, tokens, Git graph, a11y |
-| [07 — Deploy](docs/07-infrastruttura-deploy.md) | `pnpm run deploy`, GitHub Pages, runbook |
+| [07 — Deploy](docs/07-infrastruttura-deploy.md) | Publishing from GitHub Actions, GitHub Pages, runbook |
 | [08 — Quality](docs/08-qualita-testing.md) | Tests, budgets, conventions |
 | [09 — Roadmap & ADRs](docs/09-roadmap-e-adr.md) | Milestones, decisions, coherence review |
 

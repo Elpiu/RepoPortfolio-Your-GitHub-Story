@@ -53,15 +53,14 @@ Attività:
 - Layout default, header, footer, skip link, 404.
 - Theme toggle (default dark) e locale switcher dal registry.
 - Struttura `shared/`, `server/`, `i18n/`, `scripts/`.
-- `scripts/repo-context.mjs` + `scripts/deploy.mjs` con `gh-pages`.
+- `scripts/repo-context.mjs` + `scripts/build-site.mjs`.
 - CI `ci.yml` (lint, typecheck, unit, generate offline, budget) e `deploy.yml`.
 - `.env.example`, `.nvmrc`, `packageManager`.
 
 Accettazione:
 
 - [ ] `pnpm dev` e `pnpm generate` funzionano.
-- [ ] `pnpm run deploy` pubblica su `gh-pages` con base URL corretto e
-      `.nojekyll`.
+- [ ] Un push sul branch di default pubblica con base URL corretto (ADR-030).
 - [x] Home EN e `/it/` renderizzano con header/footer; con una sola lingua lo
       switcher sparisce.
 - [x] Un JSON in `data/` invalido produce un errore con file e campo.
@@ -208,7 +207,7 @@ Attività:
 - Smoke test post-deploy su `build.json`, sitemap e 404.
 - Link checker settimanale.
 - Runbook e rollback provati.
-- Cutover legacy: Pages su `gh-pages`, base URL, id di sezione legacy.
+- Cutover legacy: Pages da GitHub Actions, base URL, id di sezione legacy.
 - README del progetto con la guida per chi clona.
 
 Accettazione:
@@ -260,8 +259,7 @@ rimandano.
 **Stato:** Accettata (confermata il 30/10/2026)
 **Contesto:** il token non può stare nel browser; servono SEO e stabilità.
 **Decisione:** fetch durante la build, validazione zod, snapshot di fallback;
-deploy a ogni push su `main`, dispatch manuale o `pnpm run deploy` per un
-refresh. Il legame con i push è **intenzionale**: per aggiornare la GitHub Story
+deploy a ogni push sul branch di default, dispatch manuale per un refresh. Il legame con i push è **intenzionale**: per aggiornare la GitHub Story
 si modifica il JSON e si pubblica.
 **Conseguenze:** tra un deploy e l'altro stelle, README e activity restano
 quelli dell'ultima build. La UI lo dichiara con "Last synced" e la data della
@@ -384,8 +382,7 @@ l'IP del visitatore e gli URL possono scadere.
 
 **Stato:** Accettata
 **Decisione:** Node 22 LTS, pnpm con Corepack, lockfile committed.
-**Conseguenze:** richiede Corepack. Il deploy si lancia con `pnpm run deploy`
-(`pnpm deploy` è un comando interno di pnpm).
+**Conseguenze:** richiede Corepack.
 
 ### ADR-016 — Telefono come azione rapida
 
@@ -422,7 +419,7 @@ meno.
 
 ### ADR-019 — Deploy con un comando tramite `gh-pages`
 
-**Stato:** Accettata (30/10/2026) — sostituisce ADR-009
+**Stato:** Superata da ADR-030 (06/11/2026). Sostituiva ADR-009
 **Contesto:** chi clona deve poter ripubblicare cambiando solo i JSON.
 **Decisione:** `pnpm run deploy` risolve owner, repository e base URL (project
 site, user site, dominio custom), esegue `nuxt generate` e pubblica
@@ -558,13 +555,33 @@ l'owner vuole pubblicare i propri dati senza un fork.
 **Decisione:** `data/` resta il payload di default. Payload alternativi con la
 stessa forma stanno in `datasets/{nome}/` e si selezionano con
 `PORTFOLIO_DATA_DIR` (`.env`, variabile di repository in Actions) o con
-`pnpm run deploy -- --data <dir>`. Gli schemi restano in `data/schema/`. I test
+`pnpm build:site -- --data <dir>`. Gli schemi restano in `data/schema/`. I test
 validano tutte le cartelle. Lo snapshot GitHub è legato allo username.
 **Conseguenze:** nessun codice da toccare per cambiare dataset; ADR-023 resta
 valido (i dati owner sono solo JSON, fuori dal codice). La CI di qualità usa
 sempre `data/`; il deploy usa la variabile di repository.
 **Alternative:** sostituire `data/` con i dati reali (scartato: si perde il
 template), branch separato per i dati (scartato: due storie da mantenere).
+
+### ADR-030 — Pubblicazione da GitHub Actions sul branch di default
+
+**Stato:** Accettata (06/11/2026, richiesta dell'owner) — sostituisce ADR-019
+**Contesto:** chi pubblica vuole il percorso più semplice possibile: il comando
+locale, il branch `gh-pages` e il cambio di sorgente di Pages erano passaggi in
+più, e il motivo di ADR-019 (lo stesso comando da un portatile) serve poco se il
+commit basta già a pubblicare.
+**Decisione:** Pages con sorgente "GitHub Actions". A ogni push sul branch di
+default (individuato da `github.event.repository.default_branch`, non scritto nel
+workflow) `deploy.yml` esegue `pnpm build:site` e pubblica con
+`actions/deploy-pages`. Nessun comando di pubblicazione locale, nessun branch di
+output, dipendenza `gh-pages` rimossa. In locale restano `pnpm build:site` e
+`pnpm preview:deploy`, che non pubblicano.
+**Conseguenze:** pubblicare è un commit, anche dall'editor web; zero dipendenze e
+credenziali in più. Non si pubblica senza GitHub Actions, il rollback è un
+`git revert` e i push sugli altri branch compaiono come run saltati. Il dominio
+custom va inserito anche nelle impostazioni di Pages.
+**Alternative:** `gh-pages` (ADR-019), lista fissa `branches: [main]` (scartata:
+chi ha un altro branch di default dovrebbe toccare il workflow).
 
 ## Decisioni chiuse
 
@@ -573,7 +590,7 @@ template), branch separato per i dati (scartato: due storie da mantenere).
 | Q1 | Feature pilastro | F1–F3, F5–F6 + F0/F7/F8 Must; F9 CV & Export Should; F4 carousel rimosso | 2026-10-30 |
 | Q2 | Dati GitHub a build time o runtime? | Build su push + dispatch manuale o deploy locale | 2026-10-30 |
 | Q3 | Dettaglio progetto | Pagina dedicata `/projects/[slug]` | 2026-10-30 |
-| Q4 | Hosting | GitHub Pages, branch `gh-pages` pubblicato con `gh-pages` | 2026-10-30 |
+| Q4 | Hosting | GitHub Pages, pubblicato da GitHub Actions (ADR-030) | 2026-11-06 |
 | Q5 | Contatto | Nessun form; pulsanti `mailto:` e `tel:` + social/CV | 2026-10-30 |
 | Q6 | Lingua default | Inglese; altre lingue dal registry in `data/site.json`; nessun rilevamento | 2026-10-30 |
 | Q7 | Palette e direzione | Engineered Minimalism, dark-first, Emerald, Geist + Geist Mono | 2026-10-30 |
@@ -641,8 +658,7 @@ Queste cose possono essere progetti separati, non parti di questo motore.
 | Cambio schema API | Bassa | Build rossa | zod, fixture, messaggi precisi |
 | XSS da README | Bassa | Alto | Sanitizzazione allowlist, test |
 | Discovery preview sbagliata | Media | Basso | Ordine di sorgenti documentato, log `previewSource`, `.repo-story.json` |
-| Pages non impostato su `gh-pages` | Media | Alto (sito non visibile) | Guida al primo deploy, runbook, smoke test |
-| `.nojekyll` mancante | Bassa | Alto (asset 404) | Opzione della libreria, test sull'output |
+| Pages non impostato su "GitHub Actions" | Media | Alto (deploy fallito) | Guida al primo deploy, runbook, smoke test |
 | Base URL errato | Bassa | Alto | Calcolo automatico testato, smoke test |
 | Dati fermi tra un deploy e l'altro | Alta | Basso | Accettato (ADR-002); "Last synced" visibile |
 | Snapshot non disponibile in CI | Media | Medio | Retry con `workflow_dispatch`; deploy locale |
@@ -666,9 +682,9 @@ unitari, `pnpm generate` offline, budget in byte, 51 test E2E Playwright + axe
 Restano da fare, perché richiedono push o accesso al repository remoto:
 
 - [ ] CI verde su una PR reale (`ci.yml` con E2E e Lighthouse).
-- [ ] Primo `pnpm run deploy` e Pages impostato su `gh-pages`.
+- [ ] Primo deploy da GitHub Actions, con Pages su sorgente "GitHub Actions".
 - [ ] Smoke test di `deploy.yml` verde all'URL pubblico.
-- [ ] Rollback provato sul branch `gh-pages`.
+- [ ] Rollback provato con `git revert`.
 - [ ] Variabile di repository `PORTFOLIO_DATA_DIR` se il sito pubblico deve
       usare un dataset diverso da `data/` (ADR-029).
 - [ ] Report Lighthouse letto (≥ 95 / a11y 100).
@@ -687,5 +703,5 @@ deploy, snapshot riusato in `pnpm dev` (prima richiesta da ~7 s a istantanea).
 ## Prossimo passo
 
 Dopo la revisione dell'owner: commit per intenzione su `feat/m1-scaffold`, PR
-verso `main`, CI verde, primo deploy (`pnpm run deploy`) e checklist di cutover
+verso `main`, CI verde, merge (che pubblica) e checklist di cutover
 in [07](07-infrastruttura-deploy.md#checklist-di-cutover).

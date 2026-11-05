@@ -46,7 +46,7 @@ test.
     "build": "nuxt build",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "deploy": "node scripts/deploy.mjs",
+    "build:site": "node scripts/build-site.mjs",
     "check:budget": "node scripts/check-budget.mjs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -62,8 +62,8 @@ test.
 }
 ```
 
-`pnpm run deploy` va sempre lanciato con `run`: `pnpm deploy` è un comando
-interno di pnpm. I JSON Schema in `data/schema/` vengono riscritti dal modulo
+Non esiste un comando di pubblicazione: si pubblica con un push sul branch di
+default (ADR-030). I JSON Schema in `data/schema/` vengono riscritti dal modulo
 `validate-data` a ogni `dev`/`generate`; la CI verifica che siano committati
 aggiornati con `git diff --exit-code data/schema`.
 
@@ -558,7 +558,7 @@ condivisi i punteggi variano da un run all'altro.
 ### Su `main`
 
 - [ ] Tutto quanto sopra
-- [ ] `pnpm run deploy` in `deploy.yml`
+- [ ] `deploy.yml`: `pnpm build:site` e `actions/deploy-pages`
 - [ ] Smoke test (`build.json` del commit, sitemap, 404)
 - [ ] Deploy su push e dispatch manuale verdi
 
@@ -640,8 +640,8 @@ logga con un identificativo utile.
 - Conventional Commits: `feat: add project filters`, `fix: resolve base url`,
   `docs: define architecture`.
 - PR piccole e con una sola intenzione.
-- Nessun commit di segreti, `.env`, snapshot o artefatti di build. Il branch
-  `gh-pages` è scritto solo da `pnpm run deploy`.
+- Nessun commit di segreti, `.env`, snapshot o artefatti di build. Un push sul
+  branch di default pubblica il sito (ADR-030).
 
 ## Definition of Done
 

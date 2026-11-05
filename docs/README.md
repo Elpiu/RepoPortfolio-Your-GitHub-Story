@@ -6,8 +6,8 @@
 
 RepoPortfolio è un portfolio statico che racconta la storia professionale di uno
 sviluppatore partendo dai suoi repository GitHub. Chi lo clona modifica solo i
-JSON in `data/` e pubblica con un comando (`pnpm run deploy`) sul branch
-`gh-pages`; la stessa operazione gira a ogni push su `main`. Nessun database,
+JSON in `data/` e pubblica con un commit: a ogni push sul branch di default una
+GitHub Action genera il sito e lo mette su GitHub Pages. Nessun database,
 nessun backend, nessuna API key esposta al browser.
 
 > **Regola d'oro**
@@ -40,7 +40,7 @@ e resta solo nella storia git.
 | [04 — Tech stack](04-tech-stack.md) | Ogni libreria, ruolo, configurazione |
 | [05 — Dati e contenuti](05-dati-e-contenuti.md) | `data/`, schemi, API REST pubblica, discovery preview, story |
 | [06 — Design system e UX](06-design-system.md) | Engineered Minimalism, token, Bento, Git graph a lane, accessibilità |
-| [07 — Infrastruttura e deploy](07-infrastruttura-deploy.md) | `pnpm run deploy`, GitHub Pages, Actions, sicurezza, runbook |
+| [07 — Infrastruttura e deploy](07-infrastruttura-deploy.md) | Pubblicazione da GitHub Actions, GitHub Pages, sicurezza, runbook |
 | [08 — Qualità e testing](08-qualita-testing.md) | Test, quality gate, budget, convenzioni |
 | [09 — Roadmap e decisioni](09-roadmap-e-adr.md) | Milestone, backlog, registro ADR (unico), domande aperte |
 

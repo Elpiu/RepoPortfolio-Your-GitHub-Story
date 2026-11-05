@@ -272,7 +272,6 @@ export type GitHubRestRepoNode = z.infer<typeof githubRestRepoNodeSchema>
 | Pacchetto | Necessità | Perché |
 | --- | --- | --- |
 | `markdown-it` + `@shikijs/markdown-it` + `sanitize-html` | **Necessario** | Rendering README e code highlighting a build time |
-| `gh-pages` | **Necessario** | Pubblica `.output/public` sul branch `gh-pages` (`pnpm run deploy`) |
 | `@iconify-json/lucide` + `@iconify-json/simple-icons` | **Necessario** | Collezioni locali per `@nuxt/icon` e per le icone dei dati (`/api/data-icons`) |
 | `@nuxt/eslint` | **Necessario** | Qualità del codice in CI |
 | `prettier` + `eslint-config-prettier` | **Necessario** | Formattazione coerente |
@@ -302,7 +301,7 @@ solo `node:zlib` e `node:fs`): nessuna dipendenza in più.
 | `embla-carousel-vue` | — | Carousel rimosso |
 | `@nuxt/content` | JSON + zod | Overkill per pochi file |
 | `@nuxtjs/seo` (bundle completo) | `@nuxtjs/sitemap` + `@nuxtjs/robots` | Niente generazione di OG image; meno moduli |
-| `actions/deploy-pages` | `gh-pages` | Lo stesso comando funziona in locale e in CI |
+| Libreria `gh-pages` e branch di output | `actions/deploy-pages` | Pubblicare è un commit, senza comandi né dipendenze (ADR-030) |
 | Inter + Outfit + JetBrains Mono | Geist + Geist Mono | Due famiglie, più coerenti con la direzione |
 
 ## Configurazione Nuxt di riferimento
@@ -337,7 +336,7 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
 
   app: {
-    // valorizzato da scripts/deploy.mjs; '/' in dev
+    // valorizzato da scripts/build-site.mjs; '/' in dev
     baseURL: process.env.NUXT_APP_BASE_URL || '/',
   },
 
