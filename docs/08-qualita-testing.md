@@ -375,7 +375,12 @@ test sono ermetici e verificano che a runtime partano solo immagini GitHub. I
 dati attesi si leggono dalla stessa cartella dati della build:
 `PORTFOLIO_DATA_DIR=datasets/me pnpm test:e2e` verifica un dataset alternativo.
 
-Implementati (`tests/e2e/*.spec.ts`, 47 test; `E2E_PORT` se la 4173 è
+In locale di norma si usa lo snapshot reale, in CI la fixture: per riprodurre la CI
+si sposta `.cache` e si lancia con `CI=1` e `GITHUB_OFFLINE=1` (fixture con
+README con codice, che lo snapshot può non avere). `goto` e `reload` della fixture
+E2E aspettano la fine dell'idratazione; axe gira con le transizioni disattivate.
+
+Implementati (`tests/e2e/*.spec.ts`, 51 test; `E2E_PORT` se la 4173 è
 occupata): offset delle ancore sotto l'header, filtri che non spostano la
 pagina, home/Bento, nessuna richiesta
 esterna, id legacy e hash, date assolute nell'HTML, story espandibile e filtri

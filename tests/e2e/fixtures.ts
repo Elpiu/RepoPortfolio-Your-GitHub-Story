@@ -54,6 +54,29 @@ type Fixtures = {
 }
 
 export const test = base.extend<Fixtures>({
+  // Il sito è statico: prima dell'idratazione i click non hanno effetto e, su un
+  // runner lento, i test sarebbero instabili. goto e reload aspettano la fine.
+  page: async ({ page }, use) => {
+    const hydrated = () =>
+      page.waitForFunction(() => {
+        const app = (window as unknown as { useNuxtApp?: () => { isHydrating?: boolean } })
+          .useNuxtApp
+        return app?.().isHydrating === false
+      })
+    const goto = page.goto.bind(page)
+    const reload = page.reload.bind(page)
+    page.goto = async (...args) => {
+      const response = await goto(...args)
+      await hydrated()
+      return response
+    }
+    page.reload = async (...args) => {
+      const response = await reload(...args)
+      await hydrated()
+      return response
+    }
+    await use(page)
+  },
   externalRequests: [
     async ({ page }, use) => {
       const requests: string[] = []

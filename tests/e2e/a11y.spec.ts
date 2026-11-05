@@ -18,6 +18,9 @@ const prefix = secondaryLocale ? `/${secondaryLocale.code}` : null
 
 for (const theme of ['dark', 'light'] as const) {
   test.describe(`axe @a11y (${theme})`, () => {
+    // Senza transizioni: axe non deve misurare i colori a metà di un cambio tema.
+    test.use({ contextOptions: { reducedMotion: 'reduce' } })
+
     test.beforeEach(async ({ page }) => {
       await page.addInitScript((value) => {
         window.localStorage.setItem('rp-color-mode', value)

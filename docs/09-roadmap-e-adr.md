@@ -658,8 +658,8 @@ Queste cose possono essere progetti separati, non parti di questo motore.
 ## Stato dell'implementazione (01/11/2026)
 
 M1–M5 sono implementati; M6 è implementato per tutto ciò che si verifica in
-locale. Verificato in locale (Windows, Node 24): lint, typecheck, 77 test
-unitari, `pnpm generate` offline, budget in byte, 44 test E2E Playwright + axe
+locale. Verificato in locale (Windows, Node 24): lint, typecheck, 95 test
+unitari, `pnpm generate` offline, budget in byte, 51 test E2E Playwright + axe
 (tema chiaro e scuro, 320 px, motion ridotto) sia con `data/` sia con
 `datasets/elpiu/`.
 
