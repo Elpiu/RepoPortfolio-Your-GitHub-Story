@@ -25,12 +25,18 @@ export const githubConfigSchema = z.object({
   readmeMaxBytes: z.number().int().positive().default(200_000),
 })
 
+// Link facoltativi: assente, null e "" significano la stessa cosa, "non c'è".
+function optionalLink(schema: z.ZodString) {
+  return z.union([z.literal('').transform(() => null), schema.nullable()]).default(null)
+}
+
 export const linksSchema = z.object({
   email: z.string().email(),
-  phone: z.string().min(1).nullable().default(null),
-  linkedin: z.string().url().nullable().default(null),
-  website: z.string().url().nullable().default(null),
-  cvUrl: z.string().url().nullable().default(null),
+  phone: optionalLink(z.string().min(1)),
+  linkedin: optionalLink(z.string().url()),
+  website: optionalLink(z.string().url()),
+  // Se c'è, il bottone CV apre questo URL; altrimenti porta alla pagina /cv generata.
+  cvUrl: optionalLink(z.string().url()),
 })
 
 export const careerSchema = z.object({

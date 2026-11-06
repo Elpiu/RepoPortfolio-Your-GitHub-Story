@@ -71,6 +71,24 @@ describe('schemi minimi', () => {
     ).toThrow(/host GitHub/)
   })
 
+  it('un link facoltativo assente, null o vuoto vale "non c è"', () => {
+    const locales = [{ code: 'en', language: 'en-US', name: 'English', default: true }]
+    const parse = (links: Record<string, unknown>) =>
+      siteSchema.parse({ links: { email: 'you@example.com', ...links }, locales }).links
+
+    expect(parse({}).cvUrl).toBeNull()
+    expect(parse({ cvUrl: null }).cvUrl).toBeNull()
+    expect(parse({ cvUrl: '', phone: '', linkedin: '', website: '' })).toMatchObject({
+      cvUrl: null,
+      phone: null,
+      linkedin: null,
+      website: null,
+    })
+    const url = 'https://example.com/cv.pdf'
+    expect(parse({ cvUrl: url }).cvUrl).toBe(url)
+    expect(() => parse({ cvUrl: 'non-un-url' })).toThrow()
+  })
+
   it('rifiuta due lingue di default', () => {
     const invalid = {
       links: { email: 'you@example.com' },

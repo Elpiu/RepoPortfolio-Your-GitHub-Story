@@ -56,50 +56,78 @@
           "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
         },
         "phone": {
-          "default": null,
           "anyOf": [
             {
               "type": "string",
-              "minLength": 1
+              "const": ""
             },
             {
-              "type": "null"
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           ]
         },
         "linkedin": {
-          "default": null,
           "anyOf": [
             {
               "type": "string",
-              "format": "uri"
+              "const": ""
             },
             {
-              "type": "null"
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uri"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           ]
         },
         "website": {
-          "default": null,
           "anyOf": [
             {
               "type": "string",
-              "format": "uri"
+              "const": ""
             },
             {
-              "type": "null"
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uri"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           ]
         },
         "cvUrl": {
-          "default": null,
           "anyOf": [
             {
               "type": "string",
-              "format": "uri"
+              "const": ""
             },
             {
-              "type": "null"
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uri"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           ]
         }

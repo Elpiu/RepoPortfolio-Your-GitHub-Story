@@ -141,7 +141,7 @@ Esempio minimo valido (tutto il resto prende i default):
 | `links.email` | — | Pulsante `mailto:` |
 | `links.phone` | `null` | Pulsante `tel:`; se `null` non viene renderizzato |
 | `links.linkedin`, `links.website` | `null` | |
-| `links.cvUrl` | `null` | Se `null`, il pulsante CV porta a `/cv` (F9) |
+| `links.cvUrl` | `null` | URL del CV: il pulsante lo apre in una nuova scheda. Se manca, il pulsante porta alla pagina `/cv` generata (F9), che resta comunque online |
 | `career.start` | `null` | `YYYY-MM`; se assente gli anni di esperienza non vengono mostrati |
 | `story.autoEvents` | `true` | Featured come nodi automatici della GitHub Story |
 | `story.maxAutoEvents` | `8` | |

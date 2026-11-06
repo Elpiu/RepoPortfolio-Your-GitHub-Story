@@ -11,6 +11,29 @@ test('/cv mostra gli stessi dati del profilo', async ({ page }) => {
   await expect(page.getByRole('button', { name: ui('cv.downloadPdf') })).toBeVisible()
 })
 
+test('il bottone CV apre cvUrl se c è, altrimenti la pagina generata', async ({ page }) => {
+  await page.goto('/')
+  const button = page.getByTestId('profile-card').getByRole('link', {
+    name: ui('bento.cv'),
+    exact: true,
+  })
+  await expect(button).toHaveCount(1)
+
+  if (site.links.cvUrl) {
+    await expect(button).toHaveAttribute('href', site.links.cvUrl)
+    await expect(button).toHaveAttribute('target', '_blank')
+    await expect(button).toHaveAttribute('rel', /noopener/)
+  } else {
+    await button.click()
+    await expect(page).toHaveURL(/\/cv\/?$/)
+    await expect(page.locator('h1')).toHaveText(defaultProfile.meta.fullName)
+  }
+
+  // In entrambi i casi la pagina generata resta raggiungibile (F9).
+  await page.goto('/cv')
+  await expect(page.locator('.cv-document')).toBeVisible()
+})
+
 test('in stampa spariscono toolbar, header e footer', async ({ page }) => {
   await page.goto('/cv')
   await page.emulateMedia({ media: 'print' })
