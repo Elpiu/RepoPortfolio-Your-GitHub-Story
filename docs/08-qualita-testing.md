@@ -380,7 +380,7 @@ si sposta `.cache` e si lancia con `CI=1` e `GITHUB_OFFLINE=1` (fixture con
 README con codice, che lo snapshot può non avere). `goto` e `reload` della fixture
 E2E aspettano la fine dell'idratazione; axe gira con le transizioni disattivate.
 
-Implementati (`tests/e2e/*.spec.ts`, 51 test; `E2E_PORT` se la 4173 è
+Implementati (`tests/e2e/*.spec.ts`, 52 test; `E2E_PORT` se la 4173 è
 occupata): offset delle ancore sotto l'header, filtri che non spostano la
 pagina, home/Bento, nessuna richiesta
 esterna, id legacy e hash, date assolute nell'HTML, story espandibile e filtri

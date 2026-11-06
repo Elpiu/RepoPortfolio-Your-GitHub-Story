@@ -290,7 +290,8 @@ identità umana e identità GitHub in un'unica narrazione visiva.
 - Bento asimmetrica (4 riquadri):
   - **Profile (2 colonne):** avatar, nome, ruolo, anni di esperienza calcolati,
     bio breve, badge di disponibilità con pallino, quick actions (`mailto:`,
-    `tel:`, copia email, GitHub, LinkedIn e CV (`/cv` o `links.cvUrl`).\n    Tutto letto da `data/profile/{locale}.json`
+    `tel:`, copia email, GitHub, LinkedIn e CV (`links.cvUrl` o la pagina `/cv`).
+    Tutto letto da `data/profile/{locale}.json`
     e `data/site.json`.
   - **Top Repo:** il repository con più stelle, con preview, stelle, linguaggio
     e link al dettaglio.
