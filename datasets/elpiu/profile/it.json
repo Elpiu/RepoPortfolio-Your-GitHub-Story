@@ -85,7 +85,7 @@
       "location": "Da remoto",
       "start": "2025-09",
       "end": null,
-      "description": "Sviluppatore full-stack su CyberZoom, piattaforma a microservizi di intelligence OSINT e sicurezza di livello enterprise. Stack: Python (FastAPI, SQLAlchemy, LangGraph), Java (Spring Boot, Quartz), Angular (standalone components, signals, PrimeNG, Tailwind CSS 4) e infrastruttura containerizzata (Docker, Kubernetes, KasmVNC).",
+      "description": "Sviluppatore full-stack all'interno della unit Software Farm, su una piattaforma a microservizi di intelligence OSINT e sicurezza di livello enterprise. Stack: Python (FastAPI, SQLAlchemy, LangGraph), Java (Spring Boot, Quartz), Angular (standalone components, signals, PrimeNG, Tailwind CSS 4) e infrastruttura containerizzata (Docker, Kubernetes, KasmVNC).",
       "highlights": [
         "Integrazione dell'AI nei flussi decisionali e di automazione: LLM, OCR e trasformazione di dati non strutturati in dati strutturati",
         "Architetture a microservizi e comunicazione tra servizi",

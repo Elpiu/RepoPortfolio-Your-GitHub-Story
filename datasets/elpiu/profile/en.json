@@ -85,7 +85,7 @@
       "location": "Remote",
       "start": "2025-09",
       "end": null,
-      "description": "Full-stack developer on CyberZoom, an enterprise-grade microservices platform for OSINT and security intelligence. Stack: Python (FastAPI, SQLAlchemy, LangGraph), Java (Spring Boot, Quartz), Angular (standalone components, signals, PrimeNG, Tailwind CSS 4) and containerized infrastructure (Docker, Kubernetes, KasmVNC).",
+      "description": "Full-stack developer within the Software Farm unit, working on an enterprise-grade microservices platform for OSINT and security intelligence. Stack: Python (FastAPI, SQLAlchemy, LangGraph), Java (Spring Boot, Quartz), Angular (standalone components, signals, PrimeNG, Tailwind CSS 4) and containerized infrastructure (Docker, Kubernetes, KasmVNC).",
       "highlights": [
         "AI in decision-making and automation workflows: LLMs, OCR and turning unstructured data into structured data",
         "Microservices architectures and service-to-service communication",

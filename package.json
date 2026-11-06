@@ -10,6 +10,7 @@
     "node": ">=22"
   },
   "scripts": {
+    "me": "pnpm preview:deploy -- --data datasets/elpiu",
     "postinstall": "nuxt prepare",
     "dev": "nuxt dev",
     "build": "nuxt build",
