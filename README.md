@@ -50,8 +50,10 @@ checks that the new version is online. Your site is at
 
 - **No token and no secrets to configure.** The build reads public repositories
   through the REST API with the token GitHub Actions already provides.
-- **Refresh without committing** (new stars, READMEs, repositories): **Actions →
-  Deploy → Run workflow**.
+- **Refresh without committing** (new stars, READMEs, repositories): the site is
+  rebuilt automatically every Monday; for an immediate refresh use **Actions →
+  Deploy → Run workflow**. GitHub pauses scheduled workflows after 60 days
+  without repository activity: re-enable it from **Actions → Deploy**.
 - **Base URL:** detected automatically for project sites and user sites
   (`{owner}.github.io`).
 - **Custom domain:** set `deploy.customDomain` in `data/site.json` and enter the

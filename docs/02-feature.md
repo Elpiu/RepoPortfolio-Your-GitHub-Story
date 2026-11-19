@@ -450,7 +450,8 @@ flash, stringhe duplicate e hydration mismatch.
 ## F8 — Delivery statica: SEO, performance, deploy con un commit (abilitante)
 
 **Cosa:** il sito è generato staticamente e pubblicato su GitHub Pages dalla
-GitHub Action che gira a **ogni push sul branch di default** (ADR-030).
+GitHub Action che gira a **ogni push sul branch di default** (ADR-030) e una
+volta a settimana per aggiornare i dati GitHub (ADR-031).
 
 **Perché è pilastro:** è il modello di distribuzione e la promessa "facile da
 rideployare": chi clona modifica i JSON in `data/` e fa commit.
@@ -459,8 +460,9 @@ rideployare": chi clona modifica i JSON in `data/` e fa commit.
 
 - `pnpm build:site`: risolve owner, repository e base URL (project site, user
   site `{owner}.github.io` o dominio custom) ed esegue `nuxt generate`.
-- Workflow `deploy.yml` su push sul branch di default e dispatch manuale: esegue
-  la build e pubblica `.output/public` con `actions/deploy-pages`.
+- Workflow `deploy.yml` su push sul branch di default, ogni lunedì e su
+  dispatch manuale: esegue la build e pubblica `.output/public` con
+  `actions/deploy-pages`.
 - Sitemap, `robots.txt`, pagina 404, canonical, hreflang, Open Graph e JSON-LD.
 - Nessuna richiesta runtime a font, icone o API esterne.
 - Budget deterministici (byte di JS, CSS, payload) come gate; Lighthouse CI
@@ -481,8 +483,10 @@ rideployare": chi clona modifica i JSON in `data/` e fa commit.
 - [ ] Una PR che supera i budget in byte viene bloccata.
 - [ ] Un push sul branch di default aggiorna stelle, date e README con una nuova
       build, qualunque sia il nome del branch.
+- [ ] Il rebuild settimanale ripubblica lo stesso commit con dati GitHub
+      aggiornati e lo smoke test riconosce il nuovo deploy.
 
-**Decisioni collegate:** ADR-002, ADR-026, ADR-030.
+**Decisioni collegate:** ADR-002, ADR-026, ADR-030, ADR-031.
 
 ---
 
@@ -629,7 +633,6 @@ Queste feature non entrano nell'MVP ma l'architettura deve poterle accogliere.
 | OG image per progetto | Nessuna generazione di immagini in build |
 | Download e ottimizzazione delle immagini in build | Le preview restano remote (ADR-013) |
 | Identità letta dal profilo GitHub | Il racconto personale vive nel JSON (ADR-023) |
-| Rebuild programmato | Il deploy segue i push (ADR-002) |
 | Separare motore e sito in due step | Una sola build Nuxt; i dati owner stanno in `data/` (ADR-023) |
 | Rilevamento automatico della lingua | Redirect lato client su sito statico |
 | Reveal on scroll | Effetto da template, nasconde contenuto prima dell'idratazione |

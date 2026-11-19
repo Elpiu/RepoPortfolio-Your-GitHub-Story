@@ -8,7 +8,7 @@
 | I dati devono essere SEO-friendly e indicizzabili | Contenuto nel payload/HTML di build, non fetch client-side |
 | GitHub REST pubblico ha rate limit; il token è opzionale | Integrazione GitHub solo a build time, lato Nitro |
 | Chi clona deve poter ripubblicare senza toccare il codice | Dati owner solo in `data/*.json`; deploy con un comando |
-| I dati si aggiornano a ogni push | Deploy su push + dispatch manuale + snapshot di fallback |
+| I dati si aggiornano a ogni push | Deploy su push + rebuild settimanale + dispatch manuale + snapshot di fallback |
 | Inglese default + lingue estensibili, tema chiaro/scuro | Rotte localizzate, color mode con script anti-flash |
 | Poche centinaia di repository | Filtro e ricerca client-side sul dataset incorporato |
 | Il portfolio è esso stesso una vetrina tecnica | TypeScript strict, schema validation, budget in CI |
@@ -56,8 +56,8 @@ HTML + payload già presenti
 
 **Perché non SSR runtime:** un portfolio non ha dati per-utente. Un server
 sempre acceso aggiungerebbe costo, superficie d'attacco e complessità senza
-benefici. La freschezza si ottiene con un nuovo deploy (push o dispatch
-manuale).
+benefici. La freschezza si ottiene con un nuovo deploy (push, rebuild
+settimanale o dispatch manuale).
 
 **Perché non fetch client-side:** il contenuto non sarebbe indicizzabile, il
 visitatore vedrebbe skeleton e rate limit, e servirebbe un token esposto.

@@ -748,8 +748,9 @@ export default defineNuxtModule({
 - Non va committato: è una cache di build (`.gitignore`).
 - In locale persiste tra un deploy e l'altro. In GitHub Actions vive in
   `actions/cache`, che elimina le voci non usate da 7 giorni: il fallback in CI
-  esiste solo se c'è stata una build nell'ultima settimana. È un limite
-  accettato, coerente con la scadenza dello snapshot.
+  esiste solo se c'è stata una build nell'ultima settimana. Il rebuild
+  settimanale (ADR-031) la rinnova; resta un limite accettato, coerente con la
+  scadenza dello snapshot.
 - `GITHUB_OFFLINE=1` salta la rete e usa lo snapshot (qualunque età) o, se
   manca, la fixture versionata `tests/fixtures/github.json`. È la modalità
   delle PR in CI e dello sviluppo senza rete.

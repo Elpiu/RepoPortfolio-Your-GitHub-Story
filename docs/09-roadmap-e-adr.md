@@ -257,7 +257,8 @@ rimandano.
 
 ### ADR-002 — Dati GitHub a build time, deploy su push
 
-**Stato:** Accettata (confermata il 30/10/2026)
+**Stato:** Accettata (confermata il 30/10/2026); il rebuild programmato è
+aggiunto da ADR-031 (19/11/2026)
 **Contesto:** il token non può stare nel browser; servono SEO e stabilità.
 **Decisione:** fetch durante la build, validazione zod, snapshot di fallback;
 deploy a ogni push sul branch di default, dispatch manuale per un refresh. Il legame con i push è **intenzionale**: per aggiornare la GitHub Story
@@ -265,9 +266,10 @@ si modifica il JSON e si pubblica.
 **Conseguenze:** tra un deploy e l'altro stelle, README e activity restano
 quelli dell'ultima build. La UI lo dichiara con "Last synced" e la data della
 build.
-**Alternative:** rebuild programmato (scartato: il refresh deve seguire le
-modifiche dell'owner, non un timer; inoltre GitHub disattiva i workflow
-programmati nei repository inattivi da 60 giorni), fetch client-side (SEO e
+**Alternative:** rebuild programmato (scartato il 30/10/2026: il refresh deve
+seguire le modifiche dell'owner, non un timer; inoltre GitHub disattiva i
+workflow programmati nei repository inattivi da 60 giorni. Introdotto poi come
+aggiunta ai push da ADR-031), fetch client-side (SEO e
 rate limit), webhook + backend (fuori modello).
 
 ### ADR-003 — Dati owner come JSON validati con zod
@@ -584,12 +586,35 @@ custom va inserito anche nelle impostazioni di Pages.
 **Alternative:** `gh-pages` (ADR-019), lista fissa `branches: [main]` (scartata:
 chi ha un altro branch di default dovrebbe toccare il workflow).
 
+### ADR-031 — Rebuild settimanale del deploy
+
+**Stato:** Accettata (19/11/2026, richiesta dell'owner) — modifica ADR-002
+**Contesto:** tra un push e l'altro stelle, README, repository e activity
+restano fermi all'ultima build; chi non committa per settimane mostra dati
+vecchi, e il refresh manuale da `workflow_dispatch` va ricordato.
+**Decisione:** `deploy.yml` ha anche un trigger `schedule` (lunedì 05:17 UTC,
+prima di `weekly.yml`): stessa build, stessa pubblicazione, stesso smoke test.
+Il push resta il modo principale di pubblicare e il dispatch manuale resta. Lo
+schedule gira sempre sul branch di default, quindi il controllo del branch lo
+accetta senza leggere `github.event.repository` (assente nel suo payload).
+`build.json` riporta anche il run (`run_id.run_attempt`): lo smoke test
+riconosce così un rebuild che ripubblica lo stesso commit.
+**Conseguenze:** i dati GitHub hanno al massimo circa una settimana; lo snapshot
+in `actions/cache` viene rinnovato ogni settimana. Un deploy in più a settimana
+nell'environment `github-pages`. GitHub disattiva i workflow programmati dopo 60
+giorni senza attività nel repository (il rebuild non conta come attività): si
+riattivano dalla tab Actions, mentre i deploy su push continuano a funzionare.
+**Alternative:** workflow separato che chiama `deploy.yml` con `workflow_call`
+(scartato: un file e un trigger in più per la stessa pipeline), commit
+automatico per tenere vivo lo schedule (scartato: rumore nella storia e
+permessi di scrittura).
+
 ## Decisioni chiuse
 
 | # | Domanda | Decisione | Data |
 | --- | --- | --- | --- |
 | Q1 | Feature pilastro | F1–F3, F5–F6 + F0/F7/F8 Must; F9 CV & Export Should; F4 carousel rimosso | 2026-10-30 |
-| Q2 | Dati GitHub a build time o runtime? | Build su push + dispatch manuale o deploy locale | 2026-10-30 |
+| Q2 | Dati GitHub a build time o runtime? | Build su push + rebuild settimanale + dispatch manuale (ADR-030, ADR-031) | 2026-11-19 |
 | Q3 | Dettaglio progetto | Pagina dedicata `/projects/[slug]` | 2026-10-30 |
 | Q4 | Hosting | GitHub Pages, pubblicato da GitHub Actions (ADR-030) | 2026-11-06 |
 | Q5 | Contatto | Nessun form; pulsanti `mailto:` e `tel:` + social/CV | 2026-10-30 |
@@ -597,7 +622,7 @@ chi ha un altro branch di default dovrebbe toccare il workflow).
 | Q7 | Palette e direzione | Engineered Minimalism, dark-first, Emerald, Geist + Geist Mono | 2026-10-30 |
 | Q9 | Legacy | Rimosso completamente; storia preservata in git | 2026-10-30 |
 | Q10 | Package manager | pnpm | 2026-10-30 |
-| Q11 | Rebuild programmato? | No: il refresh segue i push e il deploy manuale | 2026-10-30 |
+| Q11 | Rebuild programmato? | Sì, settimanale, in aggiunta ai push e al dispatch manuale (ADR-031) | 2026-11-19 |
 | Q12 | Identità dal profilo GitHub? | No: il racconto personale si legge dal JSON | 2026-10-30 |
 | Q13 | Separare motore e sito? | No: una sola build; dati owner in `data/` | 2026-10-30 |
 | Q14 | GraphQL? | No: REST pubblico senza token (ADR-028) | 2026-10-30 |

@@ -75,7 +75,7 @@ un solo comando.
 | Core Web Vitals | LCP < 2,5 s; CLS < 0,1; INP < 200 ms | Lighthouse CI / CrUX dopo il deploy |
 | Accessibilità | WCAG 2.2 AA; Lighthouse A11y = 100 | axe (gate) + test manuale da tastiera |
 | SEO | Ogni progetto e ogni locale ha title, description, canonical, OG | Test E2E + controllo HTML generato |
-| Freschezza dati | Repository aggiornati a ogni deploy | Deploy su push, dispatch manuale |
+| Freschezza dati | Repository aggiornati a ogni deploy, al massimo dopo una settimana | Deploy su push, rebuild settimanale, dispatch manuale |
 | Semplicità di personalizzazione | Solo file JSON in `data/`; nessun file di codice da toccare | Validazione + JSON Schema nell'editor |
 | Rideploy | Un commit, base URL dedotto | Push sul branch di default da un template pulito |
 | Build | `generate` < 3 minuti con 100 repository | Timing della CI |
@@ -102,7 +102,6 @@ delle capacità tecniche di chi lo possiede.
 - Editor di contenuti nel browser.
 - Generazione di immagini in build (OG per progetto, screenshot, ottimizzazione
   delle preview).
-- Aggiornamenti programmati: il sito si aggiorna quando l'owner pubblica.
 
 Questi punti possono diventare feature secondarie, ma non devono condizionare
 l'architettura statica.

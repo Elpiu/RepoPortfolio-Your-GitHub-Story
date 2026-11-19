@@ -119,7 +119,7 @@ L'applicazione Nuxt 4 implementa M1–M6 (dettaglio e cose ancora da fare in
   selezionabili con `PORTFOLIO_DATA_DIR` (ADR-029), incluso quello dell'owner;
 - `app/`, `server/`, `shared/`, `modules/`, `scripts/` — il motore;
 - `tests/unit` (Vitest) e `tests/e2e` (Playwright + axe);
-- `.github/workflows` — CI, deploy su push, controlli settimanali;
+- `.github/workflows` — CI, deploy su push e settimanale, controlli settimanali;
 - `.github/RepoPortfolio-Your-GitHub-Story/index.png` — preview del repository
   (path legacy, riconosciuto dalla discovery automatica).
 

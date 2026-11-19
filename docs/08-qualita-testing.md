@@ -559,8 +559,8 @@ condivisi i punteggi variano da un run all'altro.
 
 - [ ] Tutto quanto sopra
 - [ ] `deploy.yml`: `pnpm build:site` e `actions/deploy-pages`
-- [ ] Smoke test (`build.json` del commit, sitemap, 404)
-- [ ] Deploy su push e dispatch manuale verdi
+- [ ] Smoke test (`build.json` del run e del commit, sitemap, 404)
+- [ ] Deploy su push, schedule settimanale e dispatch manuale verdi
 
 ### Settimanale
 

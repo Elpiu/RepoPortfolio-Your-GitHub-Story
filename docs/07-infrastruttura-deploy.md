@@ -62,7 +62,7 @@ pnpm build:site [-- --data datasets/me]
   ├─ risolve owner e repository (GITHUB_REPOSITORY in CI, git remote in locale)
   ├─ calcola base URL e URL del sito (project site, user site, dominio custom)
   ├─ nuxt generate
-  └─ scrive build.json (commit, data, URL) per lo smoke test
+  └─ scrive build.json (commit, run, data, URL) per lo smoke test
 ```
 
 `pnpm preview:deploy` esegue la stessa build e serve `.output/public` sotto il base
@@ -204,7 +204,8 @@ non appesantisce ogni `pnpm install`. Gli E2E e Lighthouse servono l'output con
 
 Ogni lunedì (e su dispatch manuale): `pnpm generate` con lo stesso dataset del
 deploy, lychee sull'HTML generato (action pinnata a SHA) e `pnpm audit --prod`.
-Non ripubblica nulla: il deploy resta legato ai push (ADR-002).
+Non ripubblica nulla: il refresh settimanale lo fa `deploy.yml`, poco prima
+(ADR-031).
 
 Scelte:
 
@@ -223,8 +224,8 @@ Scelte:
 Il file è la fonte: [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml).
 
 ```text
-push su qualunque branch / workflow_dispatch
-  job build (solo se github.ref_name == branch di default)
+push su qualunque branch / schedule (lunedì 05:17 UTC) / workflow_dispatch
+  job build (solo sul branch di default; lo schedule gira sempre lì)
     checkout → pnpm → node 22 → snapshot GitHub → pnpm install --frozen-lockfile
     pnpm build:site (GITHUB_TOKEN, vars.PORTFOLIO_DATA_DIR)
     upload-pages-artifact (.output/public)
@@ -238,10 +239,17 @@ Note:
   nome del branch nel workflow: `main`, `master` o altro funzionano senza
   configurazione. I push sugli altri branch compaiono come run saltati.
 - Ogni push sul branch di default rigenera il sito e aggiorna stelle, date, README
-  e anteprime. Per un refresh senza modifiche: `workflow_dispatch` dalla tab
-  Actions.
-- Lo smoke test aspetta (fino a 5 minuti) che Pages serva il `build.json` del
-  commit appena pubblicato, poi controlla home, CV, export, sitemap e 404.
+  e anteprime. Senza push lo fa lo schedule ogni lunedì (ADR-031); per un
+  refresh immediato: `workflow_dispatch` dalla tab Actions.
+- Il payload di `schedule` non contiene `repository`: per questo il controllo del
+  branch accetta `github.event_name == 'schedule'`, che GitHub esegue solo sul
+  branch di default.
+- GitHub disattiva i workflow programmati dopo 60 giorni senza attività nel
+  repository e lo segnala per email; si riattivano da Actions → Deploy →
+  Enable workflow. I deploy su push non ne risentono.
+- Lo smoke test aspetta (fino a 5 minuti) che Pages serva il `build.json` di
+  questo run (`run_id.run_attempt`, perché un rebuild programmato ripubblica lo
+  stesso commit), poi controlla commit, home, CV, export, sitemap e 404.
 - `concurrency: pages` con `cancel-in-progress: false` evita deploy intermedi che
   si sovrascrivono.
 - `deploy.yml` non dipende da `ci.yml`: il gate di qualità è sulla PR. Un push
@@ -258,7 +266,8 @@ Note:
 | Snapshot GitHub | `.cache/github` con `restore-keys` | Fallback se l'API è giù |
 
 Lo snapshot ha una scadenza logica di 7 giorni. `actions/cache` elimina le voci
-non usate da 7 giorni: con deploy rari il fallback in CI può non esserci, e in
+non usate da 7 giorni: il rebuild settimanale la rinnova, ma un run in ritardo o
+fallito può lasciarla scadere, e in
 quel caso un'API irraggiungibile fa fallire la build (si riprova con
 `workflow_dispatch`).
 
