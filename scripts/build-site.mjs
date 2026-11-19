@@ -7,7 +7,7 @@ import { resolveRepoContext, resolveSiteUrls } from './repo-context.mjs'
 /**
  * Genera `.output/public` come verrà pubblicato: risolve repository, base URL e
  * cartella dati, poi `nuxt generate`. La pubblicazione la fa `deploy.yml` a ogni
- * push sul branch di default (ADR-030). Uso: pnpm build:site [-- --data datasets/me]
+ * push sul branch di default (ADR-030) e una volta a settimana (ADR-031). Uso: pnpm build:site [-- --data datasets/me]
  */
 
 // Stesse variabili di `nuxt dev/generate` (es. PORTFOLIO_DATA_DIR, GITHUB_OFFLINE);
@@ -45,10 +45,14 @@ execSync('nuxt generate', {
   },
 })
 
-// build.json: lo smoke test di deploy.yml lo usa per riconoscere il commit online.
+// build.json: lo smoke test di deploy.yml lo usa per riconoscere il deploy online.
+// `run` distingue anche i rebuild programmati, che ripubblicano lo stesso commit.
 const sha = process.env.GITHUB_SHA ?? execSync('git rev-parse HEAD').toString().trim()
+const run = process.env.GITHUB_RUN_ID
+  ? `${process.env.GITHUB_RUN_ID}.${process.env.GITHUB_RUN_ATTEMPT ?? '1'}`
+  : null
 writeFileSync(
   resolve('.output/public/build.json'),
-  `${JSON.stringify({ sha, syncedAt: new Date().toISOString(), siteUrl }, null, 2)}\n`,
+  `${JSON.stringify({ sha, run, syncedAt: new Date().toISOString(), siteUrl }, null, 2)}\n`,
 )
 console.log('[build-site] Generato .output/public.')

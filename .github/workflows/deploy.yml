@@ -1,9 +1,13 @@
 # Ogni push sul branch di default pubblica il sito su GitHub Pages (ADR-030).
+# Una volta a settimana lo ripubblica per aggiornare i dati GitHub (ADR-031).
 # Una tantum: Settings → Pages → Source: GitHub Actions.
 name: Deploy
 
 on:
   push:
+  # Lunedì 05:17 UTC, prima di weekly.yml. Gira sempre sul branch di default.
+  schedule:
+    - cron: '17 5 * * 1'
   workflow_dispatch:
 
 permissions:
@@ -16,7 +20,8 @@ concurrency:
 jobs:
   build:
     # Vale per qualunque nome del branch di default, senza configurazione.
-    if: github.ref_name == github.event.repository.default_branch
+    # Il payload di `schedule` non ha `repository`, ma gira solo sul default.
+    if: github.event_name == 'schedule' || github.ref_name == github.event.repository.default_branch
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -65,12 +70,15 @@ jobs:
       - name: Smoke test
         env:
           BASE: ${{ steps.deployment.outputs.page_url }}
+          # Il run, non il commit: un rebuild programmato ha lo stesso SHA del precedente.
+          RUN: '"run": "${{ github.run_id }}.${{ github.run_attempt }}"'
         run: |
           set -e
           for i in $(seq 1 30); do
-            if curl -fsS "${BASE}build.json" | grep -q "$GITHUB_SHA"; then break; fi
+            if curl -fsS "${BASE}build.json" | grep -qF "$RUN"; then break; fi
             sleep 10
           done
+          curl -fsS "${BASE}build.json" | grep -qF "$RUN"
           curl -fsS "${BASE}build.json" | grep -q "$GITHUB_SHA"
           curl -fsS "${BASE}" | grep -q 'data-testid="project-card"'
           curl -fsSL "${BASE}cv/" > /dev/null
